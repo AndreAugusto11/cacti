@@ -69,13 +69,6 @@ export class KnexLocalLogRepository implements ILocalLogRepository {
       .andWhere("sequenceNumber", ">", sequenceNumber);
   }
 
-  async createKnex() {
-    if (!this.created) {
-      await this.database.migrate.latest();
-      this.created = true;
-    }
-  }
-
   async reset() {
     await this.database.migrate.rollback();
     await this.database.migrate.latest();

@@ -3,16 +3,13 @@ import {
   Containers,
   pruneDockerAllIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
-import {
-  LogLevelDesc,
-  LoggerProvider,
-} from "@hyperledger/cactus-common";
+import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
 import {
   SATPGateway,
   SATPGatewayConfig,
 } from "../../../main/typescript/plugin-satp-hermes-gateway";
 import { PluginFactorySATPGateway } from "../../../main/typescript/factory/plugin-factory-gateway-orchestrator";
-import { 
+import {
   IPluginFactoryOptions,
   LedgerType,
   PluginImportType,
@@ -27,10 +24,13 @@ import {
   knexSourceRemoteConnection,
 } from "../knex.config";
 import { SATPSession } from "../../../main/typescript/core/satp-session";
-import { 
+import {
   TransactRequest,
-  TransactRequestSourceAsset
- } from "../../../main/typescript";
+  TransactRequestSourceAsset,
+} from "../../../main/typescript";
+import { PluginRegistry } from "@hyperledger/cactus-core";
+import path from "path";
+import { v4 as uuidv4 } from "uuid";
 
 const logLevel: LogLevelDesc = "DEBUG";
 const logger = LoggerProvider.getOrCreate({
@@ -55,17 +55,20 @@ beforeAll(async () => {
       fail("Pruning didn't throw OK");
     });
   mockSession = new SATPSession({
-      contextID: "MOCK_CONTEXT_ID",
-      server: false,
-      client: true,
-    });
-  
+    contextID: "MOCK_CONTEXT_ID",
+    server: false,
+    client: true,
+  });
+
   sessionIDs.push(mockSession.getSessionId());
 });
 
 describe("Shutdown Verify State Tests", () => {
   test("Gateway waits to verify the sessions state before shutdown", async () => {
+    const ontologiesPath = path.join(__dirname, "../../ontologies");
     const options: SATPGatewayConfig = {
+      instanceId: uuidv4(),
+      pluginRegistry: new PluginRegistry({ plugins: [] }),
       gid: {
         id: "mockID",
         name: "CustomGateway",
@@ -84,18 +87,25 @@ describe("Shutdown Verify State Tests", () => {
       },
       knexLocalConfig: knexClientConnection,
       knexRemoteConfig: knexSourceRemoteConnection,
+      ontologyPath: ontologiesPath,
     };
-  
+
     const gateway = await factory.create(options);
     expect(gateway).toBeInstanceOf(SATPGateway);
-  
-    const verifySessionsStateSpy = jest.spyOn(gateway as any, "verifySessionsState");
-  
-    const shutdownBLOServerSpy = jest.spyOn(gateway as any, "shutdownBLOServer");
+
+    const verifySessionsStateSpy = jest.spyOn(
+      gateway as any,
+      "verifySessionsState",
+    );
+
+    const shutdownBLOServerSpy = jest.spyOn(
+      gateway as any,
+      "shutdownBLOServer",
+    );
 
     await gateway.startup();
     await gateway.shutdown();
- 
+
     expect(verifySessionsStateSpy).toHaveBeenCalled();
 
     expect(shutdownBLOServerSpy).toHaveBeenCalled();
@@ -105,7 +115,10 @@ describe("Shutdown Verify State Tests", () => {
   });
 
   test("Gateway waits for pending sessions to complete before shutdown", async () => {
+    const ontologiesPath = path.join(__dirname, "../../ontologies");
     const options: SATPGatewayConfig = {
+      instanceId: uuidv4(),
+      pluginRegistry: new PluginRegistry({ plugins: [] }),
       gid: {
         id: "mockID",
         name: "CustomGateway",
@@ -124,11 +137,12 @@ describe("Shutdown Verify State Tests", () => {
       },
       knexLocalConfig: knexClientConnection,
       knexRemoteConfig: knexSourceRemoteConnection,
+      ontologyPath: ontologiesPath,
     };
-  
+
     const gateway = await factory.create(options);
     expect(gateway).toBeInstanceOf(SATPGateway);
-  
+
     const satpManager = (gateway as any).BLODispatcher.manager;
 
     let sessionState = false;
@@ -140,28 +154,30 @@ describe("Shutdown Verify State Tests", () => {
 
     const initialSessionState = await satpManager.getSATPSessionState();
     expect(initialSessionState).toBe(false);
-  
+
     const getSATPSessionStateSpy = jest
       .spyOn(satpManager, "getSATPSessionState")
       .mockImplementation(async () => {
         if (!sessionState) {
-          await new Promise((resolve) => setTimeout(resolve, 20000)); 
+          await new Promise((resolve) => setTimeout(resolve, 20000));
           sessionState = true;
         }
         return sessionState;
       });
-    
+
     await shutdownPromise;
 
     const finalSessionState = await satpManager.getSATPSessionState();
-    expect(finalSessionState).toBe(true); 
+    expect(finalSessionState).toBe(true);
 
     getSATPSessionStateSpy.mockRestore();
-    
   });
 
   test("Gateway does not allow new transactions after shutdown is initiated", async () => {
+    const ontologiesPath = path.join(__dirname, "../../ontologies");
     const options: SATPGatewayConfig = {
+      instanceId: uuidv4(),
+      pluginRegistry: new PluginRegistry({ plugins: [] }),
       gid: {
         id: "mockID",
         name: "CustomGateway",
@@ -180,36 +196,43 @@ describe("Shutdown Verify State Tests", () => {
       },
       knexLocalConfig: knexClientConnection,
       knexRemoteConfig: knexSourceRemoteConnection,
+      ontologyPath: ontologiesPath,
     };
-  
+
     const gateway = await factory.create(options);
     expect(gateway).toBeInstanceOf(SATPGateway);
-  
+
     await gateway.startup();
-  
+
     const shutdownPromise = gateway.shutdown();
 
     const transactRequestSourceAsset: TransactRequestSourceAsset = {
       owner: "mockOwner",
-      ontology: "mockOntology",
       contractName: "mockContractName",
+      id: "",
+      networkId: {
+        id: "mockNetworkId",
+        ledgerType: LedgerType.Ethereum,
+      },
+      tokenType: "ERC20",
+      referenceId: "",
+      amount: "100",
     };
-  
+
     const transactRequest: TransactRequest = {
       contextID: "mockContextID",
-      fromDLTNetworkID: "mockFromDLTNetworkID",
-      toDLTNetworkID: "mockToDLTNetworkID",
-      fromAmount: "100",
-      toAmount: "100",
       beneficiaryPubkey: "mockBeneficiaryPubkey",
       originatorPubkey: "mockOriginatorPubkey",
       sourceAsset: transactRequestSourceAsset,
       receiverAsset: transactRequestSourceAsset,
     };
-  
-    await expect(gateway.BLODispatcherInstance?.Transact(transactRequest)).rejects.toThrow("BLODispatcher#transact(), shutdown initiated not receiving new requests");
-  
+
+    await expect(
+      gateway.BLODispatcherInstance?.Transact(transactRequest),
+    ).rejects.toThrow(
+      "BLODispatcher#transact(), shutdown initiated not receiving new requests",
+    );
+
     await shutdownPromise;
   });
 });
-

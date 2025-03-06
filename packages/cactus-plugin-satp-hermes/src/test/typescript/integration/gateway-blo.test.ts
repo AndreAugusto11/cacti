@@ -11,13 +11,14 @@ import {
   PluginImportType,
 } from "@hyperledger/cactus-core-api";
 
-import type { SATPGatewayConfig } from "../../../main/typescript/core/types";
+import type { SATPGatewayConfig } from "../../../main/typescript/plugin-satp-hermes-gateway";
 import { createClient } from "../test-utils";
 import { HealthCheckResponseStatusEnum } from "../../../main/typescript";
 import {
   knexClientConnection,
   knexSourceRemoteConnection,
 } from "../knex.config";
+import { PluginRegistry } from "@hyperledger/cactus-core";
 
 const logLevel: LogLevelDesc = "DEBUG";
 const logger = LoggerProvider.getOrCreate({
@@ -42,6 +43,7 @@ beforeAll(async () => {
 
 const options: SATPGatewayConfig = {
   logLevel: logLevel,
+  instanceId: "gateway-orchestrator-instance-id",
   gid: {
     id: "mockID",
     name: "CustomGateway",
@@ -59,11 +61,11 @@ const options: SATPGatewayConfig = {
     proofID: "mockProofID10",
     gatewayServerPort: 3010,
     gatewayClientPort: 3011,
-    gatewayOpenAPIPort: 4010,
     address: "http://localhost",
   },
   knexLocalConfig: knexClientConnection,
   knexRemoteConfig: knexSourceRemoteConnection,
+  pluginRegistry: new PluginRegistry({ plugins: [] }),
 };
 
 describe("GetStatus Endpoint and Functionality testing", () => {
@@ -73,7 +75,7 @@ describe("GetStatus Endpoint and Functionality testing", () => {
     try {
       await gateway.startup();
       const address = options.gid!.address!;
-      const port = options.gid!.gatewayOpenAPIPort!;
+      const port = 4010;
 
       const adminApiClient = createClient("AdminApi", address, port, logger);
 
@@ -95,7 +97,7 @@ describe("GetStatus Endpoint and Functionality testing", () => {
     try {
       await gateway.startup();
       const address = options.gid!.address!;
-      const port = options.gid!.gatewayOpenAPIPort!;
+      const port = 4010;
 
       const adminApiClient = createClient("AdminApi", address, port, logger);
 
@@ -114,7 +116,7 @@ describe("GetStatus Endpoint and Functionality testing", () => {
     try {
       await gateway.startup();
       const address = options.gid!.address!;
-      const port = options.gid!.gatewayOpenAPIPort!;
+      const port = 4010;
 
       const transactApiClient = createClient(
         "TransactionApi",

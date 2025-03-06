@@ -1,9 +1,7 @@
 //// filepath: /Users/rafaelapb/Projects/blockchain-integration-framework/packages/cactus-plugin-satp-hermes/src/main/typescript/cross-chain-mechanisms/oracle/oracle-abstract.ts
-import type {
-  LogLevelDesc,
-} from "@hyperledger/cactus-common";
+import type { LogLevelDesc } from "@hyperledger/cactus-common";
 import type { PluginBungeeHermes } from "@hyperledger/cactus-plugin-bungee-hermes";
-import type { TransactionResponse } from "../../types/blockchain-interaction";
+import { OracleResponse } from "./oracle-types";
 
 /**
  * Common interface options for all Oracles.
@@ -38,6 +36,7 @@ export abstract class OracleAbstract {
   protected readonly config: any;
   public network: string;
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   constructor(options: OracleAbstractOptions) {
     this.network = this.config?.network?.id || "";
   }
@@ -48,7 +47,7 @@ export abstract class OracleAbstract {
    */
   public abstract updateEntry(
     entry: UpdateOracleEntryBase,
-  ): Promise<{ transactionResponse: TransactionResponse; proof: any }>;
+  ): Promise<{ transactionResponse: OracleResponse; proof: any }>;
 
   /**
    * Method to read from the ledger (e.g., query a method).

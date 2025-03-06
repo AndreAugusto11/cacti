@@ -3,6 +3,7 @@
 README.md
 api/openapi.yaml
 api_admin.go
+api_get_approve_address.go
 api_transaction.go
 client.go
 configuration.go
@@ -24,6 +25,11 @@ docs/DLTProtocol.md
 docs/Estimate.md
 docs/FeeCost.md
 docs/GasCost.md
+docs/GetApproveAddress200Response.md
+docs/GetApproveAddressApi.md
+docs/GetApproveAddressApproveAddressRequestParameter.md
+docs/GetApproveAddressRequest.md
+docs/GetApproveAddressResponse.md
 docs/GetAudit200Response.md
 docs/GetAuditRequest.md
 docs/GetAuditResponse.md
@@ -48,6 +54,7 @@ docs/Insurance.md
 docs/Integration.md
 docs/IntegrationDetails.md
 docs/IntegrationsResponse.md
+docs/NetworkId.md
 docs/Pause200Response.md
 docs/PauseRequest.md
 docs/PauseResponse.md
@@ -56,6 +63,7 @@ docs/RoutesResponse.md
 docs/StatusRequest.md
 docs/StatusResponse.md
 docs/Token.md
+docs/TokenType.md
 docs/Transact200Response.md
 docs/Transact200ResponseStatusResponse.md
 docs/Transact200ResponseStatusResponseDestinationNetwork.md
@@ -63,6 +71,7 @@ docs/Transact200ResponseStatusResponseOriginNetwork.md
 docs/TransactDefaultResponse.md
 docs/TransactRequest.md
 docs/TransactRequestSourceAsset.md
+docs/TransactRequestSourceAssetNetworkId.md
 docs/TransactResponse.md
 docs/TransactionApi.md
 git_push.sh
@@ -85,6 +94,10 @@ model_dlt_protocol.go
 model_estimate.go
 model_fee_cost.go
 model_gas_cost.go
+model_get_approve_address_200_response.go
+model_get_approve_address_approve_address_request_parameter.go
+model_get_approve_address_request.go
+model_get_approve_address_response.go
 model_get_audit_200_response.go
 model_get_audit_request.go
 model_get_audit_response.go
@@ -109,6 +122,7 @@ model_insurance.go
 model_integration.go
 model_integration_details.go
 model_integrations_response.go
+model_network_id.go
 model_pause_200_response.go
 model_pause_request.go
 model_pause_response.go
@@ -117,6 +131,7 @@ model_routes_response.go
 model_status_request.go
 model_status_response.go
 model_token.go
+model_token_type.go
 model_transact_200_response.go
 model_transact_200_response_status_response.go
 model_transact_200_response_status_response_destination_network.go
@@ -124,6 +139,7 @@ model_transact_200_response_status_response_origin_network.go
 model_transact_default_response.go
 model_transact_request.go
 model_transact_request_source_asset.go
+model_transact_request_source_asset_network_id.go
 model_transact_response.go
 response.go
 utils.go

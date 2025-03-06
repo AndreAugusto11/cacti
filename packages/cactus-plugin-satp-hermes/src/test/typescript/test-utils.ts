@@ -70,9 +70,10 @@ export function setupGatewayDockerFiles(
     publicKey: string;
   },
 ): {
-  configFile: string;
-  outputLogFile: string;
-  errorLogFile: string;
+  configFilePath: string;
+  logsPath: string;
+  databasePath: string;
+  ontologiesPath: string;
 } {
   const jsonObject = {
     gid: gatewayIdentity,
@@ -81,7 +82,6 @@ export function setupGatewayDockerFiles(
     localRepository,
     remoteRepository,
     environment: "development",
-    enableOpenAPI: true,
     bridgesConfig,
     gatewayKeyPair,
     enableCrashRecovery: enableCrashRecovery,
@@ -92,30 +92,45 @@ export function setupGatewayDockerFiles(
     new Date().toISOString().replace(/:/g, "-").replace(/\..+/, "");
 
   // creates the configuration file for the gateway setup
-  const configDir = path.join(__dirname, `gateway-info/config`);
+  const directory = `${__dirname}/../../../bin/`;
+  const configDir = path.join(directory, `gateway-info/config`);
+
   if (!fs.existsSync(configDir)) {
     fs.mkdirSync(configDir, { recursive: true });
   }
-  const configFile = path.join(configDir, `gateway-config-${context}.json`);
-  fs.writeFileSync(configFile, JSON.stringify(jsonObject, null, 2));
-  expect(fs.existsSync(configFile)).toBe(true);
+  const configFilePath = path.join(configDir, `gateway-config-${context}.json`);
+  fs.writeFileSync(configFilePath, JSON.stringify(jsonObject, null, 2));
+  expect(fs.existsSync(configFilePath)).toBe(true);
 
   // creates the files for logging the output and error:
-  const logDir = path.join(__dirname, `gateway-info/logs`);
+  const logDir = path.join(directory, `gateway-info/logs`);
   if (!fs.existsSync(logDir)) {
     fs.mkdirSync(logDir, { recursive: true });
   }
-  const outputLogFile = path.join(logDir, `gateway-logs-output-${context}.log`);
-  const errorLogFile = path.join(logDir, `gateway-logs-error-${context}.log`);
-  fs.writeFileSync(outputLogFile, "");
-  fs.writeFileSync(errorLogFile, "");
-  expect(fs.existsSync(outputLogFile)).toBe(true);
-  expect(fs.existsSync(errorLogFile)).toBe(true);
 
+  const databaseDir = path.join(directory, `gateway-info/database`);
+
+  const ontologiesDir = path.join(directory, `gateway-info/ontologies`);
+  // Ensure the ontologies directory exists
+  if (!fs.existsSync(ontologiesDir)) {
+    fs.mkdirSync(ontologiesDir, { recursive: true });
+  }
+
+  // Copy the ontologies folder to the specified location
+  const sourceOntologiesDir = path.join(__dirname, "../ontologies");
+  if (fs.existsSync(sourceOntologiesDir)) {
+    fs.copySync(sourceOntologiesDir, ontologiesDir);
+  } else {
+    throw new Error(
+      `Source ontologies directory does not exist: ${sourceOntologiesDir}`,
+    );
+  }
+  expect(fs.existsSync(ontologiesDir)).toBe(true);
   return {
-    configFile,
-    outputLogFile,
-    errorLogFile,
+    configFilePath,
+    logsPath: logDir,
+    databasePath: databaseDir,
+    ontologiesPath: ontologiesDir,
   };
 }
 
@@ -129,14 +144,10 @@ export function getTransactRequest(
 ): TransactRequest {
   return {
     contextID,
-    fromDLTNetworkID: from.network.id,
-    toDLTNetworkID: to.network.id,
-    fromAmount,
-    toAmount,
     originatorPubkey: from.transactRequestPubKey,
     beneficiaryPubkey: to.transactRequestPubKey,
-    sourceAsset: from.defaultAsset,
-    receiverAsset: to.defaultAsset,
+    sourceAsset: { ...from.defaultAsset, amount: fromAmount },
+    receiverAsset: { ...to.defaultAsset, amount: toAmount },
   };
 }
 
@@ -253,7 +264,7 @@ export async function createPGDatabase(
       },
       migrations: {
         directory:
-          "./packages/cactus-plugin-satp-hermes/src/main/typescript/knex/migrations",
+          "./packages/cactus-plugin-satp-hermes/src/main/typescript/database/migrations",
       },
     } as Knex.Config,
     container: await container,

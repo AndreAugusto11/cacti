@@ -43,7 +43,8 @@ import {
   resolveGatewayID,
 } from "../network-identification/resolve-gateway";
 import { SATPHandler, Stage } from "../../types/satp-protocol";
-import { NetworkId } from "../network-identification/chainid-list";
+import { BridgeManagerClientInterface } from "../../cross-chain-mechanisms/bridge/interfaces/bridge-manager-client-interface";
+import { NetworkId } from "../../public-api";
 
 export class GatewayOrchestrator {
   public readonly label = "GatewayOrchestrator";
@@ -52,6 +53,7 @@ export class GatewayOrchestrator {
   private counterPartyGateways: Map<string, GatewayIdentity> = new Map();
   private handlers: Map<string, SATPHandler> = new Map();
   private crashEnabled: boolean = false;
+  private bridgeManager?: BridgeManagerClientInterface;
 
   // TODO!: add logic to manage sessions (parallelization, user input, freeze, unfreeze, rollback, recovery)
   private channels: Map<string, GatewayChannel> = new Map();
@@ -89,23 +91,31 @@ export class GatewayOrchestrator {
       `Gateway Connection Manager bootstrapped with ${allCounterPartyGateways.length} gateways`,
     );
 
-    this.channels.set(
-      this.localGateway.id,
-      this.createChannel(this.localGateway),
-    );
-
     this.addGateways(allCounterPartyGateways);
     const numberGatewayChannels = this.connectToCounterPartyGateways();
     if (numberGatewayChannels > 0) {
       this.logger.info(
         `Gateway Connection Manager connected to ${numberGatewayChannels} gateways.`,
       );
-      this.logger.info("Creating SATPManager");
     }
   }
 
   public get ourGateway(): GatewayIdentity {
     return this.localGateway;
+  }
+
+  public addBridgeManager(bridgeManager: BridgeManagerClientInterface): void {
+    this.bridgeManager = bridgeManager;
+  }
+
+  public addGatewayOwnChannels(connectedDLTs: NetworkId[]): void {
+    // add this gatways bridge channels
+    const id = {
+      ...this.localGateway,
+      connectedDLTs: connectedDLTs,
+    };
+
+    this.channels.set(this.localGateway.id, this.createChannel(id));
   }
 
   public addGOLServer(server: Express): void {
@@ -257,11 +267,18 @@ export class GatewayOrchestrator {
   }
 
   get connectedDLTs(): NetworkId[] {
-    return this.localGateway.connectedDLTs;
+    if (!this.bridgeManager) return [];
+    return this.bridgeManager.getAvailableEndPoints();
   }
 
   createChannel(identity: GatewayIdentity): GatewayChannel {
     const clients = this.createConnectClients(identity);
+
+    if (!identity.connectedDLTs) {
+      throw new Error(
+        `Gateway ${identity.id} does not have connectedDLTs defined`,
+      );
+    }
 
     const channel: GatewayChannel = {
       fromGatewayID: this.localGateway.id,

@@ -256,6 +256,7 @@ export class SATPSession {
     type: SessionType,
     rejected?: boolean,
     completed?: boolean,
+    stage0?: boolean,
   ): void {
     let sessionData: SessionData | undefined;
     try {
@@ -292,10 +293,10 @@ export class SATPSession {
       if (sessionData.beneficiaryPubkey == "") {
         throw new PubKeyError(tag);
       }
-      if (sessionData.senderGatewayNetworkId == "") {
+      if (!stage0 && sessionData.senderGatewayNetworkId == "") {
         throw new GatewayNetworkIdError(tag);
       }
-      if (sessionData.recipientGatewayNetworkId == "") {
+      if (!stage0 && sessionData.recipientGatewayNetworkId == "") {
         throw new GatewayNetworkIdError(tag);
       }
       if (sessionData.clientGatewayPubkey == "") {

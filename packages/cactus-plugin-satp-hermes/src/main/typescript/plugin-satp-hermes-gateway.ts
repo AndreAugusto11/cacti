@@ -6,6 +6,8 @@ import {
   type ILoggerOptions,
   JsObjectSigner,
   type IJsObjectSignerOptions,
+  LogLevelDesc,
+  Servers,
 } from "@hyperledger/cactus-common";
 import { v4 as uuidv4 } from "uuid";
 
@@ -15,23 +17,19 @@ import {
   IsObject,
   IsString,
   Contains,
+  ValidatorOptions,
 } from "class-validator";
 
-import {
-  SATPGatewayConfig,
-  type GatewayIdentity,
-  type ShutdownHook,
-} from "./core/types";
+import { type GatewayIdentity, type ShutdownHook } from "./core/types";
 import {
   GatewayOrchestrator,
   type IGatewayOrchestratorOptions,
 } from "./services/gateway/gateway-orchestrator";
-export { SATPGatewayConfig };
 import express, { type Express } from "express";
 import http from "node:http";
 import {
-  DEFAULT_PORT_GATEWAY_API,
   DEFAULT_PORT_GATEWAY_CLIENT,
+  DEFAULT_PORT_GATEWAY_OAPI,
   DEFAULT_PORT_GATEWAY_SERVER,
   SATP_ARCHITECTURE_VERSION,
   SATP_CORE_VERSION,
@@ -45,28 +43,59 @@ import type {
 import { KnexRemoteLogRepository as RemoteLogRepository } from "./database/repository/knex-remote-log-repository";
 import { KnexLocalLogRepository as LocalLogRepository } from "./database/repository/knex-local-log-repository";
 import { BLODispatcher, type BLODispatcherOptions } from "./api1/dispatcher";
-import swaggerUi, { type JsonObject } from "swagger-ui-express";
+import { type JsonObject } from "swagger-ui-express";
 import type {
   IPluginWebService,
   ICactusPlugin,
   IWebServiceEndpoint,
+  ICactusPluginOptions,
 } from "@hyperledger/cactus-core-api";
 import {
-  type ISATPBridgesOptions,
+  ICrossChainMechanismsOptions,
+  type ISATPCrossChainManagerOptions,
   SATPCrossChainManager,
 } from "./cross-chain-mechanisms/satp-cc-manager";
-import bodyParser from "body-parser";
 import {
   CrashManager,
   type ICrashRecoveryManagerOptions,
 } from "./services/gateway/crash-manager";
-import cors from "cors";
 
 import * as OAS from "../json/openapi-blo-bundled.json";
-import type { NetworkId } from "./services/network-identification/chainid-list";
 import { knexLocalInstance } from "./database/knexfile";
 import schedule, { Job } from "node-schedule";
 import { BLODispatcherErraneousError } from "./core/errors/satp-errors";
+import { ClaimFormat } from "./generated/proto/cacti/satp/v02/common/message_pb";
+import { getEnumKeyByValue, getEnumValueByKey } from "./services/utils";
+import { ISignerKeyPairs } from "@hyperledger/cactus-common/src/main/typescript/signer-key-pairs";
+import { IPrivacyPolicyValue } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/view-creation/privacy-policies";
+import { IMergePolicyValue } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/view-merging/merge-policies";
+import knex, { Knex } from "knex";
+import { PluginRegistry } from "@hyperledger/cactus-core";
+import { NetworkId } from "./public-api";
+import {
+  ApiServer,
+  AuthorizationProtocol,
+  ConfigService,
+} from "@hyperledger/cactus-cmd-api-server";
+import { AddressInfo } from "node:net";
+
+export interface SATPGatewayConfig extends ICactusPluginOptions {
+  gid?: GatewayIdentity;
+  counterPartyGateways?: GatewayIdentity[];
+  keyPair?: ISignerKeyPairs;
+  environment?: "development" | "production";
+  validationOptions?: ValidatorOptions;
+  privacyPolicies?: IPrivacyPolicyValue[];
+  mergePolicies?: IMergePolicyValue[];
+  ccConfig?: ICrossChainMechanismsOptions;
+  knexLocalConfig?: Knex.Config;
+  knexRemoteConfig?: Knex.Config;
+  enableCrashRecovery?: boolean;
+  claimFormat?: string;
+  ontologyPath?: string;
+  pluginRegistry: PluginRegistry;
+  logLevel?: LogLevelDesc;
+}
 
 export class SATPGateway implements IPluginWebService, ICactusPlugin {
   @IsDefined()
@@ -87,28 +116,26 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
   public readonly instanceId: string;
   private connectedDLTs: NetworkId[];
   private gatewayOrchestrator: GatewayOrchestrator;
-  private bridgesManager: SATPCrossChainManager;
+  private SATPCCManager: SATPCrossChainManager;
 
-  private BLOApplication?: Express;
-  private BLOServer?: http.Server;
   private BLODispatcher?: BLODispatcher;
   private GOLApplication?: Express;
   private GOLServer?: http.Server;
   private readonly OAS: JsonObject;
-  public OAPIServerEnabled = false;
+  private OApiServer?: ApiServer;
 
   private signer: JsObjectSigner;
   private _pubKey: string;
 
-  // Flag to create a db repository when not givenx
-  public defaultRepository = true;
+  private isShutdown: boolean = false;
+
+  public claimFormat?: ClaimFormat;
   public localRepository?: ILocalLogRepository;
   public remoteRepository?: IRemoteLogRepository;
   private readonly shutdownHooks: ShutdownHook[];
   private crashManager?: CrashManager;
   private sessionVerificationJob: Job | null = null;
   private activeJobs: Set<schedule.Job> = new Set();
-
 
   constructor(public readonly options: SATPGatewayConfig) {
     const fnTag = `${this.className}#constructor()`;
@@ -124,7 +151,6 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     this.logger.info("Initializing Gateway Coordinator");
 
     if (this.config.knexLocalConfig) {
-      this.defaultRepository = false;
       this.localRepository = new LocalLogRepository(
         this.config.knexLocalConfig,
       );
@@ -163,6 +189,21 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
       throw new Error("GatewayIdentity is not defined");
     }
 
+    this.claimFormat = getEnumValueByKey(
+      ClaimFormat,
+      options.claimFormat || "",
+    );
+
+    if (
+      this.claimFormat === undefined ||
+      this.claimFormat === ClaimFormat.UNSPECIFIED
+    )
+      this.claimFormat = ClaimFormat.DEFAULT;
+
+    this.logger.info(
+      `Gateway's claim format: ${getEnumKeyByValue(ClaimFormat, this.claimFormat)}`,
+    );
+
     const gatewayOrchestratorOptions: IGatewayOrchestratorOptions = {
       logLevel: this.config.logLevel,
       localGateway: this.config.gid,
@@ -170,18 +211,6 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
       signer: this.signer,
       enableCrashRecovery: this.config.enableCrashRecovery,
     };
-
-    const bridgesManagerOptions: ISATPBridgesOptions = {
-      logLevel: this.config.logLevel,
-      connectedDLTs: this.config.gid.connectedDLTs,
-      networks: options.bridgesConfig ? options.bridgesConfig : [],
-    };
-
-    this.bridgesManager = new SATPCrossChainManager(bridgesManagerOptions);
-
-    if (!this.bridgesManager) {
-      throw new Error("BridgesManager is not defined");
-    }
 
     if (this.config.gid) {
       this.logger.info(
@@ -194,6 +223,20 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
       throw new Error("GatewayIdentity is not defined");
     }
 
+    const SATPCCManagerOptions: ISATPCrossChainManagerOptions = {
+      orquestrator: this.gatewayOrchestrator,
+      ontologyOptions: {
+        ontologiesPath: this.config.ontologyPath,
+      },
+      logLevel: this.config.logLevel,
+    };
+
+    this.SATPCCManager = new SATPCrossChainManager(SATPCCManagerOptions);
+
+    if (!this.SATPCCManager) {
+      throw new Error("SATPCCManager is not defined");
+    }
+
     this.instanceId = uuidv4();
     const dispatcherOps: BLODispatcherOptions = {
       logger: this.logger,
@@ -201,21 +244,20 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
       instanceId: this.config.gid.id,
       orchestrator: this.gatewayOrchestrator,
       signer: this.signer,
-      bridgesManager: this.bridgesManager,
+      ccManager: this.SATPCCManager,
       pubKey: this.pubKey,
-      defaultRepository: this.defaultRepository,
       localRepository: this.localRepository,
       remoteRepository: this.remoteRepository,
+      claimFormat: this.claimFormat,
     };
 
-    this.connectedDLTs = this.config.gid.connectedDLTs;
+    this.connectedDLTs = this.config.gid.connectedDLTs || [];
 
     if (!this.config.gid || !dispatcherOps.instanceId) {
       throw new Error("Invalid configuration");
     }
 
     this.BLODispatcher = new BLODispatcher(dispatcherOps);
-    this.OAPIServerEnabled = this.config.enableOpenAPI ?? true;
 
     this.OAS = OAS;
 
@@ -223,9 +265,8 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
       const crashOptions: ICrashRecoveryManagerOptions = {
         instanceId: this.instanceId,
         logLevel: this.config.logLevel,
-        bridgeConfig: this.bridgesManager,
+        ccManager: this.SATPCCManager,
         orchestrator: this.gatewayOrchestrator,
-        defaultRepository: this.defaultRepository,
         localRepository: this.localRepository,
         remoteRepository: this.remoteRepository,
         signer: this.signer,
@@ -249,7 +290,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
   public async onPluginInit(): Promise<undefined> {
     const fnTag = `${this.className}#onPluginInit()`;
     this.logger.trace(`Entering ${fnTag}`);
-    await Promise.all([this.startupGOLServer()]);
+    await Promise.all([this.startup()]);
   }
 
   /* IPluginWebService methods */
@@ -259,7 +300,6 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
       this.logger.debug(`Registering service ${ws.getPath()}`);
       ws.registerExpress(app);
     }
-    this.BLOApplication = app;
     return webServices;
   }
 
@@ -269,26 +309,12 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     if (!this.BLODispatcher) {
       throw new BLODispatcherErraneousError(fnTag);
     }
-    let webServices = await this.BLODispatcher?.getOrCreateWebServices();
-    if (this.OAPIServerEnabled) {
-      webServices = webServices.concat(
-        await this.BLODispatcher?.getOrCreateOAPIWebServices(),
-      );
-    }
-    return webServices;
+    return await this.BLODispatcher?.getOrCreateWebServices();
   }
 
   /* Getters */
   public get BLODispatcherInstance(): BLODispatcher | undefined {
     return this.BLODispatcher;
-  }
-
-  public get BLOServerInstance(): http.Server | undefined {
-    return this.BLOServer;
-  }
-
-  public get BLOApplicationInstance(): Express | undefined {
-    return this.BLOApplication;
   }
 
   public get SignerInstance(): JsObjectSigner {
@@ -349,7 +375,6 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
         proofID: "mockProofID1",
         gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
         gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
-        gatewayOpenAPIPort: DEFAULT_PORT_GATEWAY_API,
         address: "http://localhost",
       };
     } else {
@@ -393,8 +418,12 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
         pluginOptions.gid.gatewayClientPort = DEFAULT_PORT_GATEWAY_CLIENT;
       }
 
-      if (!pluginOptions.gid.gatewayOpenAPIPort) {
-        pluginOptions.gid.gatewayOpenAPIPort = DEFAULT_PORT_GATEWAY_API;
+      if (!pluginOptions.gid.gatewayOapiPort) {
+        pluginOptions.gid.gatewayOapiPort = DEFAULT_PORT_GATEWAY_OAPI;
+      }
+
+      if (!pluginOptions.gid.gatewayUIPort) {
+        //TODO
       }
     }
 
@@ -410,10 +439,6 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
       pluginOptions.environment = "development";
     }
 
-    if (!pluginOptions.enableOpenAPI) {
-      pluginOptions.enableOpenAPI = true;
-    }
-
     if (!pluginOptions.validationOptions) {
       pluginOptions.validationOptions = {};
     }
@@ -426,8 +451,10 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
       pluginOptions.mergePolicies = [];
     }
 
-    if (!pluginOptions.bridgesConfig) {
-      pluginOptions.bridgesConfig = [];
+    if (!pluginOptions.ccConfig) {
+      pluginOptions.ccConfig = {
+        bridgeConfig: [],
+      } as ICrossChainMechanismsOptions;
     }
 
     if (!pluginOptions.enableCrashRecovery) {
@@ -441,79 +468,78 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
    * Startup Methods
    * ----------------
    * This section includes methods responsible for starting up the server and its associated services independently of the existence of a Hyperledger Cacti Node.
-   * It ensures that both the GatewayServer and BLOServer are initiated concurrently for efficient launch.
+   * It ensures that both the GatewayServer and Bridges are initiated concurrently for efficient launch.
    */
   public async startup(): Promise<void> {
     const fnTag = `${this.className}#startup()`;
     this.logger.trace(`Entering ${fnTag}`);
 
-    await Promise.all([this.startupBLOServer(), this.startupGOLServer()]);
+    await Promise.all([
+      this.createDBRepository(),
+      this.SATPCCManager.deployCCMechanisms(this.options.ccConfig!),
+      this.startupGOLServer(),
+    ]);
   }
 
-  protected async startupBLOServer(): Promise<void> {
-    const fnTag = `${this.className}#startupBLOServer()`;
+  public async getOrCreateHttpServer(): Promise<ApiServer> {
+    const fnTag = `${this.className}#getOrCreateHttpServer()`;
     this.logger.trace(`Entering ${fnTag}`);
-    this.logger.info("Starting BOL server");
-    const port =
-      this.options.gid?.gatewayOpenAPIPort ?? DEFAULT_PORT_GATEWAY_API;
 
-    if (!this.BLOApplication || !this.BLOServer) {
-      if (!this.BLODispatcher) {
-        throw new BLODispatcherErraneousError(fnTag);
-      }
-      this.BLOApplication = express();
-      this.BLOApplication.use(bodyParser.json({ limit: "250mb" }));
-      this.BLOApplication.use(cors());
-      try {
-        const webServices = await this.BLODispatcher.getOrCreateWebServices();
-        for (const service of webServices) {
-          this.logger.debug(`Registering web service: ${service.getPath()}`);
-          await service.registerExpress(this.BLOApplication);
-        }
-      } catch (error) {
-        throw new Error(`Failed to register web services: ${error}`);
-      }
+    const pluginRegistry = new PluginRegistry({ plugins: [this] });
 
-      if (this.OAPIServerEnabled) {
-        this.logger.debug("OpenAPI server is enabled");
-
-        try {
-          const webServices =
-            await this.BLODispatcher.getOrCreateOAPIWebServices();
-          for (const service of webServices) {
-            this.logger.debug(
-              `Registering OpenAPI web service: ${service.getPath()}`,
-            );
-            await service.registerExpress(this.BLOApplication);
-          }
-          this.BLOApplication.use(
-            "/api-docs",
-            swaggerUi.serve as express.RequestHandler[],
-            swaggerUi.setup(this.OAS) as express.RequestHandler,
-          );
-        } catch (error) {
-          throw new Error(`Error to register OpenAPI web services: ${error}`);
-        }
-      }
-
-      this.BLOServer = http.createServer(this.BLOApplication);
-
-      await new Promise<void>((resolve, reject) => {
-        if (!this.BLOServer) {
-          throw new Error("BLOServer is not defined");
-        }
-        this.BLOServer.listen(port, () => {
-          this.logger.info(`BLO server started and listening on port ${port}`);
-          resolve();
-        });
-        this.BLOServer.on("error", (error) => {
-          this.logger.error(`BLO server failed to start: ${error}`);
-          reject(error);
-        });
-      });
-    } else {
-      this.logger.warn("BLO Server already running.");
+    if (!this.config.gid) {
+      throw new Error("GatewayIdentity is not defined");
     }
+
+    if (!this.config.gid.gatewayOapiPort) {
+      throw new Error("Gateway OAPI port is not defined");
+    }
+
+    const httpApiA = await Servers.startOnPort(
+      this.config.gid?.gatewayOapiPort,
+      this.config.gid?.address?.split("://")[1] ?? undefined, //this is necessary because it does not receive the http:// part of the address
+    );
+
+    const addressInfoApi = httpApiA.address() as AddressInfo;
+
+    //TODO FIX THIS WHEN DOING AUTH CONFIG
+    const configService = new ConfigService();
+    const apiServerOptions = await configService.newExampleConfig();
+    apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
+    apiServerOptions.configFile = "";
+    apiServerOptions.apiCorsDomainCsv = "*";
+    apiServerOptions.apiPort = addressInfoApi.port;
+    apiServerOptions.apiHost = addressInfoApi.address;
+    apiServerOptions.logLevel = this.config.logLevel || "INFO";
+    apiServerOptions.apiTlsEnabled = false;
+    apiServerOptions.grpcPort = 0;
+    apiServerOptions.crpcPort = 0;
+    const config =
+      await configService.newExampleConfigConvict(apiServerOptions);
+    const prop = config.getProperties();
+    this.OApiServer = new ApiServer({
+      httpServerApi: httpApiA,
+      config: prop,
+      pluginRegistry: pluginRegistry,
+    });
+    await this.OApiServer.start();
+
+    return this.OApiServer;
+  }
+
+  public getAddressOApiAddress(): string {
+    return (this.config.gid?.address +
+      ":" +
+      this.config.gid?.gatewayOapiPort) as string;
+  }
+
+  public async createDBRepository(): Promise<void> {
+    if (!this.config.knexLocalConfig) {
+      this.config.knexLocalConfig = knexLocalInstance.default;
+    }
+    const database = knex(this.config.knexLocalConfig);
+
+    await database.migrate.latest();
   }
 
   protected async startupGOLServer(): Promise<void> {
@@ -588,9 +614,21 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
   public async shutdown(): Promise<void> {
     const fnTag = `${this.className}#getGatewaySeeds()`;
     this.logger.debug(`Entering ${fnTag}`);
-    
-    this.logger.info("Shutting down Node server - BOL");
-    await this.shutdownBLOServer();
+
+    this.logger.debug("Shutting down Gateway Application");
+    if (this.isShutdown) {
+      this.OApiServer = undefined; // without this, this will be a recursive loop, OAPI server will call shutdown on the gateway
+    }
+
+    this.isShutdown = true;
+    if (this.OApiServer) {
+      this.logger.debug("Shutting down OpenAPI server");
+      await this.OApiServer?.shutdown();
+      this.logger.debug("OpenAPI server shut down");
+      return;
+    }
+
+    this.logger.debug("Shutting down Gateway Coordinator");
     await this.shutdownGOLServer();
     this.logger.debug("Running shutdown hooks");
     for (const hook of this.shutdownHooks) {
@@ -618,28 +656,8 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     return;
   }
 
-  private async shutdownBLOServer(): Promise<void> {
-    const fnTag = `${this.className}#shutdownBLOServer()`;
-    this.logger.debug(`Entering ${fnTag}`);
-    if (this.BLOServer) {
-      try {
-        await this.verifySessionsState();
-        await this.BLOServer.closeAllConnections();
-        await this.BLOServer.close();
-        this.BLOServer = undefined;
-        this.logger.info("Server shut down");
-      } catch (error) {
-        this.logger.error(
-          `Error shutting down the gatewayApplication: ${error}`,
-        );
-      }
-    } else {
-      this.logger.warn("Server is not running.");
-    }
-  }
-
   private async shutdownGOLServer(): Promise<void> {
-    const fnTag = `${this.className}#shutdownBLOServer()`;
+    const fnTag = `${this.className}#shutdownGOLServer()`;
     this.logger.debug(`Entering ${fnTag}`);
     if (this.GOLServer) {
       try {
@@ -658,10 +676,10 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
 
   /**
    * Verify the state of the sessions before shutting down the server.
-   * This method is called before the server is shut down and awaits ensure that 
+   * This method is called before the server is shut down and awaits ensure that
    * all sessions are concluded before the server is terminated.
    * After all sessions are concluded, the job is cancelled.
-  */
+   */
   private async verifySessionsState(): Promise<void> {
     const fnTag = `${this.className}#verifySessionsState()`;
     this.logger.trace(`Entering ${fnTag}`);
@@ -678,14 +696,14 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
    * Verifies if the sessions are concluded before shutting down the server.
    * If they aren't starts a scheduled job to verify session states.
    * The job runs every 20 seconds until all sessions are concluded.
-  */
+   */
   private async startSessionVerificationJob(manager: any): Promise<void> {
     return new Promise<void>((resolve) => {
       const cleanup = () => {
         if (this.sessionVerificationJob) {
-            this.sessionVerificationJob.cancel();
-            this.activeJobs.delete(this.sessionVerificationJob);
-            this.sessionVerificationJob = null;
+          this.sessionVerificationJob.cancel();
+          this.activeJobs.delete(this.sessionVerificationJob);
+          this.sessionVerificationJob = null;
         }
       };
 
@@ -708,20 +726,22 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
       initialCheck().then((needsRecurring) => {
         if (needsRecurring) {
           this.sessionVerificationJob = schedule.scheduleJob(
-            "*/20 * * * * *", async () => {
-            try {
-              const status = await manager.getSATPSessionState();
-              if (status) {
-                this.logger.info("All sessions concluded");
-                cleanup();
-                resolve();
-              } else {
-                this.logger.info("Sessions still pending");
+            "*/20 * * * * *",
+            async () => {
+              try {
+                const status = await manager.getSATPSessionState();
+                if (status) {
+                  this.logger.info("All sessions concluded");
+                  cleanup();
+                  resolve();
+                } else {
+                  this.logger.info("Sessions still pending");
+                }
+              } catch (error) {
+                this.logger.error(`Session check failed: ${error}`);
               }
-            } catch (error) {
-              this.logger.error(`Session check failed: ${error}`);
-            }
-          });
+            },
+          );
           this.activeJobs.add(this.sessionVerificationJob);
         }
       });

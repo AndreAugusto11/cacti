@@ -25,7 +25,7 @@ import {
   getTransactRequest,
 } from "../test-utils";
 import {
-  DEFAULT_PORT_GATEWAY_API,
+  DEFAULT_PORT_GATEWAY_OAPI,
   DEFAULT_PORT_GATEWAY_CLIENT,
   DEFAULT_PORT_GATEWAY_SERVER,
   SATP_ARCHITECTURE_VERSION,
@@ -46,8 +46,6 @@ let fabricEnv: FabricTestEnvironment;
 let besuEnv: BesuTestEnvironment;
 let gatewayRunner1: SATPGatewayRunner;
 let gatewayRunner2: SATPGatewayRunner;
-const bridge_id =
-  "x509::/OU=org2/OU=client/OU=department1/CN=bridge::/C=UK/ST=Hampshire/L=Hursley/O=org2.example.com/CN=ca.org2.example.com";
 
 afterAll(async () => {
   await gatewayRunner1.stop();
@@ -81,7 +79,6 @@ beforeAll(async () => {
     const satpContractName = "satp-contract";
     fabricEnv = await FabricTestEnvironment.setupTestEnvironment(
       satpContractName,
-      bridge_id,
       logLevel,
     );
     log.info("Fabric Ledger started successfully");
@@ -90,11 +87,9 @@ beforeAll(async () => {
 
   {
     const erc20TokenContract = "SATPContract";
-    const contractNameWrapper = "SATPWrapperContract";
 
     besuEnv = await BesuTestEnvironment.setupTestEnvironment(
       erc20TokenContract,
-      contractNameWrapper,
       logLevel,
     );
     log.info("Besu Ledger started successfully");
@@ -105,10 +100,10 @@ beforeAll(async () => {
 describe("SATPGateway sending a token from Besu to Fabric", () => {
   it("should realize a transfer", async () => {
     // besuConfig Json object setup:
-    const besuConfigJSON = await besuEnv.createBesuConfigJSON(logLevel);
+    const besuConfigJSON = await besuEnv.createBesuConfigJSON();
 
     // fabricConfig Json object setup:
-    const fabricConfigJSON = await fabricEnv.createFabricConfigJSON(logLevel);
+    const fabricConfigJSON = await fabricEnv.createFabricConfigJSON();
 
     // gatewayIds setup:
     const gateway1KeyPair = Secp256k1Keys.generateKeyPairsBuffer();
@@ -135,7 +130,7 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
       address,
       gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
       gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
-      gatewayOpenAPIPort: DEFAULT_PORT_GATEWAY_API,
+      gatewayOpenAPIPort: DEFAULT_PORT_GATEWAY_OAPI,
     } as GatewayIdentity;
 
     const gatewayIdentity2 = {
@@ -188,7 +183,6 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
           address,
           gatewayServerPort: 3110,
           gatewayClientPort: 3111,
-          gatewayOpenAPIPort: 4110,
         },
       ],
       [besuConfigJSON],
@@ -229,7 +223,7 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
           address,
           gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
           gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
-          gatewayOpenAPIPort: DEFAULT_PORT_GATEWAY_API,
+          //gatewayOpenAPIPort: DEFAULT_PORT_GATEWAY_API,
         },
       ],
       [fabricConfigJSON],
@@ -249,12 +243,13 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
       containerImageName: "rafaelapb/cacti-satp-hermes-gateway",
       logLevel,
       emitContainerLogs: true,
-      configFile: files1.configFile,
-      outputLogFile: files1.outputLogFile,
-      errorLogFile: files1.errorLogFile,
+      configFilePath: files1.configFilePath,
+      logsPath: files1.logsPath,
+      databasePath: files1.databasePath,
+      ontologiesPath: files1.ontologiesPath,
       serverPort: gatewayIdentity1.gatewayServerPort,
       clientPort: gatewayIdentity1.gatewayClientPort,
-      apiPort: gatewayIdentity1.gatewayOpenAPIPort,
+      //apiPort: gatewayIdentity1.gatewayOpenAPIPort,
     };
 
     // gatewayRunner2 setup:
@@ -263,12 +258,13 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
       containerImageName: "ghcr.io/hyperledger/cacti-satp-hermes-gateway",
       logLevel,
       emitContainerLogs: true,
-      configFile: files2.configFile,
-      outputLogFile: files2.outputLogFile,
-      errorLogFile: files2.errorLogFile,
+      configFilePath: files2.configFilePath,
+      logsPath: files2.logsPath,
+      databasePath: files2.databasePath,
+      ontologiesPath: files2.ontologiesPath,
       serverPort: gatewayIdentity2.gatewayServerPort,
       clientPort: gatewayIdentity2.gatewayClientPort,
-      apiPort: gatewayIdentity2.gatewayOpenAPIPort,
+      //apiPort: gatewayIdentity2.gatewayOpenAPIPort,
     };
 
     gatewayRunner1 = new SATPGatewayRunner(gatewayRunnerOptions1);
@@ -289,7 +285,7 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
       "1",
     );
 
-    const port = await gatewayRunner1.getHostPort(DEFAULT_PORT_GATEWAY_API);
+    const port = await gatewayRunner1.getHostPort(DEFAULT_PORT_GATEWAY_OAPI);
 
     const transactionApiClient = createClient(
       "TransactionApi",
@@ -335,7 +331,7 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
       invocationType: EthContractInvocationType.Call,
       contractAddress: besuEnv.assetContractAddress,
       methodName: "checkBalance",
-      params: [besuEnv.wrapperContractAddress],
+      params: ["besuEnv.wrapperContractAddress"],
       signingCredential: {
         ethAccount: besuEnv.firstHighNetWorthAccount,
         secret: besuEnv.besuKeyPair.privateKey,
@@ -354,7 +350,7 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
     const responseBalance1 = await fabricEnv.apiClient.runTransactionV1({
       contractName: fabricEnv.satpContractName,
       channelName: fabricEnv.fabricChannelName,
-      params: [fabricEnv.bridge_id],
+      params: ["fabricEnv.bridge_id"],
       methodName: "ClientIDAccountBalance",
       invocationType: FabricContractInvocationType.Send,
       signingCredential: fabricEnv.fabricSigningCredential,

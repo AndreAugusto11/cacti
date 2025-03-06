@@ -19,11 +19,14 @@
     "src/**/*.json"
   ],
   "exclude":[
-    "./src/main/typescript/cross-chain-mechanisms/satp-bridge/fabric-contracts",
+    "./src/main/typescript/cross-chain-mechanisms/bridge/fabric-contracts",
     "./src/test/typescript/fabric/**/*.ts"
   ],
   
   "references": [
+    {
+      "path": "../cactus-common/tsconfig.json"
+    },
     {
       "path": "../cactus-plugin-ledger-connector-fabric/tsconfig.json"
     },

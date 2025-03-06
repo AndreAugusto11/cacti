@@ -15,13 +15,13 @@ export interface ISATPGatewayRunnerConstructorOptions {
   containerImageName?: string;
   serverPort?: number;
   clientPort?: number;
-  apiPort?: number;
+  oapiPort?: number;
   logLevel?: LogLevelDesc;
   emitContainerLogs?: boolean;
-  configFile?: string;
-  outputLogFile?: string;
-  errorLogFile?: string;
-  knexDir?: string;
+  configFilePath?: string;
+  logsPath?: string;
+  ontologiesPath?: string;
+  databasePath?: string;
 }
 
 export const SATP_GATEWAY_RUNNER_DEFAULT_OPTIONS = Object.freeze({
@@ -29,7 +29,7 @@ export const SATP_GATEWAY_RUNNER_DEFAULT_OPTIONS = Object.freeze({
   containerImageName: "ghcr.io/hyperledger/cacti-satp-hermes-gateway",
   serverPort: 3010,
   clientPort: 3011,
-  apiPort: 4010,
+  oapiPort: 4010,
 });
 
 export const SATP_GATEWAY_RUNNER_OPTIONS_JOI_SCHEMA: Joi.Schema =
@@ -56,12 +56,12 @@ export class SATPGatewayRunner implements ITestLedger {
   public readonly containerImageName: string;
   public readonly serverPort: number;
   public readonly clientPort: number;
-  public readonly apiPort: number;
+  public readonly oapiPort: number;
   public readonly emitContainerLogs: boolean;
-  public readonly configFile?: string;
-  public readonly outputLogFile?: string;
-  public readonly errorLogFile?: string;
+  public readonly logsPath?: string;
   public readonly knexDir?: string;
+  public readonly configFilePath?: string;
+  public readonly ontologiesPath?: string;
 
   private readonly log: Logger;
   private container: Container | undefined;
@@ -83,13 +83,12 @@ export class SATPGatewayRunner implements ITestLedger {
       options.serverPort || SATP_GATEWAY_RUNNER_DEFAULT_OPTIONS.serverPort;
     this.clientPort =
       options.clientPort || SATP_GATEWAY_RUNNER_DEFAULT_OPTIONS.clientPort;
-    this.apiPort =
-      options.apiPort || SATP_GATEWAY_RUNNER_DEFAULT_OPTIONS.apiPort;
+    this.oapiPort =
+      options.oapiPort || SATP_GATEWAY_RUNNER_DEFAULT_OPTIONS.oapiPort;
 
-    this.configFile = options.configFile;
-    this.outputLogFile = options.outputLogFile;
-    this.errorLogFile = options.errorLogFile;
-    this.knexDir = options.knexDir;
+    this.configFilePath = options.configFilePath;
+    this.knexDir = options.databasePath;
+    this.ontologiesPath = options.ontologiesPath;
 
     this.emitContainerLogs = Bools.isBooleanStrict(options.emitContainerLogs)
       ? (options.emitContainerLogs as boolean)
@@ -126,8 +125,8 @@ export class SATPGatewayRunner implements ITestLedger {
     return `http://localhost:${hostPort}`;
   }
 
-  public async getApiHost(): Promise<string> {
-    const hostPort = await this.getHostPort(this.apiPort);
+  public async getOApiHost(): Promise<string> {
+    const hostPort = await this.getHostPort(this.oapiPort);
     this.log.debug(`getApiHost: ${hostPort}`);
     return `http://localhost:${hostPort}`;
   }
@@ -148,31 +147,40 @@ export class SATPGatewayRunner implements ITestLedger {
   }
 
   private createDockerHostConfig(): Docker.HostConfig {
+    this.log.debug("createDockerHostConfig()");
     const hostConfig: Docker.HostConfig = {
       PublishAllPorts: true,
       Binds: [],
       NetworkMode: "host",
     };
 
-    if (this.configFile) {
-      const containerPath = "/opt/cacti/satp-hermes/gateway-config.json";
-      hostConfig.Binds!.push(`${this.configFile}:${containerPath}:ro`);
+    const containerPath = "/opt/cacti/satp-hermes/";
+
+    if (this.configFilePath) {
+      this.log.debug("configFilePath", this.configFilePath);
+      hostConfig.Binds!.push(
+        `${this.configFilePath}:${containerPath}/config/config.json:ro`,
+      );
     }
 
-    if (this.outputLogFile) {
-      const containerPath =
-        "/opt/cacti/satp-hermes/log/satp-gateway-output.log";
-      hostConfig.Binds!.push(`${this.outputLogFile}:${containerPath}:rw`);
+    if (this.logsPath) {
+      this.log.debug("logsPath", this.logsPath);
+      hostConfig.Binds!.push(
+        `${this.logsPath}/satp-gateway-output.log:${containerPath}/logs/satp-gateway-output.log:rw`,
+      );
+      hostConfig.Binds!.push(
+        `${this.logsPath}/satp-gateway-error.log:${containerPath}/logs/satp-gateway-error.log:rw`,
+      );
     }
 
-    if (this.errorLogFile) {
-      const containerPath = "/opt/cacti/satp-hermes/log/satp-gateway-error.log";
-      hostConfig.Binds!.push(`${this.errorLogFile}:${containerPath}:rw`);
+    if (this.ontologiesPath) {
+      hostConfig.Binds!.push(
+        `${this.ontologiesPath}:${containerPath}/ontologies:rw`,
+      );
     }
 
     if (this.knexDir) {
-      const containerPath = "/opt/cacti/satp-hermes/src/knex/";
-      hostConfig.Binds!.push(`${this.knexDir}:${containerPath}:rw`);
+      hostConfig.Binds!.push(`${this.knexDir}:${containerPath}/database:rw`);
     }
     return hostConfig;
   }
@@ -204,7 +212,7 @@ export class SATPGatewayRunner implements ITestLedger {
           ExposedPorts: {
             [`${this.serverPort}/tcp`]: {}, // SERVER_PORT
             [`${this.clientPort}/tcp`]: {}, // CLIENT_PORT
-            [`${this.apiPort}/tcp`]: {}, // API_PORT
+            [`${this.oapiPort}/tcp`]: {}, // OAPI_PORT
           },
           HostConfig: hostConfig,
         },
@@ -309,7 +317,7 @@ export class SATPGatewayRunner implements ITestLedger {
       containerImageName: this.containerImageName,
       serverPort: this.serverPort,
       clientPort: this.clientPort,
-      apiPort: this.apiPort,
+      apiPort: this.oapiPort,
     });
 
     if (validationResult.error) {

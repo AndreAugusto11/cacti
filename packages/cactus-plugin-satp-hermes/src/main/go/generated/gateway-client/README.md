@@ -94,6 +94,7 @@ Class | Method | HTTP request | Description
 *AdminApi* | [**GetSessionIds**](docs/AdminApi.md#getsessionids) | **Get** /api/v1/@hyperledger/cactus-plugin-satp-hermes/get-sessions-ids | Get SATP session ids
 *AdminApi* | [**GetStatus**](docs/AdminApi.md#getstatus) | **Get** /api/v1/@hyperledger/cactus-plugin-satp-hermes/status | Get SATP current session data
 *AdminApi* | [**Pause**](docs/AdminApi.md#pause) | **Post** /api/v1/@hyperledger/cactus-plugin-satp-hermes/pause | Pause a transaction session
+*GetApproveAddressApi* | [**GetApproveAddress**](docs/GetApproveAddressApi.md#getapproveaddress) | **Get** /api/v1/@hyperledger/cactus-plugin-satp-hermes/approve-address | Get approve address
 *TransactionApi* | [**Cancel**](docs/TransactionApi.md#cancel) | **Post** /api/v1/@hyperledger/cactus-plugin-satp-hermes/cancel | Cancel a transaction session
 *TransactionApi* | [**GetIntegrations**](docs/TransactionApi.md#getintegrations) | **Get** /api/v1/@hyperledger/cactus-plugin-satp-hermes/integrations | Get supported integrations
 *TransactionApi* | [**GetRoutes**](docs/TransactionApi.md#getroutes) | **Get** /api/v1/@hyperledger/cactus-plugin-satp-hermes/routes | Get a list of routes for a gateway-to-gateway asset transfer
@@ -119,6 +120,10 @@ Class | Method | HTTP request | Description
  - [Estimate](docs/Estimate.md)
  - [FeeCost](docs/FeeCost.md)
  - [GasCost](docs/GasCost.md)
+ - [GetApproveAddress200Response](docs/GetApproveAddress200Response.md)
+ - [GetApproveAddressApproveAddressRequestParameter](docs/GetApproveAddressApproveAddressRequestParameter.md)
+ - [GetApproveAddressRequest](docs/GetApproveAddressRequest.md)
+ - [GetApproveAddressResponse](docs/GetApproveAddressResponse.md)
  - [GetAudit200Response](docs/GetAudit200Response.md)
  - [GetAuditRequest](docs/GetAuditRequest.md)
  - [GetAuditResponse](docs/GetAuditResponse.md)
@@ -143,6 +148,7 @@ Class | Method | HTTP request | Description
  - [Integration](docs/Integration.md)
  - [IntegrationDetails](docs/IntegrationDetails.md)
  - [IntegrationsResponse](docs/IntegrationsResponse.md)
+ - [NetworkId](docs/NetworkId.md)
  - [Pause200Response](docs/Pause200Response.md)
  - [PauseRequest](docs/PauseRequest.md)
  - [PauseResponse](docs/PauseResponse.md)
@@ -151,6 +157,7 @@ Class | Method | HTTP request | Description
  - [StatusRequest](docs/StatusRequest.md)
  - [StatusResponse](docs/StatusResponse.md)
  - [Token](docs/Token.md)
+ - [TokenType](docs/TokenType.md)
  - [Transact200Response](docs/Transact200Response.md)
  - [Transact200ResponseStatusResponse](docs/Transact200ResponseStatusResponse.md)
  - [Transact200ResponseStatusResponseDestinationNetwork](docs/Transact200ResponseStatusResponseDestinationNetwork.md)
@@ -158,6 +165,7 @@ Class | Method | HTTP request | Description
  - [TransactDefaultResponse](docs/TransactDefaultResponse.md)
  - [TransactRequest](docs/TransactRequest.md)
  - [TransactRequestSourceAsset](docs/TransactRequestSourceAsset.md)
+ - [TransactRequestSourceAssetNetworkId](docs/TransactRequestSourceAssetNetworkId.md)
  - [TransactResponse](docs/TransactResponse.md)
 
 

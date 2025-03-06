@@ -187,7 +187,6 @@ PauseRequest:
       type: string
       format: uuid
       example: "123e4567-e89b-12d3-a456-426614174001"
-
 PauseResponse:
   description: "Response for a pause transaction request. Returns the current status of the SATP session post-pause action."
   type: object
@@ -211,13 +210,16 @@ Asset:
   description: "An asset"
   type: object
   required:
+    - id
     - owner
-    - ontology
     - contractName
+    - networkId
+    - tokenType
+    - referenceId
   properties:
-    owner:
+    id:
       type: string
-    ontology:
+    owner:
       type: string
     contractName:
       type: string
@@ -227,15 +229,20 @@ Asset:
       type: string
     channelName:
       type: string
+    amount:
+      type: string
+    networkId:
+      $ref: ./schemas.yml#/NetworkId
+    tokenType:
+      $ref: ./schemas.yml#/TokenType
+    referenceId:
+      type: string
+    
 TransactRequest:
   description: "Request schema for initiating a transaction. Includes details such as the transaction context, mode (data or transfer), payload, and information about the source and destination DLT networks."
   type: object
   required:
     - contextID
-    - fromDLTNetworkID
-    - toDLTNetworkID
-    - fromAmount
-    - toAmount
     - beneficiaryPubkey
     - originatorPubkey
     - sourceAsset
@@ -248,18 +255,6 @@ TransactRequest:
     payload:
       type: string
       example: '{"data":"example payload"}'
-    fromDLTNetworkID:
-      type: string
-      example: "network1"
-    toDLTNetworkID:
-      type: string
-      example: "network2"
-    fromAmount:
-      type: string
-      example: "100"
-    toAmount:
-      type: string
-      example: "95"
     beneficiaryPubkey:
       type: string
     originatorPubkey:
@@ -748,3 +743,45 @@ GasCost:
       pattern: ^(0(\.[0-9]+)?|[1-9][0-9]*(\.[0-9]+)?)$
     token:
       $ref: ./schemas.yml#/Token
+GetApproveAddressRequest:
+  type: object
+  description: Request schema for getting the address to approve the token transfer.
+  properties:
+    networkId:
+     $ref: ./schemas.yml#/NetworkId
+    tokenType:
+      $ref: ./schemas.yml#/TokenType
+      description: The type of token.
+  required:
+    - networkId
+    - tokenType
+GetApproveAddressResponse:
+  type: object
+  description: Response schema for getting the address to approve the token transfer.
+  properties:
+    approveAddress:
+      type: string
+      description: The address to approve the token transfer.
+  required:
+    - approveAddress
+NetworkId:
+  type: object
+  description: The network of the DLT being interacted with.
+  properties:
+    id:
+      type: string
+      description: The network of the DLT being interacted with.
+    ledgerType:
+      $ref: ../../../../../cactus-core-api/src/main/json/openapi.json#/components/schemas/LedgerType
+  required:
+    - id
+    - ledgerType
+TokenType:
+  type: string
+  enum:
+    - ERC20
+    - ERC721
+    - ERC1155
+    - NONSTANDARD_FUNGIBLE
+    - NONSTANDARD_NONFUNGIBLE
+  description: The type of token.
