@@ -71,9 +71,6 @@ export function isSupportedDLT(obj: unknown): obj is LedgerType {
 function isNetworkIdArray(input: unknown): input is Array<NetworkId> {
   return Array.isArray(input) && input.every(isNetworkId);
 }
-function isSupportedDLTsArray(input: unknown): input is Array<NetworkId> {
-  return Array.isArray(input) && input.every(isSupportedDLT);
-}
 
 // Type guard for GatewayIdentity
 export function isGatewayIdentity(obj: unknown): obj is GatewayIdentity {
@@ -84,10 +81,8 @@ export function isGatewayIdentity(obj: unknown): obj is GatewayIdentity {
     typeof (obj as Record<string, unknown>).id === "string" &&
     "version" in obj &&
     isPrivacyDraftVersionsArray((obj as Record<string, unknown>).version) &&
-    "connectedDLTs" in obj &&
-    isNetworkIdArray((obj as Record<string, unknown>).connectedDLTs) &&
-    (!("supportedDLTs" in obj) ||
-      isSupportedDLTsArray((obj as Record<string, unknown>).supportedDLTs)) &&
+    (!("connectedDLTs" in obj) ||
+      isNetworkIdArray((obj as Record<string, unknown>).connectedDLTs)) &&
     (!("pubKey" in obj) ||
       typeof (obj as Record<string, unknown>).pubKey === "string") &&
     (!("name" in obj) ||

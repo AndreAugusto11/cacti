@@ -42,7 +42,7 @@ import {
   TransactionApi,
 } from "../../../main/typescript";
 
-const logLevel: LogLevelDesc = "DEBUG";
+const logLevel: LogLevelDesc = "TRACE";
 const log = LoggerProvider.getOrCreate({
   level: logLevel,
   label: "SATP - Hermes",
@@ -172,24 +172,30 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
     } as GatewayIdentity;
 
     // besuConfig Json object setup:
-    const besuConfigJSON = await besuEnv.createBesuConfigJSON();
+    const besuConfigJSON = await besuEnv.createBesuConfig();
 
     // fabricConfig Json object setup:
-    const fabricConfigJSON = await fabricEnv.createFabricConfigJSON();
+    const fabricConfigJSON = await fabricEnv.createFabricConfig();
 
     const files = setupGatewayDockerFiles(
       gatewayIdentity,
       logLevel,
       [], //only knows itself
-      [besuConfigJSON, fabricConfigJSON],
       false, // Crash recovery disabled
-      db_local_config,
-      db_remote_config,
+      { bridgeConfig: [besuConfigJSON, fabricConfigJSON] },
+      {
+        client: db_local_config.client,
+        connection: db_local_config.connection,
+      } as Knex.Config,
+      {
+        client: db_remote_config.client,
+        connection: db_remote_config.connection,
+      } as Knex.Config,
     );
 
     // gatewayRunner setup:
     const gatewayRunnerOptions: ISATPGatewayRunnerConstructorOptions = {
-      containerImageVersion: "3d7116ee9-2025-03-31",
+      containerImageVersion: "36e3c0c74-2025-04-01",
       containerImageName: "kubaya/cacti-satp-hermes-gateway",
       logLevel,
       emitContainerLogs: true,
@@ -334,18 +340,18 @@ describe("SATPGateway sending a token from Ethereum to Fabric", () => {
     } as GatewayIdentity;
 
     // ethereumConfig Json object setup:
-    const ethereumConfigJSON = await ethereumEnv.createEthereumConfigJSON();
+    const ethereumConfigJSON = await ethereumEnv.createEthereumConfig();
 
     // fabricConfig Json object setup:
-    const fabricConfigJSON = await fabricEnv.createFabricConfigJSON();
+    const fabricConfigJSON = await fabricEnv.createFabricConfig();
 
     // gateway configuration setup:
     const files = setupGatewayDockerFiles(
       gatewayIdentity,
       logLevel,
       [], //only knows itself
-      [ethereumConfigJSON, fabricConfigJSON],
       false, // Crash recovery disabled
+      { bridgeConfig: [ethereumConfigJSON, fabricConfigJSON] },
       db_local_config,
       db_remote_config,
     );

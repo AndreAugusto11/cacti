@@ -6,7 +6,6 @@ import { SATPGateway } from "../plugin-satp-hermes-gateway";
 import { SATPService } from "../types/satp-protocol";
 import { Client as ConnectClient } from "@connectrpc/connect";
 import { SATPServiceInstance } from "./stage-services/satp-service";
-import { LedgerType } from "@hyperledger/cactus-core-api";
 import { NetworkId } from "../public-api";
 
 export type SATPConnectHandler = (
@@ -52,7 +51,6 @@ export type GatewayIdentity = {
   name?: string;
   version: DraftVersions[];
   connectedDLTs?: NetworkId[];
-  supportedDLTs?: LedgerType[];
   proofID?: string;
   gatewayServerPort?: number;
   gatewayClientPort?: number;

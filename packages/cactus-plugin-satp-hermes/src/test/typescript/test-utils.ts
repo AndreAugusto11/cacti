@@ -16,6 +16,7 @@ import knex, { Knex } from "knex";
 import Docker, { Container, ContainerInfo } from "dockerode";
 import { Containers } from "@hyperledger/cactus-test-tooling/src/main/typescript/common/containers";
 import { EventEmitter } from "events";
+import { ICrossChainMechanismsOptions } from "../../main/typescript/cross-chain-mechanisms/satp-cc-manager";
 
 export { BesuTestEnvironment } from "./environments/besu-test-environment";
 export { EthereumTestEnvironment } from "./environments/ethereum-test-environment";
@@ -60,8 +61,8 @@ export function setupGatewayDockerFiles(
   gatewayIdentity: GatewayIdentity,
   logLevel: LogLevelDesc,
   counterPartyGateways: GatewayIdentity[],
-  bridgesConfig: Record<string, unknown>[],
   enableCrashRecovery: boolean = false,
+  ccConfig?: ICrossChainMechanismsOptions,
   localRepository?: Knex.Config,
   remoteRepository?: Knex.Config,
   fileContext?: string,
@@ -82,9 +83,10 @@ export function setupGatewayDockerFiles(
     localRepository,
     remoteRepository,
     environment: "development",
-    bridgesConfig,
+    ccConfig,
     gatewayKeyPair,
     enableCrashRecovery: enableCrashRecovery,
+    ontologyPath: "/opt/cacti/satp-hermes/ontologies",
   };
   // Create a timestamp for the files if no context provided
   const context =
@@ -92,7 +94,7 @@ export function setupGatewayDockerFiles(
     new Date().toISOString().replace(/:/g, "-").replace(/\..+/, "");
 
   // creates the configuration file for the gateway setup
-  const directory = `${__dirname}/../../../bin/`;
+  const directory = `${__dirname}/../../../cache/`;
   const configDir = path.join(directory, `gateway-info/config`);
 
   if (!fs.existsSync(configDir)) {

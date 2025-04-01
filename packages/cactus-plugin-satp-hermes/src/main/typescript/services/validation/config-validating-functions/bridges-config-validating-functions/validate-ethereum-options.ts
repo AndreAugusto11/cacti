@@ -14,8 +14,6 @@ export function isEthereumOptionsJSON(
   }
   const objRecord = obj as Record<string, unknown>;
   return (
-    "instanceId" in obj &&
-    typeof objRecord.instanceId === "string" &&
     (!("rpcApiHttpHost" in obj) ||
       typeof objRecord.rpcApiHttpHost === "string") &&
     (!("rpcApiWsHost" in obj) || typeof objRecord.rpcApiWsHost === "string")

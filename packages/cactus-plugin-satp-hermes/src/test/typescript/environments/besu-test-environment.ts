@@ -163,22 +163,6 @@ export class BesuTestEnvironment {
     return instance;
   }
 
-  // Generates the Besu configuration for use in SATP Gateway Docker container
-  public createBesuConfigJSON(): Record<string, unknown> {
-    return {
-      networkIdentification: this.besuConfig.networkIdentification,
-      signingCredential: this.besuConfig.signingCredential,
-      wrapperContractName: this.besuConfig.wrapperContractName,
-      wrapperContractAddress: this.besuConfig.wrapperContractAddress,
-      gas: this.besuConfig.gas,
-      connectorOptions: {
-        rpcApiHttpHost: this.connectorOptions.rpcApiHttpHost,
-        rpcApiWsHost: this.connectorOptions.rpcApiWsHost,
-      },
-      claimFormats: this.besuConfig.claimFormats,
-    };
-  }
-
   // this is the config to be loaded by the gateway, does not contain the log level because it will use the one in the gateway config
   public createBesuConfig(): INetworkOptions {
     return {

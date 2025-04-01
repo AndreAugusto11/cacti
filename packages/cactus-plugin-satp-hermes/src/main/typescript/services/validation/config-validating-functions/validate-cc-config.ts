@@ -73,7 +73,7 @@ function createBridgeConfig(configs: NetworkOptionsJSON[]): INetworkOptions[] {
         userIdentity: config.userIdentity,
         connectorOptions: fabricOptions,
         channelName: config.channelName,
-        targetOrnagizations: config.targetOrganizations,
+        targetOrganizations: config.targetOrganizations,
         caFile: config.caFile,
         ccSequence: config.ccSequence,
         orderer: config.orderer,
@@ -151,7 +151,9 @@ export function validateCCConfig(opts: {
   readonly configValue: unknown;
 }): ICrossChainMechanismsOptions {
   if (!opts || !opts.configValue) {
-    throw new TypeError("Invalid or missing configuration value.");
+    return {
+      bridgeConfig: [],
+    };
   }
 
   if (!isCCConfigJSON(opts.configValue)) {

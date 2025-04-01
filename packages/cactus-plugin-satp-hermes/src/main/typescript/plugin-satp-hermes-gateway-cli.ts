@@ -40,7 +40,6 @@ export async function launchGateway(): Promise<void> {
 
   logger.debug("Reading configuration from: /config/config.json");
   const config = await fs.readJson(path.join(workDir, "/config/config.json"));
-  logger.debug(`Gateway Congiguration: ${JSON.stringify(config, null, 2)}`);
   logger.debug("Configuration read OK");
 
   // validating gateway-config.json
@@ -131,6 +130,12 @@ export async function launchGateway(): Promise<void> {
 
   logger.debug("SATP Bridges Config is valid.");
 
+  logger.debug("Validating Ontologies Path...");
+  const ontologyPath = validateInstanceId({
+    configValue: config.ontologyPath,
+  });
+  logger.debug("SATP Gateway instanceId is valid.");
+
   logger.debug("Creating SATPGatewayConfig...");
   const gatewayConfig: SATPGatewayConfig = {
     instanceId: instanceId || uuidv4(),
@@ -153,13 +158,19 @@ export async function launchGateway(): Promise<void> {
     knexLocalConfig: localRepository,
     knexRemoteConfig: remoteRepository,
     pluginRegistry: new PluginRegistry({ plugins: [] }),
+    ontologyPath,
   };
+
   logger.debug("SATPGatewayConfig created successfully");
 
   const gateway = new SATPGateway(gatewayConfig);
   try {
     logger.info("Starting SATP Gateway...");
     await gateway.startup();
+    if (gatewayConfig.gid?.gatewayOapiPort) {
+      logger.info(`Gateway OpenAPI Server Active`);
+      await gateway.getOrCreateHttpServer();
+    }
     logger.info("SATP Gateway started successfully");
   } catch (ex) {
     // biome-ignore lint/style/noUnusedTemplateLiteral: <explanation>

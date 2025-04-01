@@ -13,6 +13,8 @@ RUN mkdir -p  ${APP_DIR}/ontologies/
 RUN mkdir -p  ${APP_DIR}/database/
 
 COPY ./dist/bundle/ncc/ ${APP_DIR}
+COPY ./src/main/typescript/cross-chain-mechanisms/bridge/fabric-contracts ${APP_DIR}/../fabric-contracts
+# copy of the wrapper contract chain code
 COPY ./satp-hermes-gateway.Dockerfile.healthcheck.mjs ${APP_DIR}
 
 COPY ./dist/lib/main/typescript/database/migrations/*.js ${APP_DIR}/migrations/

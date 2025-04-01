@@ -266,35 +266,6 @@ export class FabricTestEnvironment {
     return instance;
   }
 
-  // Generates the Fabric configuration for use in SATP Gateway Docker container
-  public createFabricConfigJSON(): Record<string, unknown> {
-    return {
-      networkIdentification: this.fabricConfig.networkIdentification,
-      userIdentity: this.bridgeIdentity,
-      channelName: this.fabricConfig.channelName,
-      targetOrganizations: this.fabricConfig.targetOrganizations,
-      caFile: this.fabricConfig.caFile,
-      ccSequence: this.fabricConfig.ccSequence,
-      orderer: this.fabricConfig.orderer,
-      ordererTLSHostnameOverride: this.fabricConfig.ordererTLSHostnameOverride,
-      connTimeout: this.fabricConfig.connTimeout,
-      signaturePolicy: this.fabricConfig.signaturePolicy,
-      mspId: this.bridgeMSPID,
-      wrapperContractName: this.fabricConfig.wrapperContractName,
-      connectorOptions: {
-        dockerBinary: this.connectorOptions.dockerBinary,
-        peerBinary: this.connectorOptions.peerBinary,
-        goBinary: this.connectorOptions.goBinary,
-        cliContainerEnv: FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
-        sshConfig: this.connectorOptions.sshConfig,
-        connectionProfile: this.bridgeProfile,
-        discoveryOptions: this.connectorOptions.discoveryOptions,
-        eventHandlerOptions: this.connectorOptions.eventHandlerOptions,
-      },
-      claimFormats: this.fabricConfig.claimFormats,
-    };
-  }
-
   // this is the config to be loaded by the gateway, does not contain the log level because it will use the one in the gateway config
   public createFabricConfig(): INetworkOptions {
     return {

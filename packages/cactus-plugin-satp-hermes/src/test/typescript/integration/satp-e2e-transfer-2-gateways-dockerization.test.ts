@@ -100,10 +100,10 @@ beforeAll(async () => {
 describe("SATPGateway sending a token from Besu to Fabric", () => {
   it("should realize a transfer", async () => {
     // besuConfig Json object setup:
-    const besuConfigJSON = await besuEnv.createBesuConfigJSON();
+    const besuConfigJSON = await besuEnv.createBesuConfig();
 
     // fabricConfig Json object setup:
-    const fabricConfigJSON = await fabricEnv.createFabricConfigJSON();
+    const fabricConfigJSON = await fabricEnv.createFabricConfig();
 
     // gatewayIds setup:
     const gateway1KeyPair = Secp256k1Keys.generateKeyPairsBuffer();
@@ -185,8 +185,8 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
           gatewayClientPort: 3111,
         },
       ],
-      [besuConfigJSON],
       false,
+      { bridgeConfig: [besuConfigJSON] },
       undefined,
       undefined,
       "gateway1",
@@ -226,8 +226,8 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
           //gatewayOpenAPIPort: DEFAULT_PORT_GATEWAY_API,
         },
       ],
-      [fabricConfigJSON],
       false,
+      { bridgeConfig: [fabricConfigJSON] },
       undefined,
       undefined,
       "gateway2",

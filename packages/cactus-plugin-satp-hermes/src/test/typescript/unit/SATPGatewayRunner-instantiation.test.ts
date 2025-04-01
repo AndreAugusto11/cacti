@@ -44,14 +44,11 @@ describe("Instantiate SATP Gateway Runner", () => {
     gatewayIdentity,
     logLevel,
     [], //only knows itself
-    [],
     false, // Crash recovery disabled
   );
 
-  console.log("Gateway files: ", files);
-
   const gatewayRunnerOptions: ISATPGatewayRunnerConstructorOptions = {
-    containerImageVersion: "aa49c1883-2025-04-01",
+    containerImageVersion: "36e3c0c74-2025-04-01",
     containerImageName: "kubaya/cacti-satp-hermes-gateway",
     serverPort: DEFAULT_PORT_GATEWAY_SERVER,
     clientPort: DEFAULT_PORT_GATEWAY_CLIENT,

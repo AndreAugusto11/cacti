@@ -173,22 +173,6 @@ export class EthereumTestEnvironment {
     return instance;
   }
 
-  // Generates the Ethereum configuration for use in SATP Gateway Docker container
-  public createEthereumConfigJSON(): Record<string, unknown> {
-    return {
-      networkIdentification: this.ethereumConfig.networkIdentification,
-      signingCredential: this.ethereumConfig.signingCredential,
-      wrapperContractName: this.ethereumConfig.wrapperContractName,
-      wrapperContractAddress: this.ethereumConfig.wrapperContractAddress,
-      gas: this.ethereumConfig.gas,
-      connectorOptions: {
-        rpcApiHttpHost: this.connectorOptions.rpcApiHttpHost,
-        rpcApiWsHost: this.connectorOptions.rpcApiWsHost,
-      },
-      claimFormats: this.ethereumConfig.claimFormats,
-    };
-  }
-
   // this creates the same config as the bridge manager does
   public createEthereumLeafConfig(
     ontologyManager: OntologyManager,

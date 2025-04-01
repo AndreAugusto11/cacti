@@ -279,7 +279,7 @@ export class FabricLeaf
       this.mspId = options.mspId;
     } else {
       throw new InvalidWrapperContract(
-        `${FabricLeaf.CLASS_NAME}#constructor, Missing variables necessary to deploy the Wrapper Contract`,
+        `${FabricLeaf.CLASS_NAME}#constructor, Missing variables necessary to deploy the Wrapper Contract, given: ${safeStableStringify(options)}`,
       );
     }
   }

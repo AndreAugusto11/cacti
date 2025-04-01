@@ -485,6 +485,11 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     const fnTag = `${this.className}#getOrCreateHttpServer()`;
     this.logger.trace(`Entering ${fnTag}`);
 
+    if (this.OApiServer) {
+      this.logger.info("Returning existing OApiServer instance.");
+      return this.OApiServer;
+    }
+
     const pluginRegistry = new PluginRegistry({ plugins: [this] });
 
     if (!this.config.gid) {

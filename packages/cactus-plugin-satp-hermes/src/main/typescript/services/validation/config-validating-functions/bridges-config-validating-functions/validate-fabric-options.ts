@@ -191,8 +191,6 @@ export function isFabricOptionsJSON(obj: unknown): obj is FabricOptionsJSON {
   }
   const objRecord = obj as Record<string, unknown>;
   return (
-    "instanceId" in obj &&
-    typeof objRecord.instanceId === "string" &&
     "peerBinary" in obj &&
     typeof objRecord.peerBinary === "string" &&
     (!("dockerBinary" in obj) || typeof objRecord.dockerBinary === "string") &&

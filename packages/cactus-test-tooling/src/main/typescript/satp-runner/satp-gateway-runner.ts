@@ -87,6 +87,7 @@ export class SATPGatewayRunner implements ITestLedger {
       options.oapiPort || SATP_GATEWAY_RUNNER_DEFAULT_OPTIONS.oapiPort;
 
     this.configFilePath = options.configFilePath;
+    this.logsPath = options.logsPath;
     this.knexDir = options.databasePath;
     this.ontologiesPath = options.ontologiesPath;
 
@@ -115,19 +116,16 @@ export class SATPGatewayRunner implements ITestLedger {
 
   public async getServerHost(): Promise<string> {
     const hostPort = await this.getHostPort(this.serverPort);
-    this.log.debug(`getServerHost: ${hostPort}`);
     return `http://localhost:${hostPort}`;
   }
 
   public async getClientHost(): Promise<string> {
     const hostPort = await this.getHostPort(this.clientPort);
-    this.log.debug(`getClientHost: ${hostPort}`);
     return `http://localhost:${hostPort}`;
   }
 
   public async getOApiHost(): Promise<string> {
     const hostPort = await this.getHostPort(this.oapiPort);
-    this.log.debug(`getApiHost: ${hostPort}`);
     return `http://localhost:${hostPort}`;
   }
 
@@ -157,20 +155,13 @@ export class SATPGatewayRunner implements ITestLedger {
     const containerPath = "/opt/cacti/satp-hermes";
 
     if (this.configFilePath) {
-      this.log.debug("configFilePath", this.configFilePath);
       hostConfig.Binds!.push(
         `${this.configFilePath}:${containerPath}/config/config.json:ro`,
       );
     }
 
     if (this.logsPath) {
-      this.log.debug("logsPath", this.logsPath);
-      hostConfig.Binds!.push(
-        `${this.logsPath}/satp-gateway-output.log:${containerPath}/logs/satp-gateway-output.log:rw`,
-      );
-      hostConfig.Binds!.push(
-        `${this.logsPath}/satp-gateway-error.log:${containerPath}/logs/satp-gateway-error.log:rw`,
-      );
+      hostConfig.Binds!.push(`${this.logsPath}:${containerPath}/logs:rw`);
     }
 
     if (this.ontologiesPath) {

@@ -13,8 +13,6 @@ export function isBesuOptionsJSON(obj: unknown): obj is BesuOptionsJSON {
   }
   const objRecord = obj as Record<string, unknown>;
   return (
-    "instanceId" in obj &&
-    typeof objRecord.instanceId === "string" &&
     "rpcApiHttpHost" in obj &&
     typeof objRecord.rpcApiHttpHost === "string" &&
     "rpcApiWsHost" in obj &&
