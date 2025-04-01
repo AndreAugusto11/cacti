@@ -29,7 +29,7 @@ import { BridgeLeaf, IBridgeLeafOptions } from "../bridge-leaf";
 import { BridgeLeafFungible } from "../bridge-leaf-fungible";
 import { BridgeLeafNonFungible } from "../bridge-leaf-non-fungible";
 import { OntologyManager } from "../ontology/ontology-manager";
-import { ISignerKeyPairs } from "@hyperledger/cactus-common/src/main/typescript/signer-key-pairs";
+import { ISignerKeyPair } from "@hyperledger/cactus-common/";
 import {
   ApproveAddressError,
   BungeeError,
@@ -51,6 +51,7 @@ import { Asset } from "../ontology/assets/asset";
 import { X509Identity } from "fabric-network";
 import { NetworkId } from "../../../public-api";
 import { getEnumKeyByValue } from "../../../services/utils";
+import { getUint8Key } from "./leafs-utils";
 export interface IFabricLeafNeworkOptions extends INetworkOptions {
   signingCredential: FabricSigningCredential;
   connectorOptions: Partial<IPluginLedgerConnectorFabricOptions>;
@@ -66,7 +67,7 @@ export interface IFabricLeafNeworkOptions extends INetworkOptions {
   mspId?: string;
   wrapperContractName?: string;
   leafId?: string;
-  keyPair?: ISignerKeyPairs;
+  keyPair?: ISignerKeyPair;
   claimFormats?: ClaimFormat[];
 }
 
@@ -141,7 +142,7 @@ export class FabricLeaf
 
   protected readonly networkIdentification: NetworkId;
 
-  protected readonly keyPair: ISignerKeyPairs;
+  protected readonly keyPair: ISignerKeyPair;
 
   protected readonly connector: PluginLedgerConnectorFabric;
 
@@ -233,7 +234,7 @@ export class FabricLeaf
               pluginRegistry: (
                 options.connectorOptions as IPluginLedgerConnectorFabricOptions
               ).pluginRegistry,
-              keyPair: this.keyPair,
+              keyPair: getUint8Key(this.keyPair),
               logLevel: this.logLevel,
             });
             this.bungee.addStrategy(

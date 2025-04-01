@@ -49,12 +49,13 @@ import {
   WrapperContractAlreadyCreatedError,
   WrapperContractError,
 } from "../bridge-errors";
-import { ISignerKeyPairs } from "@hyperledger/cactus-common/src/main/typescript/signer-key-pairs";
+import { ISignerKeyPair } from "@hyperledger/cactus-common";
 import SATPWrapperContract from "../../../../solidity/generated/satp-wrapper.sol/SATPWrapperContract.json";
 import { Asset } from "../ontology/assets/asset";
 import { TokenResponse } from "../../../generated/SATPWrapperContract";
 import { NetworkId } from "../../../public-api";
 import { getEnumKeyByValue } from "../../../services/utils";
+import { getUint8Key } from "./leafs-utils";
 
 export interface IEthereumLeafNeworkOptions extends INetworkOptions {
   signingCredential: Web3SigningCredential;
@@ -63,7 +64,7 @@ export interface IEthereumLeafNeworkOptions extends INetworkOptions {
   wrapperContractAddress?: string;
   gas?: number;
   leafId?: string;
-  keyPair?: ISignerKeyPairs;
+  keyPair?: ISignerKeyPair;
   claimFormats?: ClaimFormat[];
 }
 export interface IEthereumLeafOptions
@@ -125,7 +126,7 @@ export class EthereumLeaf
 
   protected readonly networkIdentification: NetworkId;
 
-  protected readonly keyPair: ISignerKeyPairs;
+  protected readonly keyPair: ISignerKeyPair;
 
   protected readonly connector: PluginLedgerConnectorEthereum;
 
@@ -215,7 +216,7 @@ export class EthereumLeaf
               pluginRegistry: (
                 options.connectorOptions as IPluginLedgerConnectorEthereumOptions
               ).pluginRegistry,
-              keyPair: this.keyPair,
+              keyPair: getUint8Key(this.keyPair),
               logLevel: this.logLevel,
             });
             this.bungee.addStrategy(

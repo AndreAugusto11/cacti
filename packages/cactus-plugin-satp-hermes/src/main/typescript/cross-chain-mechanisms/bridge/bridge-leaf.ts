@@ -3,7 +3,7 @@ import {
   LedgerType,
 } from "@hyperledger/cactus-core-api";
 import { LogLevelDesc } from "@hyperledger/cactus-common";
-import { ISignerKeyPairs } from "@hyperledger/cactus-common/src/main/typescript/signer-key-pairs";
+import { ISignerKeyPair } from "@hyperledger/cactus-common";
 import {
   ClaimFormat,
   TokenType,
@@ -28,7 +28,7 @@ export interface IBridgeLeafOptions {
   networkIdentification: NetworkId;
   ontologyManager: OntologyManager;
   leafId?: string;
-  keyPair?: ISignerKeyPairs;
+  keyPair?: ISignerKeyPair;
   logLevel?: LogLevelDesc;
   claimFormats?: ClaimFormat[];
 }
@@ -68,7 +68,7 @@ export abstract class BridgeLeaf {
    * @abstract
    * @readonly
    */
-  protected abstract readonly keyPair: ISignerKeyPairs;
+  protected abstract readonly keyPair: ISignerKeyPair;
 
   /**
    * Logging level.

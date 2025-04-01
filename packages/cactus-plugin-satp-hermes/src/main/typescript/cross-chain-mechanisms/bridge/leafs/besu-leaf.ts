@@ -6,7 +6,9 @@ import {
   RunTransactionResponse,
   Web3SigningCredential,
   Web3SigningCredentialCactusKeychainRef,
+  Web3SigningCredentialNone,
   Web3SigningCredentialPrivateKeyHex,
+  Web3SigningCredentialType,
   Web3TransactionReceipt,
 } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
@@ -46,23 +48,20 @@ import {
   ConnectorOptionsError,
   ApproveAddressError,
 } from "../bridge-errors";
-import {
-  ISignerKeyPairs,
-  Secp256k1Keys,
-} from "@hyperledger/cactus-common/src/main/typescript/signer-key-pairs";
-import { isWeb3SigningCredentialNone } from "@hyperledger/cactus-plugin-ledger-connector-besu/src/main/typescript/model-type-guards";
+import { ISignerKeyPair, Secp256k1Keys } from "@hyperledger/cactus-common";
 import SATPWrapperContract from "../../../../solidity/generated/satp-wrapper.sol/SATPWrapperContract.json";
 import { OntologyManager } from "../ontology/ontology-manager";
 import { Asset } from "../ontology/assets/asset";
 import { TokenResponse } from "../../../generated/SATPWrapperContract";
 import { NetworkId } from "../../../public-api";
 import { getEnumKeyByValue } from "../../../services/utils";
+import { getUint8Key } from "./leafs-utils";
 
 export interface IBesuLeafNeworkOptions extends INetworkOptions {
   signingCredential: Web3SigningCredential;
   connectorOptions: Partial<IPluginLedgerConnectorBesuOptions>;
   leafId?: string;
-  keyPair?: ISignerKeyPairs;
+  keyPair?: ISignerKeyPair;
   claimFormats?: ClaimFormat[];
   wrapperContractName?: string;
   wrapperContractAddress?: string;
@@ -138,7 +137,7 @@ export class BesuLeaf
 
   protected readonly networkIdentification: NetworkId;
 
-  protected readonly keyPair: ISignerKeyPairs;
+  protected readonly keyPair: ISignerKeyPair;
 
   protected readonly connector: PluginLedgerConnectorBesu;
 
@@ -229,7 +228,7 @@ export class BesuLeaf
               pluginRegistry: (
                 options.connectorOptions as IPluginLedgerConnectorBesuOptions
               ).pluginRegistry,
-              keyPair: this.keyPair,
+              keyPair: getUint8Key(this.keyPair),
               logLevel: this.logLevel,
             });
             this.bungee.addStrategy(
@@ -963,4 +962,9 @@ export class BesuLeaf
       obj.rpcApiWsHost !== undefined
     );
   };
+}
+export function isWeb3SigningCredentialNone(x?: {
+  type?: Web3SigningCredentialType;
+}): x is Web3SigningCredentialNone {
+  return x?.type === Web3SigningCredentialType.None;
 }

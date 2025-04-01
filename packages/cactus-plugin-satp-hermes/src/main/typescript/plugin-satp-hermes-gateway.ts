@@ -66,7 +66,7 @@ import schedule, { Job } from "node-schedule";
 import { BLODispatcherErraneousError } from "./core/errors/satp-errors";
 import { ClaimFormat } from "./generated/proto/cacti/satp/v02/common/message_pb";
 import { getEnumKeyByValue, getEnumValueByKey } from "./services/utils";
-import { ISignerKeyPairs } from "@hyperledger/cactus-common/src/main/typescript/signer-key-pairs";
+import { ISignerKeyPair } from "@hyperledger/cactus-common";
 import { IPrivacyPolicyValue } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/view-creation/privacy-policies";
 import { IMergePolicyValue } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/view-merging/merge-policies";
 import knex, { Knex } from "knex";
@@ -82,7 +82,7 @@ import { AddressInfo } from "node:net";
 export interface SATPGatewayConfig extends ICactusPluginOptions {
   gid?: GatewayIdentity;
   counterPartyGateways?: GatewayIdentity[];
-  keyPair?: ISignerKeyPairs;
+  keyPair?: ISignerKeyPair;
   environment?: "development" | "production";
   validationOptions?: ValidatorOptions;
   privacyPolicies?: IPrivacyPolicyValue[];

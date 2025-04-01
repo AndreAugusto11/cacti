@@ -207,7 +207,7 @@ export class BLODispatcher {
    * @param req TransactRequest
    * @throws GatewayShuttingDownError when the flag isShuttingDown is true
    * @returns TransactResponse
-  */
+   */
   public async Transact(req: TransactRequest): Promise<TransactResponse> {
     //TODO pre-verify verify input
     const fnTag = `${BLODispatcher.CLASS_NAME}#transact()`;
@@ -273,7 +273,7 @@ export class BLODispatcher {
 
   /**
    * Changes the isShuttingDown flag to true, stopping all new requests
-  */
+   */
   public setInitiateShutdown(): void {
     this.logger.info(`Stopping requests`);
     this.isShuttingDown = true;

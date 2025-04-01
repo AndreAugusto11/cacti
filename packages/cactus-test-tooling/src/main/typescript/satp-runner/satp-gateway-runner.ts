@@ -154,7 +154,7 @@ export class SATPGatewayRunner implements ITestLedger {
       NetworkMode: "host",
     };
 
-    const containerPath = "/opt/cacti/satp-hermes/";
+    const containerPath = "/opt/cacti/satp-hermes";
 
     if (this.configFilePath) {
       this.log.debug("configFilePath", this.configFilePath);
