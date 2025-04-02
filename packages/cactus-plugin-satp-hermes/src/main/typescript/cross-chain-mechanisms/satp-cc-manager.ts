@@ -97,11 +97,12 @@ export class SATPCrossChainManager {
     const fnTag = `${SATPCrossChainManager.CLASS_NAME}#deployBridgeFromConfig()`;
     this.log.debug(`${fnTag}, Deploying Bridge...`);
 
-    const deploymentPromises = [];
+    //const deploymentPromises = [];
     for (const config of bridgesNetworkConfig) {
-      deploymentPromises.push(this.bridgeManager.deployLeaf(config));
+      //deploymentPromises.push(this.bridgeManager.deployLeaf(config));
+      await this.bridgeManager.deployLeaf(config);
     }
-    await Promise.all(deploymentPromises);
+    //await Promise.all(deploymentPromises);
 
     const networkIds = [];
     for (const config of bridgesNetworkConfig) {
