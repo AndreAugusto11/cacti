@@ -150,6 +150,7 @@
     "ethereum-abi-types-generator": "1.3.4",
     "ethers": "6.13.1",
     "express": "4.21.0",
+    "fabric-common": "^2.2.20",
     "fabric-network": "2.2.19",
     "fs-extra": "11.2.0",
     "google-protobuf": "3.21.2",

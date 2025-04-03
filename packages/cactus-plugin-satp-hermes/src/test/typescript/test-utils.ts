@@ -56,7 +56,50 @@ export function createClient(
 }
 
 // Sets up the necessary configuration and log files for running a SATP Gateway in Docker
-// Creates files with unique timestamps or specified context
+// Creates configuration and related data in memory without saving to files
+export function generateGatewayConfig(
+  gatewayIdentity: GatewayIdentity,
+  logLevel: LogLevelDesc,
+  counterPartyGateways: GatewayIdentity[],
+  enableCrashRecovery: boolean = false,
+  ontologiesPath: string,
+  ccConfig?: ICrossChainMechanismsOptions,
+  localRepository?: Knex.Config,
+  remoteRepository?: Knex.Config,
+  gatewayKeyPair?: {
+    privateKey: string;
+    publicKey: string;
+  },
+): {
+  config: object;
+  logs: string;
+  database: string;
+  ontologies: object;
+} {
+  const jsonObject = {
+    gid: gatewayIdentity,
+    logLevel,
+    counterPartyGateways,
+    localRepository,
+    remoteRepository,
+    environment: "development",
+    ccConfig,
+    gatewayKeyPair,
+    enableCrashRecovery: enableCrashRecovery,
+    ontologyPath: ontologiesPath,
+  };
+
+  const logs = "Logs would be generated here.";
+  const database = "Database configuration would be here.";
+  const ontologies = { message: "Ontologies data would be here." };
+
+  return {
+    config: jsonObject,
+    logs,
+    database,
+    ontologies,
+  };
+}
 export function setupGatewayDockerFiles(
   gatewayIdentity: GatewayIdentity,
   logLevel: LogLevelDesc,
