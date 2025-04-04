@@ -11,19 +11,22 @@ RUN mkdir -p  ${APP_DIR}/logs/
 RUN mkdir -p  ${APP_DIR}/config/
 RUN mkdir -p  ${APP_DIR}/ontologies/
 RUN mkdir -p  ${APP_DIR}/database/
+RUN mkdir -p  ${APP_DIR}/database/migrations
 
 COPY ./dist/bundle/ncc/ ${APP_DIR}
 COPY ./src/main/typescript/cross-chain-mechanisms/bridge/fabric-contracts ${APP_DIR}/../fabric-contracts
 # copy of the wrapper contract chain code
 COPY ./satp-hermes-gateway.Dockerfile.healthcheck.mjs ${APP_DIR}
 
-COPY ./dist/lib/main/typescript/database/migrations/*.js ${APP_DIR}/migrations/
+COPY ./dist/lib/main/typescript/database/migrations/*.js ${APP_DIR}/database/migrations/
 COPY ./supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY ./supervisord.conf /etc/supervisord.conf
 
 # fabric-common cannot be bundled  due to some exotic transitive depenedencies
 # so we have to install it within the container manually.
 RUN npm install fabric-common
+
+RUN npm install bufferutil
 
 ENTRYPOINT ["/usr/bin/supervisord"]
 CMD ["--configuration", "/etc/supervisord.conf", "--nodaemon"]

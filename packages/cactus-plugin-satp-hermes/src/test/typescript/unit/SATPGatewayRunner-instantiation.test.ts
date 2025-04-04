@@ -57,7 +57,6 @@ describe("Instantiate SATP Gateway Runner", () => {
     emitContainerLogs: true,
     configFilePath: files.configFilePath,
     logsPath: files.logsPath,
-    databasePath: files.databasePath,
     ontologiesPath: files.ontologiesPath,
   };
 

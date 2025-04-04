@@ -1,8 +1,9 @@
 import type { IRemoteLogRepository } from "./interfaces/repository";
 import type { RemoteLog } from "../../core/types";
 import knex, { type Knex } from "knex";
-
+import fs from "fs-extra";
 import { knexRemoteInstance } from "../../database/knexfile-remote";
+import path from "node:path";
 
 export class KnexRemoteLogRepository implements IRemoteLogRepository {
   readonly database: Knex;
@@ -13,7 +14,25 @@ export class KnexRemoteLogRepository implements IRemoteLogRepository {
   public constructor(config: Knex.Config | undefined) {
     const envName = process.env.ENVIRONMENT || "development";
     const configFile = knexRemoteInstance[envName];
-    this.database = knex(config || configFile);
+
+    config = config || configFile;
+
+    if (!fs.existsSync(path.join(__dirname, "../migrations"))) {
+      config = {
+        ...config,
+        migrations: {
+          directory: path.join(__dirname, "../migrations"),
+        },
+      } as Knex.Config;
+    } else {
+      config = {
+        ...config,
+        migrations: {
+          directory: path.join(__dirname, "database/migrations"),
+        },
+      } as Knex.Config;
+    }
+    this.database = knex(config);
   }
 
   getLogsTable(): Knex.QueryBuilder {

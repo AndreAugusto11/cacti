@@ -116,20 +116,30 @@ export function setupGatewayDockerFiles(
 ): {
   configFilePath: string;
   logsPath: string;
-  databasePath: string;
   ontologiesPath: string;
 } {
   const jsonObject = {
     gid: gatewayIdentity,
     logLevel,
     counterPartyGateways,
-    localRepository,
-    remoteRepository,
+    localRepository: localRepository
+      ? ({
+          client: localRepository.client,
+          connection: localRepository.connection,
+        } as Knex.Config)
+      : undefined,
+    remoteRepository: remoteRepository
+      ? ({
+          client: remoteRepository.client,
+          connection: remoteRepository.connection,
+        } as Knex.Config)
+      : undefined,
     environment: "development",
     ccConfig,
     gatewayKeyPair,
     enableCrashRecovery: enableCrashRecovery,
     ontologyPath: "/opt/cacti/satp-hermes/ontologies",
+    // databaseMigrationPath: "/opt/cacti/satp-hermes/database/migrations",
   };
   // Create a timestamp for the files if no context provided
   const context =
@@ -153,8 +163,6 @@ export function setupGatewayDockerFiles(
     fs.mkdirSync(logDir, { recursive: true });
   }
 
-  const databaseDir = path.join(directory, `gateway-info/database`);
-
   const ontologiesDir = path.join(directory, `gateway-info/ontologies`);
   // Ensure the ontologies directory exists
   if (!fs.existsSync(ontologiesDir)) {
@@ -170,11 +178,10 @@ export function setupGatewayDockerFiles(
       `Source ontologies directory does not exist: ${sourceOntologiesDir}`,
     );
   }
-  expect(fs.existsSync(ontologiesDir)).toBe(true);
+
   return {
     configFilePath,
     logsPath: logDir,
-    databasePath: databaseDir,
     ontologiesPath: ontologiesDir,
   };
 }

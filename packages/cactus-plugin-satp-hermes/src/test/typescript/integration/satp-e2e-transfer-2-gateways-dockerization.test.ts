@@ -245,11 +245,10 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
       emitContainerLogs: true,
       configFilePath: files1.configFilePath,
       logsPath: files1.logsPath,
-      databasePath: files1.databasePath,
       ontologiesPath: files1.ontologiesPath,
       serverPort: gatewayIdentity1.gatewayServerPort,
       clientPort: gatewayIdentity1.gatewayClientPort,
-      //apiPort: gatewayIdentity1.gatewayOpenAPIPort,
+      //oapiPort: gatewayIdentity1.gatewayOpenAPIPort,
     };
 
     // gatewayRunner2 setup:
@@ -260,11 +259,10 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
       emitContainerLogs: true,
       configFilePath: files2.configFilePath,
       logsPath: files2.logsPath,
-      databasePath: files2.databasePath,
       ontologiesPath: files2.ontologiesPath,
       serverPort: gatewayIdentity2.gatewayServerPort,
       clientPort: gatewayIdentity2.gatewayClientPort,
-      //apiPort: gatewayIdentity2.gatewayOpenAPIPort,
+      //oapiPort: gatewayIdentity2.gatewayOpenAPIPort,
     };
 
     gatewayRunner1 = new SATPGatewayRunner(gatewayRunnerOptions1);

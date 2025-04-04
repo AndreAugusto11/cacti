@@ -1,7 +1,6 @@
 import type { LocalLog } from "../../core/types";
 import type { ILocalLogRepository } from "./interfaces/repository";
 import knex, { type Knex } from "knex";
-
 import { knexLocalInstance } from "../knexfile";
 
 export class KnexLocalLogRepository implements ILocalLogRepository {
@@ -11,7 +10,16 @@ export class KnexLocalLogRepository implements ILocalLogRepository {
   public constructor(config: Knex.Config | undefined) {
     const envName = process.env.ENVIRONMENT || "development";
     const configFile = knexLocalInstance[envName];
-    this.database = knex(config || configFile);
+
+    config = config || configFile;
+
+    // config = {
+    //   ...config,
+    //   migrations: {
+    //     migrationSource: ,
+    //   },
+    // } as Knex.Config;
+    this.database = knex(config);
   }
 
   public getCreated(): boolean {

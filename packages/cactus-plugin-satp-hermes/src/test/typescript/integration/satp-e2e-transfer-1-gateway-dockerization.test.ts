@@ -183,14 +183,8 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
       [], //only knows itself
       false, // Crash recovery disabled
       { bridgeConfig: [besuConfigJSON, fabricConfigJSON] },
-      {
-        client: db_local_config.client,
-        connection: db_local_config.connection,
-      } as Knex.Config,
-      {
-        client: db_remote_config.client,
-        connection: db_remote_config.connection,
-      } as Knex.Config,
+      db_local_config,
+      db_remote_config,
     );
 
     // gatewayRunner setup:
@@ -201,7 +195,6 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
       emitContainerLogs: true,
       configFilePath: files.configFilePath,
       logsPath: files.logsPath,
-      databasePath: files.databasePath,
       ontologiesPath: files.ontologiesPath,
     };
 
@@ -380,7 +373,6 @@ describe("SATPGateway sending a token from Ethereum to Fabric", () => {
       emitContainerLogs: true,
       configFilePath: files.configFilePath,
       logsPath: files.logsPath,
-      databasePath: files.databasePath,
       ontologiesPath: files.ontologiesPath,
     };
     const gatewayRunner = new SATPGatewayRunner(gatewayRunnerOptions);
