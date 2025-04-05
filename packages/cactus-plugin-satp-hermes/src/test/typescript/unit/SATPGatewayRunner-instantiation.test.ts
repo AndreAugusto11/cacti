@@ -15,6 +15,7 @@ import {
 } from "../../../main/typescript/core/constants";
 import { Address, GatewayIdentity } from "../../../main/typescript/core/types";
 import { setupGatewayDockerFiles } from "../test-utils";
+import { DOCKER_IMAGE_VERSION, DOCKER_IMAGE_NAME } from "../constants";
 
 const logLevel: LogLevelDesc = "DEBUG";
 
@@ -48,8 +49,8 @@ describe("Instantiate SATP Gateway Runner", () => {
   );
 
   const gatewayRunnerOptions: ISATPGatewayRunnerConstructorOptions = {
-    containerImageVersion: "36e3c0c74-2025-04-01",
-    containerImageName: "kubaya/cacti-satp-hermes-gateway",
+    containerImageVersion: DOCKER_IMAGE_VERSION,
+    containerImageName: DOCKER_IMAGE_NAME,
     serverPort: DEFAULT_PORT_GATEWAY_SERVER,
     clientPort: DEFAULT_PORT_GATEWAY_CLIENT,
     oapiPort: DEFAULT_PORT_GATEWAY_OAPI,

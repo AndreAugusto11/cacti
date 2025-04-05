@@ -18,7 +18,6 @@ COPY ./src/main/typescript/cross-chain-mechanisms/bridge/fabric-contracts ${APP_
 # copy of the wrapper contract chain code
 COPY ./satp-hermes-gateway.Dockerfile.healthcheck.mjs ${APP_DIR}
 
-COPY ./dist/lib/main/typescript/database/migrations/*.js ${APP_DIR}/database/migrations/
 COPY ./supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY ./supervisord.conf /etc/supervisord.conf
 

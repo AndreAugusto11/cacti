@@ -108,6 +108,7 @@ export function setupGatewayDockerFiles(
   ccConfig?: ICrossChainMechanismsOptions,
   localRepository?: Knex.Config,
   remoteRepository?: Knex.Config,
+  gatewayId: string = "gatewayId",
   fileContext?: string,
   gatewayKeyPair?: {
     privateKey: string;
@@ -148,7 +149,7 @@ export function setupGatewayDockerFiles(
 
   // creates the configuration file for the gateway setup
   const directory = `${__dirname}/../../../cache/`;
-  const configDir = path.join(directory, `gateway-info/config`);
+  const configDir = path.join(directory, `gateway-info-${gatewayId}/config`);
 
   if (!fs.existsSync(configDir)) {
     fs.mkdirSync(configDir, { recursive: true });
@@ -158,12 +159,15 @@ export function setupGatewayDockerFiles(
   expect(fs.existsSync(configFilePath)).toBe(true);
 
   // creates the files for logging the output and error:
-  const logDir = path.join(directory, `gateway-info/logs`);
+  const logDir = path.join(directory, `gateway-info-${gatewayId}/logs`);
   if (!fs.existsSync(logDir)) {
     fs.mkdirSync(logDir, { recursive: true });
   }
 
-  const ontologiesDir = path.join(directory, `gateway-info/ontologies`);
+  const ontologiesDir = path.join(
+    directory,
+    `gateway-info-${gatewayId}/ontologies`,
+  );
   // Ensure the ontologies directory exists
   if (!fs.existsSync(ontologiesDir)) {
     fs.mkdirSync(ontologiesDir, { recursive: true });

@@ -12,3 +12,7 @@ export async function up(knex: Knex): Promise<void> {
 export async function down(knex: Knex): Promise<void> {
   return knex.schema.dropTable("remote-logs");
 }
+
+export function getId(): Readonly<string> {
+  return "20240130234303_create_remote_logs_table";
+}

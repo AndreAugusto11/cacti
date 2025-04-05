@@ -94,7 +94,6 @@ beforeAll(async () => {
     "password",
   ));
 
-  await setupDBTable(db_local_config);
   await setupDBTable(db_remote_config);
 
   {
@@ -117,7 +116,7 @@ beforeAll(async () => {
   }
 });
 
-describe("SATPGateway sending a token from Besu to Fabric", () => {
+describe("SATPGateway sending a token from Besu to Ethereum", () => {
   it("should mint 100 tokens to the owner account", async () => {
     await besuEnv.mintTokens("100");
     await besuEnv.checkBalance(
@@ -168,7 +167,7 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
 
     // gatewayRunner setup:
     const gatewayRunnerOptions: ISATPGatewayRunnerConstructorOptions = {
-      containerImageVersion: "b11f0957e-2025-04-04",
+      containerImageVersion: "50a953631-2025-04-04",
       containerImageName: "kubaya/cacti-satp-hermes-gateway",
       logLevel,
       emitContainerLogs: true,

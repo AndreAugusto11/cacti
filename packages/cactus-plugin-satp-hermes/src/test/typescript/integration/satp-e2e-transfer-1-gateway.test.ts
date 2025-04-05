@@ -42,7 +42,6 @@ const log = LoggerProvider.getOrCreate({
   label: "SATP - Hermes",
 });
 
-let knexInstanceClient: Knex;
 let knexSourceRemoteInstance: Knex;
 let fabricEnv: FabricTestEnvironment;
 let besuEnv: BesuTestEnvironment;
@@ -51,9 +50,6 @@ let gateway: SATPGateway;
 
 afterAll(async () => {
   if (gateway) {
-    if (knexInstanceClient) {
-      await knexInstanceClient.destroy();
-    }
     if (knexSourceRemoteInstance) {
       await knexSourceRemoteInstance.destroy();
     }
@@ -148,9 +144,6 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
       proofID: "mockProofID10",
       address: "http://localhost" as Address,
     } as GatewayIdentity;
-
-    knexInstanceClient = knex(knexClientConnection);
-    await knexInstanceClient.migrate.latest();
 
     knexSourceRemoteInstance = knex(knexSourceRemoteConnection);
     await knexSourceRemoteInstance.migrate.latest();
@@ -299,9 +292,6 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
       proofID: "mockProofID10",
       address: "http://localhost" as Address,
     } as GatewayIdentity;
-
-    knexInstanceClient = knex(knexClientConnection);
-    await knexInstanceClient.migrate.latest();
 
     knexSourceRemoteInstance = knex(knexSourceRemoteConnection);
     await knexSourceRemoteInstance.migrate.latest();
@@ -455,9 +445,6 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
       proofID: "mockProofID10",
       address: "http://localhost" as Address,
     } as GatewayIdentity;
-
-    knexInstanceClient = knex(knexClientConnection);
-    await knexInstanceClient.migrate.latest();
 
     knexSourceRemoteInstance = knex(knexSourceRemoteConnection);
     await knexSourceRemoteInstance.migrate.latest();

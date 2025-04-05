@@ -78,6 +78,7 @@ import {
   ConfigService,
 } from "@hyperledger/cactus-cmd-api-server";
 import { AddressInfo } from "node:net";
+import { createMigrationSource } from "./database/knex-migration-source";
 
 export interface SATPGatewayConfig extends ICactusPluginOptions {
   gid?: GatewayIdentity;
@@ -539,10 +540,24 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
   }
 
   public async createDBRepository(): Promise<void> {
+    const fnTag = `${this.className}#createDBRepository()`;
     if (!this.config.knexLocalConfig) {
+      this.logger.info(`${fnTag}: Local repository is not defined`);
+      this.logger.info(`${fnTag}: Using default local repository`);
       this.config.knexLocalConfig = knexLocalInstance.default;
     }
-    const database = knex(this.config.knexLocalConfig);
+    this.logger.info(`${fnTag}: Creating migration source`);
+    const migrationSource = await createMigrationSource();
+    this.logger.info(
+      `${fnTag}: Created migration source: ${JSON.stringify(migrationSource)}`,
+    );
+    const database = knex({
+      ...this.config.knexLocalConfig,
+      migrations: {
+        // This removes the problem with the migration source being in the file system
+        migrationSource: migrationSource,
+      },
+    });
 
     await database.migrate.latest();
   }

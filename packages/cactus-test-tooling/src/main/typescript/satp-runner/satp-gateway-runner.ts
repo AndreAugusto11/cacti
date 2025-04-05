@@ -59,7 +59,6 @@ export class SATPGatewayRunner implements ITestLedger {
   public readonly oapiPort: number;
   public readonly emitContainerLogs: boolean;
   public readonly logsPath?: string;
-  public readonly knexDir?: string;
   public readonly configFilePath?: string;
   public readonly ontologiesPath?: string;
 
@@ -88,7 +87,6 @@ export class SATPGatewayRunner implements ITestLedger {
 
     this.configFilePath = options.configFilePath;
     this.logsPath = options.logsPath;
-    this.knexDir = options.databasePath;
     this.ontologiesPath = options.ontologiesPath;
 
     this.emitContainerLogs = Bools.isBooleanStrict(options.emitContainerLogs)
@@ -168,10 +166,6 @@ export class SATPGatewayRunner implements ITestLedger {
       hostConfig.Binds!.push(
         `${this.ontologiesPath}:${containerPath}/ontologies:rw`,
       );
-    }
-
-    if (this.knexDir) {
-      hostConfig.Binds!.push(`${this.knexDir}:${containerPath}/database:rw`);
     }
     return hostConfig;
   }

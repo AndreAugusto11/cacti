@@ -45,8 +45,6 @@ const log = LoggerProvider.getOrCreate({
   label: "SATP - Hermes",
 });
 
-let knexInstanceClient: Knex;
-let knexInstanceServer: Knex;
 let knexSourceRemoteInstance: Knex;
 let knexTargetRemoteInstance: Knex;
 let fabricEnv: FabricTestEnvironment;
@@ -57,18 +55,12 @@ let gateway2: SATPGateway;
 
 afterAll(async () => {
   if (gateway1) {
-    if (knexInstanceClient) {
-      await knexInstanceClient.destroy();
-    }
     if (knexSourceRemoteInstance) {
       await knexSourceRemoteInstance.destroy();
     }
   }
 
   if (gateway2) {
-    if (knexInstanceServer) {
-      await knexInstanceServer.destroy();
-    }
     if (knexTargetRemoteInstance) {
       await knexTargetRemoteInstance.destroy();
     }
@@ -197,14 +189,8 @@ describe("2 SATPGateways sending a token from Besu to Fabric", () => {
       gatewayClientPort: 3013,
     } as GatewayIdentity;
 
-    knexInstanceClient = knex(knexClientConnection);
-    await knexInstanceClient.migrate.latest();
-
     knexSourceRemoteInstance = knex(knexSourceRemoteConnection);
     await knexSourceRemoteInstance.migrate.latest();
-
-    knexInstanceServer = knex(knexServerConnection);
-    await knexInstanceServer.migrate.latest();
 
     knexTargetRemoteInstance = knex(knexTargetRemoteConnection);
     await knexTargetRemoteInstance.migrate.latest();
@@ -412,14 +398,8 @@ describe("2 SATPGateways sending a token from Fabric to Besu", () => {
       gatewayClientPort: 3013,
     } as GatewayIdentity;
 
-    knexInstanceClient = knex(knexClientConnection);
-    await knexInstanceClient.migrate.latest();
-
     knexSourceRemoteInstance = knex(knexSourceRemoteConnection);
     await knexSourceRemoteInstance.migrate.latest();
-
-    knexInstanceServer = knex(knexServerConnection);
-    await knexInstanceServer.migrate.latest();
 
     knexTargetRemoteInstance = knex(knexTargetRemoteConnection);
     await knexTargetRemoteInstance.migrate.latest();
@@ -632,14 +612,8 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
       gatewayClientPort: 3013,
     } as GatewayIdentity;
 
-    knexInstanceClient = knex(knexClientConnection);
-    await knexInstanceClient.migrate.latest();
-
     knexSourceRemoteInstance = knex(knexSourceRemoteConnection);
     await knexSourceRemoteInstance.migrate.latest();
-
-    knexInstanceServer = knex(knexServerConnection);
-    await knexInstanceServer.migrate.latest();
 
     knexTargetRemoteInstance = knex(knexTargetRemoteConnection);
     await knexTargetRemoteInstance.migrate.latest();

@@ -15,3 +15,7 @@ export function up(knex: Knex): Knex.SchemaBuilder {
 export function down(knex: Knex): Knex.SchemaBuilder {
   return knex.schema.dropTable("logs");
 }
+
+export function getId(): Readonly<string> {
+  return "20220331132128_create_logs_table";
+}

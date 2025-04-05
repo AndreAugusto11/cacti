@@ -54,6 +54,7 @@
   ],
   "scripts": {
     "build:bundle": "ncc build ./dist/lib/main/typescript/plugin-satp-hermes-gateway-cli.js --out=./dist/bundle/ncc/ --external=fabric-common --external=bufferutil",
+    "build:bundle:prod": "ncc build ./dist/lib/main/typescript/plugin-satp-hermes-gateway-cli.js --minify --out=./dist/bundle/ncc/ --external=fabric-common --external=bufferutil",
     "build": "run-s codegen tsc",
     "build-proto": "buf build --path src/main/proto --verbose",
     "build:dev:backend:postbuild": "",
@@ -167,6 +168,7 @@
     "socket.io": "4.6.2",
     "sqlite3": "5.1.5",
     "swagger-ui-express": "5.0.0",
+    "ts-results": "^3.3.0",
     "typescript-optional": "2.0.1",
     "uuid": "10.0.0",
     "web3": "1.6.1",
