@@ -151,7 +151,7 @@ export class SATPGatewayRunner implements ITestLedger {
       if (containerInfo.NetworkSettings?.IPAddress) {
         return containerInfo.NetworkSettings.IPAddress;
       } else {
-        throw new Error("Container IP address not found");
+        return "localhost";
       }
     }
     throw new Error("Container not started");
@@ -161,6 +161,7 @@ export class SATPGatewayRunner implements ITestLedger {
     this.log.debug("createDockerHostConfig()");
 
     const hostConfig: Docker.HostConfig = {
+      //NetworkMode: "host",
       Binds: [],
       PortBindings: {
         "3010": [{ HostPort: `${this.serverPort}/tcp` }],

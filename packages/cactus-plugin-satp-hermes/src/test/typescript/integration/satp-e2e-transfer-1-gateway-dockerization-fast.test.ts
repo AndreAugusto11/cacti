@@ -148,10 +148,10 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
     } as GatewayIdentity;
 
     // besuConfig Json object setup:
-    const besuConfig = await besuEnv.createBesuDockerConfig();
+    const besuConfig = await besuEnv.createBesuConfig();
 
     // fabricConfig Json object setup:
-    const ethereumConfig = await ethereumEnv.createEthereumDockerConfig();
+    const ethereumConfig = await ethereumEnv.createEthereumConfig();
 
     const files = setupGatewayDockerFiles(
       gatewayIdentity,

@@ -89,7 +89,6 @@ import {
   IRemoteLogRepository,
 } from "../../database/repository/interfaces/repository";
 import { ISATPLoggerConfig, SATPLogger } from "../../logging";
-import { LedgerType } from "@hyperledger/cactus-core-api";
 import { MonitorService } from "../monitoring/monitor";
 
 export interface ISATPManagerOptions {
@@ -174,7 +173,7 @@ export class SATPManager {
     this.monitorService = MonitorService.createOrGetMonitorService({
       logLevel: options.logLevel,
     });
-    
+
     void this.initializeMonitorService();
 
     const serviceClasses = [
@@ -225,7 +224,9 @@ export class SATPManager {
       this.logger.info(`${fnTag} Monitoring service initialized`);
     } catch (error) {
       // Log error but don't throw - allow service to continue without monitoring
-      this.logger.warn(`${fnTag} Failed to initialize monitoring service: ${error}`);
+      this.logger.warn(
+        `${fnTag} Failed to initialize monitoring service: ${error}`,
+      );
     }
   }
   public get pubKey(): string {
@@ -277,7 +278,10 @@ export class SATPManager {
     const span = this.monitorService.startSpan(fnTag);
     try {
       const activeSessionsCount = this.sessions.size;
-      void this.monitorService.incrementCounter("satp.active_sessions", activeSessionsCount);
+      void this.monitorService.incrementCounter(
+        "satp.active_sessions",
+        activeSessionsCount,
+      );
       this.logger.debug(`${fnTag} active sessions: ${activeSessionsCount}`);
       return this.sessions;
     } catch (error) {
@@ -292,7 +296,7 @@ export class SATPManager {
     const fnTag = `${SATPManager.CLASS_NAME}#getSession`;
     const span = this.monitorService.startSpan(fnTag);
     span.setAttributes({ sessionId });
-    
+
     try {
       this.logger.debug(`${fnTag} retrieving session: ${sessionId}`);
       if (this.sessions == undefined) {
@@ -316,13 +320,13 @@ export class SATPManager {
   }
 
   /*
-    * Function checks if all the sessions are in the completed state
-    * @returns boolean
-  */
+   * Function checks if all the sessions are in the completed state
+   * @returns boolean
+   */
   public getSATPSessionState(): boolean {
     const fnTag = `${SATPManager.CLASS_NAME}#getSATPSessionStatus()`;
     this.logger.info(`${fnTag}, Getting SATP Session Status...`);
-    for (let value of this.sessions.values()) {
+    for (const value of this.sessions.values()) {
       if (value.getSessionState() !== State.COMPLETED) {
         return false;
       }
@@ -1101,6 +1105,4 @@ export class SATPManager {
       throw new TransactError(fnTag, error);
     }
   }
-
-
 }
