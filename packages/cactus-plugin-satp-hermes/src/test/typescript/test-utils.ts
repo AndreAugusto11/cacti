@@ -328,10 +328,6 @@ export async function createPGDatabase(
 }
 
 export async function setupDBTable(config: Knex.Config): Promise<void> {
-  const clonedConfig = { ...config };
-
-  (clonedConfig.connection as Knex.PgConnectionConfig).host = "localhost";
-
-  const knexInstanceClient = knex(clonedConfig);
+  const knexInstanceClient = knex(config);
   await knexInstanceClient.migrate.latest();
 }

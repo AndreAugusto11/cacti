@@ -113,20 +113,26 @@ export class SATPGatewayRunner implements ITestLedger {
   }
 
   public async getServerHost(): Promise<string> {
-    const address = await this.getContainerIpAddress();
-    const hostPort = await this.getHostPort(this.serverPort);
+    const address = "localhost";
+    const hostPort = await this.getHostPort(
+      SATP_GATEWAY_RUNNER_DEFAULT_OPTIONS.serverPort,
+    );
     return `http://${address}:${hostPort}`;
   }
 
   public async getClientHost(): Promise<string> {
-    const address = await this.getContainerIpAddress();
-    const hostPort = await this.getHostPort(this.clientPort);
+    const address = "localhost";
+    const hostPort = await this.getHostPort(
+      SATP_GATEWAY_RUNNER_DEFAULT_OPTIONS.clientPort,
+    );
     return `http://${address}:${hostPort}`;
   }
 
   public async getOApiHost(): Promise<string> {
-    const address = await this.getContainerIpAddress();
-    const hostPort = await this.getHostPort(this.oapiPort);
+    const address = "localhost";
+    const hostPort = await this.getHostPort(
+      SATP_GATEWAY_RUNNER_DEFAULT_OPTIONS.oapiPort,
+    );
     return `http://${address}:${hostPort}`;
   }
 
@@ -161,12 +167,17 @@ export class SATPGatewayRunner implements ITestLedger {
     this.log.debug("createDockerHostConfig()");
 
     const hostConfig: Docker.HostConfig = {
-      //NetworkMode: "host",
       Binds: [],
       PortBindings: {
-        "3010": [{ HostPort: `${this.serverPort}/tcp` }],
-        "3011": [{ HostPort: `${this.clientPort}/tcp` }],
-        "4010": [{ HostPort: `${this.oapiPort}/tcp` }],
+        [`${SATP_GATEWAY_RUNNER_DEFAULT_OPTIONS.serverPort}/tcp`]: [
+          { HostPort: `${this.serverPort}` },
+        ],
+        [`${SATP_GATEWAY_RUNNER_DEFAULT_OPTIONS.clientPort}/tcp`]: [
+          { HostPort: `${this.clientPort}` },
+        ],
+        [`${SATP_GATEWAY_RUNNER_DEFAULT_OPTIONS.oapiPort}/tcp`]: [
+          { HostPort: `${this.oapiPort}` },
+        ],
       },
     };
 
@@ -216,9 +227,9 @@ export class SATPGatewayRunner implements ITestLedger {
         [],
         {
           ExposedPorts: {
-            ["3010/tcp"]: {}, // SERVER_PORT
-            ["3011/tcp"]: {}, // CLIENT_PORT
-            ["4010/tcp"]: {}, // OAPI_PORT
+            [`${SATP_GATEWAY_RUNNER_DEFAULT_OPTIONS.serverPort}/tcp`]: {}, // SERVER_PORT
+            [`${SATP_GATEWAY_RUNNER_DEFAULT_OPTIONS.clientPort}/tcp`]: {}, // CLIENT_PORT
+            [`${SATP_GATEWAY_RUNNER_DEFAULT_OPTIONS.oapiPort}/tcp`]: {}, // OAPI_PORT
           },
           HostConfig: hostConfig,
         },

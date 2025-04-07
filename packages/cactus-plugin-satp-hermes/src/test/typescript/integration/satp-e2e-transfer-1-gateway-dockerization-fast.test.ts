@@ -148,10 +148,10 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
     } as GatewayIdentity;
 
     // besuConfig Json object setup:
-    const besuConfig = await besuEnv.createBesuConfig();
+    const besuConfig = await besuEnv.createBesuDockerConfig();
 
     // fabricConfig Json object setup:
-    const ethereumConfig = await ethereumEnv.createEthereumConfig();
+    const ethereumConfig = await ethereumEnv.createEthereumDockerConfig();
 
     const files = setupGatewayDockerFiles(
       gatewayIdentity,
@@ -178,11 +178,11 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
     };
 
     gatewayRunner = new SATPGatewayRunner(gatewayRunnerOptions);
-    console.log("starting gatewayRunner...");
+    log.debug("starting gatewayRunner...");
     await gatewayRunner.start();
-    console.log("gatewayRunner started sucessfully");
+    log.debug("gatewayRunner started sucessfully");
 
-    console.log(await gatewayRunner.getOApiHost());
+    log.debug(await gatewayRunner.getOApiHost());
 
     const approveAddressApi = new GetApproveAddressApi(
       new Configuration({ basePath: await gatewayRunner.getOApiHost() }),

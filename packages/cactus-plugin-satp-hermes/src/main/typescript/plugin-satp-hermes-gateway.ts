@@ -503,7 +503,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
 
     const httpApiA = await Servers.startOnPort(
       this.config.gid?.gatewayOapiPort,
-      this.config.gid?.address?.split("://")[1] ?? undefined, //this is necessary because it does not receive the http:// part of the address
+      "0.0.0.0",
     );
 
     const addressInfoApi = httpApiA.address() as AddressInfo;
