@@ -295,6 +295,86 @@ export class FabricTestEnvironment {
     } as INetworkOptions;
   }
 
+  // this is the config to be loaded by the gateway to use with docker, does not contain the log level because it will use the one in the gateway config
+  public createFabricDockerConfig(): INetworkOptions {
+    return {
+      networkIdentification: this.fabricConfig.networkIdentification,
+      userIdentity: this.bridgeIdentity,
+      channelName: this.fabricConfig.channelName,
+      targetOrganizations: this.fabricConfig.targetOrganizations?.map(
+        (org) => ({
+          ...org,
+          CORE_PEER_ADDRESS: org.CORE_PEER_ADDRESS.replace(
+            /peer0\.(org\d+)\.example\.com/,
+            "172.17.0.1",
+          ),
+        }),
+      ),
+      caFile: this.fabricConfig.caFile,
+      ccSequence: this.fabricConfig.ccSequence,
+      orderer: this.fabricConfig.orderer?.replace(
+        "orderer.example.com",
+        "172.17.0.1",
+      ),
+      ordererTLSHostnameOverride: this.fabricConfig.ordererTLSHostnameOverride,
+      connTimeout: this.fabricConfig.connTimeout,
+      signaturePolicy: this.fabricConfig.signaturePolicy,
+      mspId: this.bridgeMSPID,
+      wrapperContractName: this.fabricConfig.wrapperContractName,
+      connectorOptions: {
+        dockerBinary: this.connectorOptions.dockerBinary,
+        peerBinary: this.connectorOptions.peerBinary,
+        goBinary: this.connectorOptions.goBinary,
+        cliContainerEnv: {
+          ...FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
+          CORE_PEER_ADDRESS:
+            FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.CORE_PEER_ADDRESS.replace(
+              "peer0.org1.example.com",
+              "172.17.0.1",
+            ),
+        },
+        sshConfig: {
+          ...this.connectorOptions.sshConfig,
+          host: "172.17.0.1",
+        },
+        connectionProfile: {
+          ...this.bridgeProfile,
+          peers: Object.fromEntries(
+            Object.entries(this.bridgeProfile.peers).map(([key, value]) => [
+              key,
+              { ...value, url: value.url.replace("localhost", "172.17.0.1") },
+            ]),
+          ),
+          certificateAuthorities: Object.fromEntries(
+            Object.entries(this.bridgeProfile.certificateAuthorities ?? {}).map(
+              ([key, value]) => [
+                key,
+                { ...value, url: value.url.replace("localhost", "172.17.0.1") },
+              ],
+            ),
+          ),
+          orderers: Object.fromEntries(
+            Object.entries(this.bridgeProfile.orderers ?? {}).map(
+              ([key, value]) => [
+                key,
+                { ...value, url: value.url.replace("localhost", "172.17.0.1") },
+              ],
+            ),
+          ),
+        },
+        discoveryOptions: {
+          ...this.connectorOptions.discoveryOptions,
+          asLocalhost: false, // the satp docker container does not have the network as host, so the host is in 172.17.0.1 instead of localhost
+        },
+        eventHandlerOptions: {
+          ...this.connectorOptions.eventHandlerOptions,
+          asLocalhost: false, // the satp docker container does not have the network as host, so the host is in 172.17.0.1 instead of localhost
+        },
+      },
+      claimFormats: this.fabricConfig.claimFormats,
+    } as INetworkOptions;
+  }
+
   // this creates the same config as the bridge manager does
   public createFabricLeafConfig(
     ontologyManager: OntologyManager,

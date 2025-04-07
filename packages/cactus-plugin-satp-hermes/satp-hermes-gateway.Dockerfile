@@ -30,7 +30,7 @@ RUN npm install bufferutil
 ENTRYPOINT ["/usr/bin/supervisord"]
 CMD ["--configuration", "/etc/supervisord.conf", "--nodaemon"]
 
-HEALTHCHECK --interval=5s --timeout=1s --start-period=30s --retries=5 CMD [ "node", "./satp-hermes-gateway.Dockerfile.healthcheck.mjs", "http", "localhost", "4010" ]
+HEALTHCHECK --interval=5s --timeout=5s --start-period=30s --retries=10 CMD [ "node", "./satp-hermes-gateway.Dockerfile.healthcheck.mjs", "http", "localhost", "4010" ]
 
 ENV TZ=Etc/UTC
 ENV NODE_ENV=production

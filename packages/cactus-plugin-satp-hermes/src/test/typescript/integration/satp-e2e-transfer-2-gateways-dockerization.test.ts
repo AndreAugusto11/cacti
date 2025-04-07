@@ -213,15 +213,23 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
     } as GatewayIdentity;
 
     // besuConfig Json object setup:
-    const besuConfigJSON = await besuEnv.createBesuConfig();
+    const besuConfigJSON = await besuEnv.createBesuDockerConfig();
 
     // fabricConfig Json object setup:
-    const fabricConfigJSON = await fabricEnv.createFabricConfig();
+    const fabricConfigJSON = await fabricEnv.createFabricDockerConfig();
 
     const files1 = setupGatewayDockerFiles(
       gatewayIdentity1,
       logLevel,
-      [], //only knows itself
+      [
+        {
+          ...gatewayIdentity2,
+          address: "172.17.0.1",
+          gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT + 10,
+          gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER + 10,
+          gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI + 10,
+        },
+      ], //only knows itself
       false, // Crash recovery disabled
       { bridgeConfig: [besuConfigJSON] },
       db_local_config1,
@@ -232,7 +240,15 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
     const files2 = setupGatewayDockerFiles(
       gatewayIdentity2,
       logLevel,
-      [], //only knows itself
+      [
+        {
+          ...gatewayIdentity1,
+          address: "172.17.0.1",
+          gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
+          gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
+          gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
+        },
+      ], //only knows itself
       false, // Crash recovery disabled
       { bridgeConfig: [fabricConfigJSON] },
       db_local_config2,
@@ -244,9 +260,9 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
     const gatewayRunnerOptions1: ISATPGatewayRunnerConstructorOptions = {
       containerImageVersion: DOCKER_IMAGE_VERSION,
       containerImageName: DOCKER_IMAGE_NAME,
-      serverPort: gatewayIdentity1.gatewayServerPort,
-      clientPort: gatewayIdentity1.gatewayClientPort,
-      oapiPort: gatewayIdentity1.gatewayOapiPort,
+      serverPort: DEFAULT_PORT_GATEWAY_SERVER,
+      clientPort: DEFAULT_PORT_GATEWAY_CLIENT,
+      oapiPort: DEFAULT_PORT_GATEWAY_OAPI,
       logLevel,
       emitContainerLogs: true,
       configFilePath: files1.configFilePath,
@@ -258,9 +274,9 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
     const gatewayRunnerOptions2: ISATPGatewayRunnerConstructorOptions = {
       containerImageVersion: DOCKER_IMAGE_VERSION,
       containerImageName: DOCKER_IMAGE_NAME,
-      serverPort: gatewayIdentity2.gatewayServerPort,
-      clientPort: gatewayIdentity2.gatewayClientPort,
-      oapiPort: gatewayIdentity2.gatewayOapiPort,
+      serverPort: DEFAULT_PORT_GATEWAY_SERVER + 10,
+      clientPort: DEFAULT_PORT_GATEWAY_CLIENT + 10,
+      oapiPort: DEFAULT_PORT_GATEWAY_OAPI + 10,
       logLevel,
       emitContainerLogs: true,
       configFilePath: files2.configFilePath,
@@ -278,12 +294,8 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
     await gatewayRunner2.start();
     log.debug("gatewayRunner started sucessfully");
 
-    const port1 = await gatewayRunner1.getHostPort(
-      gatewayIdentity1.gatewayOapiPort!,
-    );
-
     const approveAddressApi1 = new GetApproveAddressApi(
-      new Configuration({ basePath: `${address}:${port1}` }),
+      new Configuration({ basePath: await gatewayRunner1.getOApiHost() }),
     );
 
     const reqApproveBesuAddress = await approveAddressApi1.getApproveAddress({
@@ -309,11 +321,8 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
     }
     log.debug("Approved 100 amout to the Besu Bridge Address");
 
-    const port2 = await gatewayRunner2.getHostPort(
-      gatewayIdentity2.gatewayOapiPort!,
-    );
     const approveAddressApi2 = new GetApproveAddressApi(
-      new Configuration({ basePath: `${address}:${port2}` }),
+      new Configuration({ basePath: await gatewayRunner2.getOApiHost() }),
     );
 
     const reqApproveFabricAddress = await approveAddressApi2.getApproveAddress({
@@ -329,7 +338,7 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
     await fabricEnv.giveRoleToBridge("Org2MSP");
 
     const satpApi = new TransactionApi(
-      new Configuration({ basePath: `${address}:${port1}` }),
+      new Configuration({ basePath: await gatewayRunner1.getOApiHost() }),
     );
 
     const req = getTransactRequest(
@@ -418,9 +427,6 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
       ],
       proofID: "mockProofID10",
       address,
-      gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
-      gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
-      gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
     } as GatewayIdentity;
 
     // gateway setup:
@@ -442,22 +448,27 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
       ],
       proofID: "mockProofID11",
       address,
-      gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT + 10,
-      gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER + 10,
-      gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI + 10,
     } as GatewayIdentity;
 
     // ethereumConfig Json object setup:
-    const besuConfigJSON = await besuEnv.createBesuConfig();
+    const besuConfigJSON = await besuEnv.createBesuDockerConfig();
 
     // fabricConfig Json object setup:
-    const fabricConfigJSON = await fabricEnv.createFabricConfig();
+    const fabricConfigJSON = await fabricEnv.createFabricDockerConfig();
 
     // gateway configuration setup:
     const files1 = setupGatewayDockerFiles(
       gatewayIdentity1,
       logLevel,
-      [], //only knows itself
+      [
+        {
+          ...gatewayIdentity2,
+          address: "172.17.0.1",
+          gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT + 10,
+          gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER + 10,
+          gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI + 10,
+        },
+      ], //only knows itself
       false, // Crash recovery disabled
       { bridgeConfig: [fabricConfigJSON] },
       db_local_config1,
@@ -468,7 +479,15 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
     const files2 = setupGatewayDockerFiles(
       gatewayIdentity2,
       logLevel,
-      [], //only knows itself
+      [
+        {
+          ...gatewayIdentity1,
+          address: "172.17.0.1",
+          gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
+          gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
+          gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
+        },
+      ], //only knows itself
       false, // Crash recovery disabled
       { bridgeConfig: [besuConfigJSON] },
       db_local_config2,
@@ -480,9 +499,9 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
     const gatewayRunnerOptions1: ISATPGatewayRunnerConstructorOptions = {
       containerImageVersion: DOCKER_IMAGE_VERSION,
       containerImageName: DOCKER_IMAGE_NAME,
-      serverPort: gatewayIdentity1.gatewayServerPort,
-      clientPort: gatewayIdentity1.gatewayClientPort,
-      oapiPort: gatewayIdentity1.gatewayOapiPort,
+      serverPort: DEFAULT_PORT_GATEWAY_SERVER,
+      clientPort: DEFAULT_PORT_GATEWAY_CLIENT,
+      oapiPort: DEFAULT_PORT_GATEWAY_OAPI,
       logLevel,
       emitContainerLogs: true,
       configFilePath: files1.configFilePath,
@@ -494,9 +513,9 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
     const gatewayRunnerOptions2: ISATPGatewayRunnerConstructorOptions = {
       containerImageVersion: DOCKER_IMAGE_VERSION,
       containerImageName: DOCKER_IMAGE_NAME,
-      serverPort: gatewayIdentity2.gatewayServerPort,
-      clientPort: gatewayIdentity2.gatewayClientPort,
-      oapiPort: gatewayIdentity2.gatewayOapiPort,
+      serverPort: DEFAULT_PORT_GATEWAY_SERVER + 10,
+      clientPort: DEFAULT_PORT_GATEWAY_CLIENT + 10,
+      oapiPort: DEFAULT_PORT_GATEWAY_OAPI + 10,
       logLevel,
       emitContainerLogs: true,
       configFilePath: files2.configFilePath,
@@ -514,12 +533,8 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
     await gatewayRunner2.start();
     log.debug("gatewayRunner started sucessfully");
 
-    const port1 = await gatewayRunner1.getHostPort(
-      gatewayIdentity1.gatewayOapiPort!,
-    );
-
     const approveAddressApi1 = new GetApproveAddressApi(
-      new Configuration({ basePath: `${address}:${port1}` }),
+      new Configuration({ basePath: await gatewayRunner1.getOApiHost() }),
     );
 
     const reqApproveFabricAddress = await approveAddressApi1.getApproveAddress({
@@ -544,11 +559,8 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
 
     log.debug("Approved 100 amount to the Fabric Bridge Address");
 
-    const port2 = await gatewayRunner2.getHostPort(
-      gatewayIdentity2.gatewayOapiPort!,
-    );
     const approveAddressApi2 = new GetApproveAddressApi(
-      new Configuration({ basePath: `${address}:${port2}` }),
+      new Configuration({ basePath: await gatewayRunner2.getOApiHost() }),
     );
 
     const reqApproveBesuAddress = await approveAddressApi2.getApproveAddress({
@@ -565,7 +577,7 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
     await besuEnv.giveRoleToBridge(reqApproveBesuAddress.data.approveAddress);
 
     const satpApi = new TransactionApi(
-      new Configuration({ basePath: `${address}:${port1}` }),
+      new Configuration({ basePath: await gatewayRunner1.getOApiHost() }),
     );
 
     const req = getTransactRequest(
@@ -655,9 +667,6 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
       ],
       proofID: "mockProofID10",
       address,
-      gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
-      gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
-      gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
     } as GatewayIdentity;
 
     // gateway setup:
@@ -679,21 +688,26 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
       ],
       proofID: "mockProofID11",
       address,
-      gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT + 1,
-      gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER + 1,
-      gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI + 1,
     } as GatewayIdentity;
 
     // besuConfig Json object setup:
-    const besuConfig = await besuEnv.createBesuConfig();
+    const besuConfig = await besuEnv.createBesuDockerConfig();
 
     // fabricConfig Json object setup:
-    const ethereumConfig = await ethereumEnv.createEthereumConfig();
+    const ethereumConfig = await ethereumEnv.createEthereumDockerConfig();
 
     const files1 = setupGatewayDockerFiles(
       gatewayIdentity1,
       logLevel,
-      [], //only knows itself
+      [
+        {
+          ...gatewayIdentity2,
+          address: "172.17.0.1",
+          gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT + 10,
+          gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER + 10,
+          gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI + 10,
+        },
+      ], //only knows itself
       false, // Crash recovery disabled
       { bridgeConfig: [besuConfig] },
       db_local_config1,
@@ -704,7 +718,15 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
     const files2 = setupGatewayDockerFiles(
       gatewayIdentity2,
       logLevel,
-      [], //only knows itself
+      [
+        {
+          ...gatewayIdentity1,
+          address: "172.17.0.1",
+          gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
+          gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
+          gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
+        },
+      ], //only knows itself
       false, // Crash recovery disabled
       { bridgeConfig: [ethereumConfig] },
       db_local_config2,
@@ -716,9 +738,9 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
     const gatewayRunnerOptions1: ISATPGatewayRunnerConstructorOptions = {
       containerImageVersion: DOCKER_IMAGE_VERSION,
       containerImageName: DOCKER_IMAGE_NAME,
-      serverPort: gatewayIdentity1.gatewayServerPort,
-      clientPort: gatewayIdentity1.gatewayClientPort,
-      oapiPort: gatewayIdentity1.gatewayOapiPort,
+      serverPort: DEFAULT_PORT_GATEWAY_SERVER,
+      clientPort: DEFAULT_PORT_GATEWAY_CLIENT,
+      oapiPort: DEFAULT_PORT_GATEWAY_OAPI,
       logLevel,
       emitContainerLogs: true,
       configFilePath: files1.configFilePath,
@@ -730,9 +752,9 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
     const gatewayRunnerOptions2: ISATPGatewayRunnerConstructorOptions = {
       containerImageVersion: DOCKER_IMAGE_VERSION,
       containerImageName: DOCKER_IMAGE_NAME,
-      serverPort: gatewayIdentity2.gatewayServerPort,
-      clientPort: gatewayIdentity2.gatewayClientPort,
-      oapiPort: gatewayIdentity2.gatewayOapiPort,
+      serverPort: DEFAULT_PORT_GATEWAY_SERVER + 10,
+      clientPort: DEFAULT_PORT_GATEWAY_CLIENT + 10,
+      oapiPort: DEFAULT_PORT_GATEWAY_OAPI + 10,
       logLevel,
       emitContainerLogs: true,
       configFilePath: files2.configFilePath,
@@ -750,12 +772,8 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
     await gatewayRunner2.start();
     log.debug("gatewayRunner started sucessfully");
 
-    const port1 = await gatewayRunner1.getHostPort(
-      gatewayIdentity1.gatewayOapiPort!,
-    );
-
     const approveAddressApi1 = new GetApproveAddressApi(
-      new Configuration({ basePath: `${address}:${port1}` }),
+      new Configuration({ basePath: await gatewayRunner1.getOApiHost() }),
     );
 
     const reqApproveBesuAddress = await approveAddressApi1.getApproveAddress({
@@ -781,11 +799,8 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
     }
     log.debug("Approved 100 amout to the Besu Bridge Address");
 
-    const port2 = await gatewayRunner2.getHostPort(
-      gatewayIdentity2.gatewayOapiPort!,
-    );
     const approveAddressApi2 = new GetApproveAddressApi(
-      new Configuration({ basePath: `${address}:${port2}` }),
+      new Configuration({ basePath: await gatewayRunner2.getOApiHost() }),
     );
 
     const reqApproveEthereumAddress =
@@ -805,7 +820,7 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
     );
 
     const satpApi = new TransactionApi(
-      new Configuration({ basePath: `${address}:${port1}` }),
+      new Configuration({ basePath: await gatewayRunner1.getOApiHost() }),
     );
 
     const req = getTransactRequest(

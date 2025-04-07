@@ -165,10 +165,10 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
     } as GatewayIdentity;
 
     // besuConfig Json object setup:
-    const besuConfigJSON = await besuEnv.createBesuConfig();
+    const besuConfigJSON = await besuEnv.createBesuDockerConfig();
 
     // fabricConfig Json object setup:
-    const fabricConfigJSON = await fabricEnv.createFabricConfig();
+    const fabricConfigJSON = await fabricEnv.createFabricDockerConfig();
 
     const files = setupGatewayDockerFiles(
       gatewayIdentity,
@@ -324,10 +324,10 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
     } as GatewayIdentity;
 
     // ethereumConfig Json object setup:
-    const besuConfigJSON = await besuEnv.createBesuConfig();
+    const besuConfigJSON = await besuEnv.createBesuDockerConfig();
 
     // fabricConfig Json object setup:
-    const fabricConfigJSON = await fabricEnv.createFabricConfig();
+    const fabricConfigJSON = await fabricEnv.createFabricDockerConfig();
 
     // gateway configuration setup:
     const files = setupGatewayDockerFiles(
@@ -488,10 +488,10 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
     } as GatewayIdentity;
 
     // besuConfig Json object setup:
-    const besuConfig = await besuEnv.createBesuConfig();
+    const besuConfig = await besuEnv.createBesuDockerConfig();
 
     // fabricConfig Json object setup:
-    const ethereumConfig = await ethereumEnv.createEthereumConfig();
+    const ethereumConfig = await ethereumEnv.createEthereumDockerConfig();
 
     const files = setupGatewayDockerFiles(
       gatewayIdentity,

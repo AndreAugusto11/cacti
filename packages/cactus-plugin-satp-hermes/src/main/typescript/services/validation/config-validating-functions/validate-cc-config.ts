@@ -64,9 +64,7 @@ function createBridgeConfig(configs: NetworkOptionsJSON[]): INetworkOptions[] {
   const bridgesConfigParsed: INetworkOptions[] = [];
   configs.forEach((config) => {
     if (isFabricConfigJSON(config)) {
-      console.log("Validating FabricConfig Options...");
       const fabricOptions = createFabricOptions(config.connectorOptions);
-      console.log("FabricConnectorOptions is valid.");
 
       const fabricConfig = {
         networkIdentification: config.networkIdentification,
@@ -95,10 +93,7 @@ function createBridgeConfig(configs: NetworkOptionsJSON[]): INetworkOptions[] {
 
       bridgesConfigParsed.push(fabricConfig);
     } else if (isBesuConfigJSON(config)) {
-      console.log("Validating BesuConfig Options...");
       const besuOptions = createBesuOptions(config.connectorOptions);
-      console.log("BesuConfig Options is valid.");
-
       const besuConfig = {
         networkIdentification: config.networkIdentification,
         signingCredential: config.signingCredential,
@@ -119,14 +114,12 @@ function createBridgeConfig(configs: NetworkOptionsJSON[]): INetworkOptions[] {
 
       bridgesConfigParsed.push(besuConfig);
     } else if (isEthereumConfigJSON(config)) {
-      console.log("Validating EthereumConfig Options...");
-      const besuOptions = createEthereumOptions(config.connectorOptions);
-      console.log("EthereumConfig Options is valid.");
+      const ethereumOptions = createEthereumOptions(config.connectorOptions);
 
       const ethereumConfig = {
         networkIdentification: config.networkIdentification,
         signingCredential: config.signingCredential,
-        connectorOptions: besuOptions,
+        connectorOptions: ethereumOptions,
         leafId: config.leafId,
         keyPair:
           config.keyPair === undefined
