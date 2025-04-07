@@ -33,6 +33,7 @@ import {
   TokenType,
   TransactionApi,
 } from "../../../main/typescript";
+import { DOCKER_IMAGE_VERSION, DOCKER_IMAGE_NAME } from "../constants";
 
 const logLevel: LogLevelDesc = "TRACE";
 const log = LoggerProvider.getOrCreate({
@@ -144,16 +145,13 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
       ],
       proofID: "mockProofID10",
       address,
-      gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
-      gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
-      gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
     } as GatewayIdentity;
 
     // besuConfig Json object setup:
-    const besuConfig = await besuEnv.createBesuConfig();
+    const besuConfig = await besuEnv.createBesuDockerConfig();
 
     // fabricConfig Json object setup:
-    const ethereumConfig = await ethereumEnv.createEthereumConfig();
+    const ethereumConfig = await ethereumEnv.createEthereumDockerConfig();
 
     const files = setupGatewayDockerFiles(
       gatewayIdentity,
@@ -167,8 +165,11 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
 
     // gatewayRunner setup:
     const gatewayRunnerOptions: ISATPGatewayRunnerConstructorOptions = {
-      containerImageVersion: "50a953631-2025-04-04",
-      containerImageName: "kubaya/cacti-satp-hermes-gateway",
+      containerImageVersion: DOCKER_IMAGE_VERSION,
+      containerImageName: DOCKER_IMAGE_NAME,
+      clientPort: DEFAULT_PORT_GATEWAY_CLIENT + 10,
+      serverPort: DEFAULT_PORT_GATEWAY_SERVER + 10,
+      oapiPort: DEFAULT_PORT_GATEWAY_OAPI + 10,
       logLevel,
       emitContainerLogs: true,
       configFilePath: files.configFilePath,
@@ -181,10 +182,10 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
     await gatewayRunner.start();
     console.log("gatewayRunner started sucessfully");
 
-    const port = await gatewayRunner.getHostPort(4010);
+    console.log(await gatewayRunner.getOApiHost());
 
     const approveAddressApi = new GetApproveAddressApi(
-      new Configuration({ basePath: `${address}:${port}` }),
+      new Configuration({ basePath: await gatewayRunner.getOApiHost() }),
     );
 
     const reqApproveBesuAddress = await approveAddressApi.getApproveAddress({
@@ -228,7 +229,7 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
     );
 
     const satpApi = new TransactionApi(
-      new Configuration({ basePath: `${address}:${port}` }),
+      new Configuration({ basePath: await gatewayRunner.getOApiHost() }),
     );
 
     const req = getTransactRequest(

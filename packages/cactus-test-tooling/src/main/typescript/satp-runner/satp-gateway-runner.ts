@@ -113,18 +113,21 @@ export class SATPGatewayRunner implements ITestLedger {
   }
 
   public async getServerHost(): Promise<string> {
+    const address = await this.getContainerIpAddress();
     const hostPort = await this.getHostPort(this.serverPort);
-    return `http://localhost:${hostPort}`;
+    return `http://${address}:${hostPort}`;
   }
 
   public async getClientHost(): Promise<string> {
+    const address = await this.getContainerIpAddress();
     const hostPort = await this.getHostPort(this.clientPort);
-    return `http://localhost:${hostPort}`;
+    return `http://${address}:${hostPort}`;
   }
 
   public async getOApiHost(): Promise<string> {
+    const address = await this.getContainerIpAddress();
     const hostPort = await this.getHostPort(this.oapiPort);
-    return `http://localhost:${hostPort}`;
+    return `http://${address}:${hostPort}`;
   }
 
   public async getHostPort(configuredPort: number): Promise<number> {
@@ -142,12 +145,28 @@ export class SATPGatewayRunner implements ITestLedger {
     }
   }
 
+  public async getContainerIpAddress(): Promise<string> {
+    if (this.container) {
+      const containerInfo = await this.container.inspect();
+      if (containerInfo.NetworkSettings?.IPAddress) {
+        return containerInfo.NetworkSettings.IPAddress;
+      } else {
+        throw new Error("Container IP address not found");
+      }
+    }
+    throw new Error("Container not started");
+  }
+
   private createDockerHostConfig(): Docker.HostConfig {
     this.log.debug("createDockerHostConfig()");
+
     const hostConfig: Docker.HostConfig = {
-      PublishAllPorts: true,
       Binds: [],
-      NetworkMode: "host",
+      PortBindings: {
+        "3010": [{ HostPort: `${this.serverPort}/tcp` }],
+        "3011": [{ HostPort: `${this.clientPort}/tcp` }],
+        "4010": [{ HostPort: `${this.oapiPort}/tcp` }],
+      },
     };
 
     const containerPath = "/opt/cacti/satp-hermes";
@@ -167,6 +186,7 @@ export class SATPGatewayRunner implements ITestLedger {
         `${this.ontologiesPath}:${containerPath}/ontologies:rw`,
       );
     }
+
     return hostConfig;
   }
 
@@ -195,9 +215,9 @@ export class SATPGatewayRunner implements ITestLedger {
         [],
         {
           ExposedPorts: {
-            [`${this.serverPort}/tcp`]: {}, // SERVER_PORT
-            [`${this.clientPort}/tcp`]: {}, // CLIENT_PORT
-            [`${this.oapiPort}/tcp`]: {}, // OAPI_PORT
+            ["3010/tcp"]: {}, // SERVER_PORT
+            ["3011/tcp"]: {}, // CLIENT_PORT
+            ["4010/tcp"]: {}, // OAPI_PORT
           },
           HostConfig: hostConfig,
         },

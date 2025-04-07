@@ -213,6 +213,28 @@ export class EthereumTestEnvironment {
     } as INetworkOptions;
   }
 
+  // this is the config to be loaded by the gateway when in a docker, does not contain the log level because it will use the one in the gateway config
+  public createEthereumDockerConfig(): INetworkOptions {
+    return {
+      networkIdentification: this.ethereumConfig.networkIdentification,
+      signingCredential: this.ethereumConfig.signingCredential,
+      wrapperContractName: this.ethereumConfig.wrapperContractName,
+      wrapperContractAddress: this.ethereumConfig.wrapperContractAddress,
+      gas: this.ethereumConfig.gas,
+      connectorOptions: {
+        rpcApiHttpHost: this.connectorOptions.rpcApiHttpHost?.replace(
+          "127.0.0.1",
+          "172.17.0.1",
+        ),
+        rpcApiWsHost: this.connectorOptions.rpcApiWsHost?.replace(
+          "127.0.0.1",
+          "172.17.0.1",
+        ),
+      },
+      claimFormats: this.ethereumConfig.claimFormats,
+    } as INetworkOptions;
+  }
+
   // Deploys smart contracts and sets up configurations for testing
   public async deployAndSetupContracts(claimFormat: ClaimFormat) {
     const deployOutSATPContract = await this.connector.deployContract({

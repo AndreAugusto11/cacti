@@ -75,9 +75,9 @@ export class BesuTestEnvironment {
     await this.ledger.start();
 
     const rpcApiHttpHost = await this.ledger.getRpcApiHttpHost();
-    // rpcApiHttpHost = rpcApiHttpHost.replace("127.0.0.1", lanIp);
+
     const rpcApiWsHost = await this.ledger.getRpcApiWsHost();
-    // rpcApiWsHost = rpcApiWsHost.replace("127.0.0.1", lanIp);
+
     this.web3 = new Web3(rpcApiHttpHost);
 
     // Accounts setup
@@ -174,6 +174,28 @@ export class BesuTestEnvironment {
       connectorOptions: {
         rpcApiHttpHost: this.connectorOptions.rpcApiHttpHost,
         rpcApiWsHost: this.connectorOptions.rpcApiWsHost,
+      },
+      claimFormats: this.besuConfig.claimFormats,
+    } as INetworkOptions;
+  }
+
+  // this is the config to be loaded by the gateway when in a docker, does not contain the log level because it will use the one in the gateway config
+  public createBesuDockerConfig(): INetworkOptions {
+    return {
+      networkIdentification: this.besuConfig.networkIdentification,
+      signingCredential: this.besuConfig.signingCredential,
+      wrapperContractName: this.besuConfig.wrapperContractName,
+      wrapperContractAddress: this.besuConfig.wrapperContractAddress,
+      gas: this.besuConfig.gas,
+      connectorOptions: {
+        rpcApiHttpHost: this.connectorOptions.rpcApiHttpHost.replace(
+          "127.0.0.1",
+          "172.17.0.1",
+        ),
+        rpcApiWsHost: this.connectorOptions.rpcApiWsHost.replace(
+          "127.0.0.1",
+          "172.17.0.1",
+        ),
       },
       claimFormats: this.besuConfig.claimFormats,
     } as INetworkOptions;
