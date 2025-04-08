@@ -301,21 +301,21 @@ export class FabricTestEnvironment {
       networkIdentification: this.fabricConfig.networkIdentification,
       userIdentity: this.bridgeIdentity,
       channelName: this.fabricConfig.channelName,
-      targetOrganizations: this.fabricConfig.targetOrganizations?.map(
-        (org) => ({
-          ...org,
-          CORE_PEER_ADDRESS: org.CORE_PEER_ADDRESS.replace(
-            /peer0\.(org\d+)\.example\.com/,
-            "172.17.0.1",
-          ),
-        }),
-      ),
+      targetOrganizations: this.fabricConfig.targetOrganizations, //?.map(
+      //   (org) => ({
+      //     ...org,
+      //     CORE_PEER_ADDRESS: org.CORE_PEER_ADDRESS.replace(
+      //       /peer0\.(org\d+)\.example\.com/,
+      //       "172.17.0.1",
+      //     ),
+      //   }),
+      // ),
       caFile: this.fabricConfig.caFile,
       ccSequence: this.fabricConfig.ccSequence,
-      orderer: this.fabricConfig.orderer?.replace(
-        "orderer.example.com",
-        "172.17.0.1",
-      ),
+      orderer: this.fabricConfig.orderer, //?.replace(
+      //   "orderer.example.com",
+      //   "172.17.0.1",
+      // ),
       ordererTLSHostnameOverride: this.fabricConfig.ordererTLSHostnameOverride,
       connTimeout: this.fabricConfig.connTimeout,
       signaturePolicy: this.fabricConfig.signaturePolicy,
@@ -325,14 +325,14 @@ export class FabricTestEnvironment {
         dockerBinary: this.connectorOptions.dockerBinary,
         peerBinary: this.connectorOptions.peerBinary,
         goBinary: this.connectorOptions.goBinary,
-        cliContainerEnv: {
-          ...FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
-          CORE_PEER_ADDRESS:
-            FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.CORE_PEER_ADDRESS.replace(
-              "peer0.org1.example.com",
-              "172.17.0.1",
-            ),
-        },
+        cliContainerEnv: this.connectorOptions.cliContainerEnv, //{
+        //   ...FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
+        //   CORE_PEER_ADDRESS:
+        //     FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.CORE_PEER_ADDRESS.replace(
+        //       "peer0.org1.example.com",
+        //       "172.17.0.1",
+        //     ),
+        // },
         sshConfig: {
           ...this.connectorOptions.sshConfig,
           host: "172.17.0.1",
