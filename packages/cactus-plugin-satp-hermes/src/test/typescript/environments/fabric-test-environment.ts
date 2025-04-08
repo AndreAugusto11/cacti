@@ -325,14 +325,15 @@ export class FabricTestEnvironment {
         dockerBinary: this.connectorOptions.dockerBinary,
         peerBinary: this.connectorOptions.peerBinary,
         goBinary: this.connectorOptions.goBinary,
-        cliContainerEnv: this.connectorOptions.cliContainerEnv, //{
-        //   ...FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
-        //   CORE_PEER_ADDRESS:
-        //     FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.CORE_PEER_ADDRESS.replace(
-        //       "peer0.org1.example.com",
-        //       "172.17.0.1",
-        //     ),
-        // },
+        cliContainerEnv: {
+          //this.connectorOptions.cliContainerEnv,
+          ...FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
+          CORE_PEER_ADDRESS:
+            FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.CORE_PEER_ADDRESS.replace(
+              "peer0.org1.example.com",
+              "172.17.0.1",
+            ),
+        },
         sshConfig: {
           ...this.connectorOptions.sshConfig,
           host: "172.17.0.1",
