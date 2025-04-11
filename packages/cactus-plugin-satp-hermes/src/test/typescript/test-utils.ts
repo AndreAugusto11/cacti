@@ -21,7 +21,6 @@ import { ICrossChainMechanismsOptions } from "../../main/typescript/cross-chain-
 export { BesuTestEnvironment } from "./environments/besu-test-environment";
 export { EthereumTestEnvironment } from "./environments/ethereum-test-environment";
 export { FabricTestEnvironment } from "./environments/fabric-test-environment";
-import { v4 as internalIpV4 } from "internal-ip";
 
 // Function overloads for creating different types of API clients
 export function createClient(
@@ -308,17 +307,19 @@ export async function createPGDatabase(
     });
   });
 
-  console.debug(`IP address of the container: ${await internalIpV4()}`);
+  const containerData = await docker
+    .getContainer((await container).id)
+    .inspect();
 
   return {
     config: {
       client: "pg", // Specify PostgreSQL as the client
       connection: {
-        host: await internalIpV4(), //"172.17.0.1", // Get the container IP address or use default
+        host: containerData.NetworkSettings.Networks["bridge"].IPAddress, // Use the container's IP address
         user: postgresUser, // Database user
         password: postgresPassword, // Database password
         database: postgresDB, // The name of your PostgreSQL database
-        port: port, // Default PostgreSQL port
+        port: 5432, // Default PostgreSQL port
         ssl: false, // Set to true if you're using SSL for a secure connection
       },
       migrations: {
