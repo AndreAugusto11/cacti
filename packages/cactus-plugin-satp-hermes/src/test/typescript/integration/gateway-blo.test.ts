@@ -7,7 +7,6 @@ import { type LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
 import { PluginFactorySATPGateway } from "../../../main/typescript/factory/plugin-factory-gateway-orchestrator";
 import {
   type IPluginFactoryOptions,
-  LedgerType,
   PluginImportType,
 } from "@hyperledger/cactus-core-api";
 
@@ -54,10 +53,6 @@ const options: SATPGatewayConfig = {
         Crash: "v1",
       },
     ],
-    connectedDLTs: [
-      { id: "BESU", ledgerType: LedgerType.Besu2X },
-      { id: "FABRIC", ledgerType: LedgerType.Fabric2 },
-    ],
     proofID: "mockProofID10",
     gatewayServerPort: 3010,
     gatewayClientPort: 3011,
@@ -75,7 +70,9 @@ describe("GetStatus Endpoint and Functionality testing", () => {
     try {
       await gateway.startup();
       const address = options.gid!.address!;
-      const port = 4010;
+      const port = options.gid!.gatewayOapiPort!;
+
+      await gateway.getOrCreateHttpServer();
 
       const adminApiClient = createClient("AdminApi", address, port, logger);
 
@@ -97,7 +94,9 @@ describe("GetStatus Endpoint and Functionality testing", () => {
     try {
       await gateway.startup();
       const address = options.gid!.address!;
-      const port = 4010;
+      const port = options.gid!.gatewayOapiPort!;
+
+      await gateway.getOrCreateHttpServer();
 
       const adminApiClient = createClient("AdminApi", address, port, logger);
 
@@ -116,7 +115,9 @@ describe("GetStatus Endpoint and Functionality testing", () => {
     try {
       await gateway.startup();
       const address = options.gid!.address!;
-      const port = 4010;
+      const port = options.gid!.gatewayOapiPort!;
+
+      await gateway.getOrCreateHttpServer();
 
       const transactApiClient = createClient(
         "TransactionApi",
@@ -129,11 +130,7 @@ describe("GetStatus Endpoint and Functionality testing", () => {
       expect(result).toBeDefined();
       expect(result.status).toBe(200);
       expect(result.data.integrations).toBeDefined();
-      expect(result.data.integrations).toHaveLength(2);
-      // the type of the first integration is "fabric"
-      expect(result.data.integrations[0].type).toEqual(LedgerType.Besu2X);
-      // the type of the second integration is "besu"
-      expect(result.data.integrations[1].type).toEqual(LedgerType.Fabric2);
+      expect(result.data.integrations.length).toBe(0); // No integrations yet
     } finally {
       await gateway.shutdown();
     }
