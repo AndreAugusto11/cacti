@@ -31,6 +31,7 @@ import {
 import { OntologyManager } from "../../../main/typescript/cross-chain-mechanisms/bridge/ontology/ontology-manager";
 import ExampleOntology from "../../ontologies/ontology-satp-erc20-interact-ethereum.json";
 import { INetworkOptions } from "../../../main/typescript/cross-chain-mechanisms/bridge/bridge-types";
+import Docker from "dockerode";
 
 // Test environment for Ethereum ledger operations
 export class EthereumTestEnvironment {
@@ -56,6 +57,8 @@ export class EthereumTestEnvironment {
   public wrapperContractAddress!: string;
   public ethereumConfig!: IEthereumLeafNeworkOptions;
 
+  private dockerContainerIP?: string;
+
   private readonly log: Logger;
 
   private constructor(erc20TokenContract: string, logLevel: LogLevelDesc) {
@@ -72,7 +75,17 @@ export class EthereumTestEnvironment {
       containerImageName: "ghcr.io/hyperledger/cacti-geth-all-in-one",
       containerImageVersion: "2023-07-27-2a8c48ed6",
     });
-    await this.ledger.start();
+
+    const docker = new Docker();
+
+    const container = await this.ledger.start();
+
+    const containerData = await docker
+      .getContainer((await container).id)
+      .inspect();
+
+    this.dockerContainerIP =
+      containerData.NetworkSettings.Networks["bridge"].IPAddress;
 
     const SATPContract1 = {
       contractName: "SATPContract",
@@ -222,14 +235,8 @@ export class EthereumTestEnvironment {
       wrapperContractAddress: this.ethereumConfig.wrapperContractAddress,
       gas: this.ethereumConfig.gas,
       connectorOptions: {
-        rpcApiHttpHost: this.connectorOptions.rpcApiHttpHost?.replace(
-          "127.0.0.1",
-          "172.17.0.1",
-        ),
-        rpcApiWsHost: this.connectorOptions.rpcApiWsHost?.replace(
-          "127.0.0.1",
-          "172.17.0.1",
-        ),
+        rpcApiHttpHost: "http://" + this.dockerContainerIP + ":8545", // this is the default port for geth
+        rpcApiWsHost: "ws://" + this.dockerContainerIP + ":8546", // this is the default port for geth
       },
       claimFormats: this.ethereumConfig.claimFormats,
     } as INetworkOptions;

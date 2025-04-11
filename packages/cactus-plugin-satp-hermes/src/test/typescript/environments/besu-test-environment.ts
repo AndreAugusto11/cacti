@@ -3,7 +3,10 @@ import {
   LoggerProvider,
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
-import { BesuTestLedger } from "@hyperledger/cactus-test-tooling";
+import {
+  BESU_TEST_LEDGER_DEFAULT_OPTIONS,
+  BesuTestLedger,
+} from "@hyperledger/cactus-test-tooling";
 import {
   EthContractInvocationType as BesuContractInvocationType,
   IPluginLedgerConnectorBesuOptions,
@@ -30,6 +33,7 @@ import {
 import { OntologyManager } from "../../../main/typescript/cross-chain-mechanisms/bridge/ontology/ontology-manager";
 import ExampleOntology from "../../ontologies/ontology-satp-erc20-interact-besu.json";
 import { INetworkOptions } from "../../../main/typescript/cross-chain-mechanisms/bridge/bridge-types";
+import Docker from "dockerode";
 
 export class BesuTestEnvironment {
   public static readonly BESU_ASSET_ID: string = "BesuExampleAsset";
@@ -56,6 +60,8 @@ export class BesuTestEnvironment {
   public assetContractAddress?: string;
   public besuConfig!: IBesuLeafNeworkOptions;
 
+  private dockerContainerIP?: string;
+
   private readonly log: Logger;
 
   private constructor(erc20TokenContract: string, logLevel: LogLevelDesc) {
@@ -72,7 +78,17 @@ export class BesuTestEnvironment {
       emitContainerLogs: true,
       envVars: ["BESU_NETWORK=dev"],
     });
-    await this.ledger.start();
+
+    const docker = new Docker();
+
+    const container = await this.ledger.start();
+
+    const containerData = await docker
+      .getContainer((await container).id)
+      .inspect();
+
+    this.dockerContainerIP =
+      containerData.NetworkSettings.Networks["bridge"].IPAddress;
 
     const rpcApiHttpHost = await this.ledger.getRpcApiHttpHost();
 
@@ -188,14 +204,16 @@ export class BesuTestEnvironment {
       wrapperContractAddress: this.besuConfig.wrapperContractAddress,
       gas: this.besuConfig.gas,
       connectorOptions: {
-        rpcApiHttpHost: this.connectorOptions.rpcApiHttpHost.replace(
-          "127.0.0.1",
-          "172.17.0.1",
-        ),
-        rpcApiWsHost: this.connectorOptions.rpcApiWsHost.replace(
-          "127.0.0.1",
-          "172.17.0.1",
-        ),
+        rpcApiHttpHost:
+          "http://" +
+          this.dockerContainerIP +
+          ":" +
+          BESU_TEST_LEDGER_DEFAULT_OPTIONS.rpcApiHttpPort,
+        rpcApiWsHost:
+          "ws://" +
+          this.dockerContainerIP +
+          ":" +
+          BESU_TEST_LEDGER_DEFAULT_OPTIONS.rpcApiWsPort,
       },
       claimFormats: this.besuConfig.claimFormats,
     } as INetworkOptions;
