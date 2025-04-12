@@ -209,6 +209,8 @@ export function getTransactRequest(
 
 export async function createPGDatabase(
   port: number,
+  toUseInDocker: boolean = false,
+  network?: string,
   postgresUser: string = "postgres", // You can set default values or accept them as parameters
   postgresPassword: string = "password",
   postgresDB: string = "my_database",
@@ -224,6 +226,17 @@ export async function createPGDatabase(
 
   console.debug(`Starting container with image: ${imageFqn}...`);
 
+  if (network) {
+    const networks = await docker.listNetworks();
+    const networkExists = networks.some((n) => n.Name === network);
+    if (!networkExists) {
+      await docker.createNetwork({
+        Name: network,
+        Driver: "bridge",
+      });
+    }
+  }
+
   // Define your host configuration
   const hostConfig: Docker.HostConfig = {
     PublishAllPorts: true,
@@ -231,6 +244,7 @@ export async function createPGDatabase(
     PortBindings: {
       "5432/tcp": [{ HostPort: `${port}` }],
     },
+    NetworkMode: network,
   };
 
   // Define your health check
@@ -311,15 +325,36 @@ export async function createPGDatabase(
     .getContainer((await container).id)
     .inspect();
 
+  if (toUseInDocker) {
+    return {
+      config: {
+        client: "pg", // Specify PostgreSQL as the client
+        connection: {
+          host: containerData.NetworkSettings.Networks[network || "bridge"]
+            .IPAddress, // Use the container's IP address
+          user: postgresUser, // Database user
+          password: postgresPassword, // Database password
+          database: postgresDB, // The name of your PostgreSQL database
+          port: 5432, // Default PostgreSQL port
+          ssl: false, // Set to true if you're using SSL for a secure connection
+        },
+        migrations: {
+          directory:
+            "./packages/cactus-plugin-satp-hermes/src/main/typescript/database/migrations",
+        },
+      } as Knex.Config,
+      container: await container,
+    };
+  }
   return {
     config: {
       client: "pg", // Specify PostgreSQL as the client
       connection: {
-        host: containerData.NetworkSettings.Networks["bridge"].IPAddress, // Use the container's IP address
+        host: "localhost", // Use localhost for local development
         user: postgresUser, // Database user
         password: postgresPassword, // Database password
         database: postgresDB, // The name of your PostgreSQL database
-        port: 5432, // Default PostgreSQL port
+        port: port, // Default PostgreSQL port
         ssl: false, // Set to true if you're using SSL for a secure connection
       },
       migrations: {

@@ -54,6 +54,8 @@ let db_local: Container;
 let db_remote: Container;
 let gatewayRunner: SATPGatewayRunner;
 
+const testNetwork = "test-network";
+
 afterAll(async () => {
   await gatewayRunner.stop();
   await gatewayRunner.destroy();
@@ -88,12 +90,16 @@ beforeAll(async () => {
 
   ({ config: db_local_config, container: db_local } = await createPGDatabase(
     5432,
+    true,
+    testNetwork,
     "user123123",
     "password",
   ));
 
   ({ config: db_remote_config, container: db_remote } = await createPGDatabase(
     5450,
+    true,
+    testNetwork,
     "user123123",
     "password",
   ));
@@ -105,6 +111,7 @@ beforeAll(async () => {
     fabricEnv = await FabricTestEnvironment.setupTestEnvironment(
       satpContractName,
       logLevel,
+      testNetwork,
     );
     log.info("Fabric Ledger started successfully");
 
@@ -115,6 +122,7 @@ beforeAll(async () => {
     besuEnv = await BesuTestEnvironment.setupTestEnvironment(
       erc20TokenContract,
       logLevel,
+      testNetwork,
     );
     log.info("Besu Ledger started successfully");
 
@@ -193,7 +201,7 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
 
     gatewayRunner = new SATPGatewayRunner(gatewayRunnerOptions);
     log.debug("starting gatewayRunner...");
-    await gatewayRunner.start();
+    await gatewayRunner.start(false, fabricEnv.getNetwork());
     log.debug("gatewayRunner started sucessfully");
 
     const port = await gatewayRunner.getHostPort(DEFAULT_PORT_GATEWAY_OAPI);

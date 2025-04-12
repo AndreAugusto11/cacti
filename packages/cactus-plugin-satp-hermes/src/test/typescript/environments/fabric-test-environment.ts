@@ -51,6 +51,7 @@ import {
 import ExampleOntology from "../../ontologies/ontology-satp-erc20-interact-fabric.json";
 import { OntologyManager } from "../../../main/typescript/cross-chain-mechanisms/bridge/ontology/ontology-manager";
 import { INetworkOptions } from "../../../main/typescript/cross-chain-mechanisms/bridge/bridge-types";
+import Docker from "dockerode";
 // Test environment for Fabric ledger operations
 export class FabricTestEnvironment {
   public static readonly FABRIC_ASSET_ID: string = "FabricExampleAsset";
@@ -84,12 +85,22 @@ export class FabricTestEnvironment {
   public apiClient!: FabricApi;
   public wrapperContractName?: string;
 
+  private dockerContainerIP?: string;
+  private dockerNetwork: string = "fabric";
+
   private readonly log: Logger;
 
   private bridgeMSPID?: string;
   public bridgeIdentity?: X509Identity;
 
-  private constructor(satpContractName: string, logLevel: LogLevelDesc) {
+  private constructor(
+    satpContractName: string,
+    logLevel: LogLevelDesc,
+    network?: string,
+  ) {
+    if (network) {
+      this.dockerNetwork = network;
+    }
     this.satpContractName = satpContractName;
 
     const level = logLevel || "INFO";
@@ -106,7 +117,21 @@ export class FabricTestEnvironment {
       imageVersion: FABRIC_25_LTS_AIO_IMAGE_VERSION,
       envVars: new Map([["FABRIC_VERSION", FABRIC_25_LTS_AIO_FABRIC_VERSION]]),
     });
-    await this.ledger.start();
+
+    const docker = new Docker();
+
+    const container = await this.ledger.start({
+      networkName: this.dockerNetwork,
+    });
+
+    const containerData = await docker
+      .getContainer((await container).id)
+      .inspect();
+
+    this.dockerContainerIP =
+      containerData.NetworkSettings.Networks[
+        this.dockerNetwork || "bridge"
+      ].IPAddress;
 
     this.fabricChannelName = "mychannel";
 
@@ -260,8 +285,13 @@ export class FabricTestEnvironment {
   public static async setupTestEnvironment(
     satpContractName: string,
     logLevel: LogLevelDesc,
+    network?: string,
   ): Promise<FabricTestEnvironment> {
-    const instance = new FabricTestEnvironment(satpContractName, logLevel);
+    const instance = new FabricTestEnvironment(
+      satpContractName,
+      logLevel,
+      network,
+    );
     await instance.init(logLevel);
     return instance;
   }
@@ -301,21 +331,10 @@ export class FabricTestEnvironment {
       networkIdentification: this.fabricConfig.networkIdentification,
       userIdentity: this.bridgeIdentity,
       channelName: this.fabricConfig.channelName,
-      targetOrganizations: this.fabricConfig.targetOrganizations, //?.map(
-      //   (org) => ({
-      //     ...org,
-      //     CORE_PEER_ADDRESS: org.CORE_PEER_ADDRESS.replace(
-      //       /peer0\.(org\d+)\.example\.com/,
-      //       "172.17.0.1",
-      //     ),
-      //   }),
-      // ),
+      targetOrganizations: this.fabricConfig.targetOrganizations,
       caFile: this.fabricConfig.caFile,
       ccSequence: this.fabricConfig.ccSequence,
-      orderer: this.fabricConfig.orderer, //?.replace(
-      //   "orderer.example.com",
-      //   "172.17.0.1",
-      // ),
+      orderer: this.fabricConfig.orderer,
       ordererTLSHostnameOverride: this.fabricConfig.ordererTLSHostnameOverride,
       connTimeout: this.fabricConfig.connTimeout,
       signaturePolicy: this.fabricConfig.signaturePolicy,
@@ -325,52 +344,18 @@ export class FabricTestEnvironment {
         dockerBinary: this.connectorOptions.dockerBinary,
         peerBinary: this.connectorOptions.peerBinary,
         goBinary: this.connectorOptions.goBinary,
-        cliContainerEnv: {
-          //this.connectorOptions.cliContainerEnv,
-          ...FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
-          CORE_PEER_ADDRESS:
-            FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.CORE_PEER_ADDRESS.replace(
-              "peer0.org1.example.com",
-              "172.17.0.1",
-            ),
-        },
+        cliContainerEnv: FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
         sshConfig: {
           ...this.connectorOptions.sshConfig,
-          host: "172.17.0.1",
+          host: this.dockerContainerIP,
+          port: 22,
         },
-        connectionProfile: {
-          ...this.bridgeProfile,
-          peers: Object.fromEntries(
-            Object.entries(this.bridgeProfile.peers).map(([key, value]) => [
-              key,
-              { ...value, url: value.url.replace("localhost", "172.17.0.1") },
-            ]),
-          ),
-          certificateAuthorities: Object.fromEntries(
-            Object.entries(this.bridgeProfile.certificateAuthorities ?? {}).map(
-              ([key, value]) => [
-                key,
-                { ...value, url: value.url.replace("localhost", "172.17.0.1") },
-              ],
-            ),
-          ),
-          orderers: Object.fromEntries(
-            Object.entries(this.bridgeProfile.orderers ?? {}).map(
-              ([key, value]) => [
-                key,
-                { ...value, url: value.url.replace("localhost", "172.17.0.1") },
-              ],
-            ),
-          ),
-        },
+        connectionProfile: this.bridgeProfile,
         discoveryOptions: {
           ...this.connectorOptions.discoveryOptions,
           asLocalhost: false, // the satp docker container does not have the network as host, so the host is in 172.17.0.1 instead of localhost
         },
-        eventHandlerOptions: {
-          ...this.connectorOptions.eventHandlerOptions,
-          asLocalhost: false, // the satp docker container does not have the network as host, so the host is in 172.17.0.1 instead of localhost
-        },
+        eventHandlerOptions: this.connectorOptions.eventHandlerOptions,
       },
       claimFormats: this.fabricConfig.claimFormats,
     } as INetworkOptions;
@@ -716,6 +701,35 @@ export class FabricTestEnvironment {
     this.log.info(
       `Mint 100 amount asset by the owner response: ${JSON.stringify(responseMint.data)}`,
     );
+  }
+
+  // Connects a Docker container to the Fabric network
+  public async connectContainerToNetwork(
+    container: Docker.Container,
+  ): Promise<void> {
+    if (!this.dockerNetwork) {
+      throw new Error("Docker network is not defined");
+    }
+
+    const docker = new Docker();
+    const network = docker.getNetwork(this.dockerNetwork);
+
+    try {
+      await network.connect({ Container: container.id });
+      this.log.info(
+        `Container ${container.id} connected to network ${this.dockerNetwork}`,
+      );
+    } catch (error) {
+      this.log.error(
+        `Failed to connect container ${container.id} to network ${this.dockerNetwork}`,
+        error,
+      );
+      throw error;
+    }
+  }
+
+  public getNetwork(): string {
+    return this.dockerNetwork;
   }
 
   // Gets the default asset configuration for testing

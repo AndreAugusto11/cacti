@@ -99,21 +99,23 @@ beforeAll(async () => {
 
   ({ config: db_local_config1, container: db_local1 } = await createPGDatabase(
     5432,
+    true,
     "user123123",
     "password",
   ));
 
   ({ config: db_remote_config1, container: db_remote1 } =
-    await createPGDatabase(5450, "user123123", "password"));
+    await createPGDatabase(5450, true, "user123123", "password"));
 
   ({ config: db_local_config2, container: db_local2 } = await createPGDatabase(
     5433,
+    true,
     "user123123",
     "password",
   ));
 
   ({ config: db_remote_config2, container: db_remote2 } =
-    await createPGDatabase(5451, "user123123", "password"));
+    await createPGDatabase(5451, true, "user123123", "password"));
 
   await setupDBTable(db_remote_config1);
   await setupDBTable(db_remote_config2);

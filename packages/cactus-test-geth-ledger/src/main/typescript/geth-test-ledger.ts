@@ -53,6 +53,8 @@ export class GethTestLedger {
   private _containerId: string | undefined;
   private _web3: Web3 | undefined;
 
+  private connectedNetworkName: string | undefined;
+
   public get fullContainerImageName(): string {
     return [this.containerImageName, this.containerImageVersion].join(":");
   }
@@ -130,7 +132,11 @@ export class GethTestLedger {
    * @param omitPull Don't pull docker image from upstream if true.
    * @returns Promise<Container>
    */
-  public async start(omitPull = false, cmd: string[] = []): Promise<Container> {
+  public async start(
+    omitPull = false,
+    cmd: string[] = [],
+    network?: string,
+  ): Promise<Container> {
     if (this.useRunningLedger) {
       this.log.info(
         "Search for already running Geth Test Ledger because 'useRunningLedger' flag is enabled.",
@@ -164,6 +170,19 @@ export class GethTestLedger {
       );
     }
 
+    if (network) {
+      const docker = new Docker();
+      const networks = await docker.listNetworks();
+      const networkExists = networks.some((n) => n.Name === network);
+      if (!networkExists) {
+        await docker.createNetwork({
+          Name: network,
+          Driver: "bridge",
+        });
+      }
+      this.connectedNetworkName = network;
+    }
+
     return new Promise<Container>((resolve, reject) => {
       const docker = new Docker();
       const eventEmitter: EventEmitter = docker.run(
@@ -178,6 +197,7 @@ export class GethTestLedger {
           Env: this.envVars,
           HostConfig: {
             PublishAllPorts: true,
+            networkMode: network,
           },
         },
         {},
@@ -409,5 +429,13 @@ export class GethTestLedger {
 
   public async getHostPortWs(): Promise<number> {
     return this.getHostPort(8546);
+  }
+
+  public getConnectedNetworkName(): string {
+    const fnTag = "FabricTestLedgerV1#getNetworkName()";
+    if (this.connectedNetworkName) {
+      return this.connectedNetworkName;
+    }
+    throw new Error(`${fnTag} network name not set`);
   }
 }

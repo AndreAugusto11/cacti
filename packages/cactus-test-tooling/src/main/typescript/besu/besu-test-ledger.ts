@@ -59,6 +59,8 @@ export class BesuTestLedger implements ITestLedger {
   private container: Container | undefined;
   private containerId: string | undefined;
 
+  private connectedNetworkName: string | undefined;
+
   constructor(public readonly options: IBesuTestLedgerConstructorOptions = {}) {
     if (!options) {
       throw new TypeError(`BesuTestLedger#ctor options was falsy.`);
@@ -220,7 +222,7 @@ export class BesuTestLedger implements ITestLedger {
     return { publicKey, privateKey };
   }
 
-  public async start(omitPull = false): Promise<Container> {
+  public async start(omitPull = false, network?: string): Promise<Container> {
     const imageFqn = this.getContainerImageName();
 
     if (this.container) {
@@ -233,6 +235,18 @@ export class BesuTestLedger implements ITestLedger {
       this.log.debug(`Pulling container image ${imageFqn} ...`);
       await this.pullContainerImage(imageFqn);
       this.log.debug(`Pulled ${imageFqn} OK. Starting container...`);
+    }
+
+    if (network) {
+      const networks = await docker.listNetworks();
+      const networkExists = networks.some((n) => n.Name === network);
+      if (!networkExists) {
+        await docker.createNetwork({
+          Name: network,
+          Driver: "bridge",
+        });
+      }
+      this.connectedNetworkName = network;
     }
 
     return new Promise<Container>((resolve, reject) => {
@@ -263,6 +277,7 @@ export class BesuTestLedger implements ITestLedger {
           },
           HostConfig: {
             PublishAllPorts: true,
+            networkMode: network,
           },
           Env: this.envVars,
         },
@@ -437,5 +452,13 @@ export class BesuTestLedger implements ITestLedger {
         `BesuTestLedger#ctor ${validationResult.error.annotate()}`,
       );
     }
+  }
+
+  public getConnectedNetworkName(): string {
+    const fnTag = "FabricTestLedgerV1#getNetworkName()";
+    if (this.connectedNetworkName) {
+      return this.connectedNetworkName;
+    }
+    throw new Error(`${fnTag} network name not set`);
   }
 }

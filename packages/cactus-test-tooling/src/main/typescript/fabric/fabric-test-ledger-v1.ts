@@ -76,6 +76,7 @@ export interface LedgerStartOptions {
   omitPull?: boolean;
   setContainer?: boolean;
   containerID?: string;
+  networkName?: string;
 }
 
 export const DEFAULT_FABRIC_2_AIO_IMAGE_NAME =
@@ -135,6 +136,8 @@ export class FabricTestLedgerV1 implements ITestLedger {
   private container: Container | undefined;
   private containerId: string | undefined;
   private readonly useRunningLedger: boolean;
+
+  private connectedNetworkName: string | undefined;
 
   public get className(): string {
     return FabricTestLedgerV1.CLASS_NAME;
@@ -1300,6 +1303,18 @@ export class FabricTestLedgerV1 implements ITestLedger {
       await Containers.pullImage(containerNameAndTag);
     }
 
+    if (ops?.networkName) {
+      const networks = await docker.listNetworks();
+      const networkExists = networks.some((n) => n.Name === ops?.networkName);
+      if (!networkExists) {
+        await docker.createNetwork({
+          Name: ops?.networkName,
+          Driver: "bridge",
+        });
+      }
+      this.connectedNetworkName = ops?.networkName;
+    }
+
     const createOptions: ContainerCreateOptions = {
       name: this.testLedgerId,
       ExposedPorts: {
@@ -1320,15 +1335,10 @@ export class FabricTestLedgerV1 implements ITestLedger {
 
       Env: dockerEnvVars,
 
-      // This is a workaround needed for macOS which has issues with routing
-      // to docker container's IP addresses directly...
-      // https://stackoverflow.com/a/39217691
-
-      // needed for Docker-in-Docker support
-      // Privileged: true,
       HostConfig: {
         PublishAllPorts: this.publishAllPorts,
         Privileged: true,
+        NetworkMode: ops?.networkName,
         PortBindings: {
           "22/tcp": [{ HostPort: "30022" }],
           "7050/tcp": [{ HostPort: "7050" }],
@@ -1341,6 +1351,23 @@ export class FabricTestLedgerV1 implements ITestLedger {
         },
       },
     };
+
+    if (ops?.networkName) {
+      createOptions.NetworkingConfig = {
+        EndpointsConfig: {
+          [ops.networkName]: {
+            Aliases: [
+              "peer0.org1.example.com",
+              "peer1.org1.example.com",
+              "peer0.org2.example.com",
+              "peer1.org2.example.com",
+              "orderer.example.com",
+              "ca.org1.example.com",
+            ],
+          },
+        },
+      };
+    }
     if (this.extraOrgs) {
       this.extraOrgs.forEach((org) => {
         const caPort = String(Number(org.port) + 3);
@@ -1515,5 +1542,13 @@ export class FabricTestLedgerV1 implements ITestLedger {
     if (result.error) {
       throw new Error(`${fnTag} ${result.error.annotate()}`);
     }
+  }
+
+  public getConnectedNetworkName(): string {
+    const fnTag = "FabricTestLedgerV1#getNetworkName()";
+    if (this.connectedNetworkName) {
+      return this.connectedNetworkName;
+    }
+    throw new Error(`${fnTag} network name not set`);
   }
 }

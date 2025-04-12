@@ -58,10 +58,17 @@ export class EthereumTestEnvironment {
   public ethereumConfig!: IEthereumLeafNeworkOptions;
 
   private dockerContainerIP?: string;
+  private dockerNetwork?: string;
 
   private readonly log: Logger;
 
-  private constructor(erc20TokenContract: string, logLevel: LogLevelDesc) {
+  // eslint-disable-next-line prettier/prettier
+  private constructor(erc20TokenContract: string, logLevel: LogLevelDesc, network?: string) {
+    if (network) {
+      this.dockerNetwork = network;
+    }
+
+    this.contractNameWrapper = "SATPWrapperContract";
     this.erc20TokenContract = erc20TokenContract;
 
     const level = logLevel || "INFO";
@@ -78,14 +85,16 @@ export class EthereumTestEnvironment {
 
     const docker = new Docker();
 
-    const container = await this.ledger.start();
+    const container = await this.ledger.start(false, [], this.dockerNetwork);
 
     const containerData = await docker
       .getContainer((await container).id)
       .inspect();
 
     this.dockerContainerIP =
-      containerData.NetworkSettings.Networks["bridge"].IPAddress;
+      containerData.NetworkSettings.Networks[
+        this.dockerNetwork || "bridge"
+      ].IPAddress;
 
     const SATPContract1 = {
       contractName: "SATPContract",
@@ -180,8 +189,13 @@ export class EthereumTestEnvironment {
   public static async setupTestEnvironment(
     erc20TokenContract: string,
     logLevel: LogLevelDesc,
+    network?: string,
   ): Promise<EthereumTestEnvironment> {
-    const instance = new EthereumTestEnvironment(erc20TokenContract, logLevel);
+    const instance = new EthereumTestEnvironment(
+      erc20TokenContract,
+      logLevel,
+      network,
+    );
     await instance.init(logLevel);
     return instance;
   }

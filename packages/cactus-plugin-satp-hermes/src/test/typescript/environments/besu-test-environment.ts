@@ -61,10 +61,19 @@ export class BesuTestEnvironment {
   public besuConfig!: IBesuLeafNeworkOptions;
 
   private dockerContainerIP?: string;
+  private dockerNetwork: string = "besu";
 
   private readonly log: Logger;
 
-  private constructor(erc20TokenContract: string, logLevel: LogLevelDesc) {
+  private constructor(
+    erc20TokenContract: string,
+    logLevel: LogLevelDesc,
+    network?: string,
+  ) {
+    if (network) {
+      this.dockerNetwork = network;
+    }
+
     this.erc20TokenContract = erc20TokenContract;
 
     const level = logLevel || "INFO";
@@ -81,14 +90,16 @@ export class BesuTestEnvironment {
 
     const docker = new Docker();
 
-    const container = await this.ledger.start();
+    const container = await this.ledger.start(false, this.dockerNetwork);
 
     const containerData = await docker
       .getContainer((await container).id)
       .inspect();
 
     this.dockerContainerIP =
-      containerData.NetworkSettings.Networks["bridge"].IPAddress;
+      containerData.NetworkSettings.Networks[
+        this.dockerNetwork || "bridge"
+      ].IPAddress;
 
     const rpcApiHttpHost = await this.ledger.getRpcApiHttpHost();
 
@@ -173,8 +184,13 @@ export class BesuTestEnvironment {
   public static async setupTestEnvironment(
     erc20TokenContract: string,
     logLevel: LogLevelDesc,
+    network?: string,
   ): Promise<BesuTestEnvironment> {
-    const instance = new BesuTestEnvironment(erc20TokenContract, logLevel);
+    const instance = new BesuTestEnvironment(
+      erc20TokenContract,
+      logLevel,
+      network,
+    );
     await instance.init(logLevel);
     return instance;
   }

@@ -85,12 +85,14 @@ beforeAll(async () => {
 
   ({ config: db_local_config, container: db_local } = await createPGDatabase(
     5432,
+    true,
     "user123123",
     "password",
   ));
 
   ({ config: db_remote_config, container: db_remote } = await createPGDatabase(
     5450,
+    true,
     "user123123",
     "password",
   ));

@@ -202,7 +202,7 @@ export class SATPGatewayRunner implements ITestLedger {
     return hostConfig;
   }
 
-  public async start(omitPull = false): Promise<Container> {
+  public async start(omitPull = false, network?: string): Promise<Container> {
     const imageFqn = this.getContainerImageName();
 
     if (this.container) {
@@ -231,7 +231,7 @@ export class SATPGatewayRunner implements ITestLedger {
             [`${SATP_GATEWAY_RUNNER_DEFAULT_OPTIONS.clientPort}/tcp`]: {}, // CLIENT_PORT
             [`${SATP_GATEWAY_RUNNER_DEFAULT_OPTIONS.oapiPort}/tcp`]: {}, // OAPI_PORT
           },
-          HostConfig: hostConfig,
+          HostConfig: { ...hostConfig, NetworkMode: network },
         },
         {},
         (err: unknown) => {
@@ -340,6 +340,26 @@ export class SATPGatewayRunner implements ITestLedger {
     if (validationResult.error) {
       throw new Error(
         `SATPGatewayRunner#ctor ${validationResult.error.annotate()}`,
+      );
+    }
+  }
+
+  public async connectToNetwork(networkName: string): Promise<void> {
+    const fnTag = "SATPGatewayRunner#connectToNetwork()";
+    if (!this.container) {
+      throw new Error(`${fnTag} Container is not started.`);
+    }
+
+    const docker = new Docker();
+    const network = docker.getNetwork(networkName);
+
+    try {
+      await network.inspect(); // Check if the network exists
+      await network.connect({ Container: this.container.id });
+      this.log.info(`Connected container to network: ${networkName}`);
+    } catch (error) {
+      throw new Error(
+        `${fnTag} Failed to connect to network "${networkName}": ${error}`,
       );
     }
   }
