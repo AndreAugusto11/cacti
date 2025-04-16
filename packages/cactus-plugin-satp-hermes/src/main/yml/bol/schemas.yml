@@ -764,6 +764,338 @@ GetApproveAddressResponse:
       description: The address to approve the token transfer.
   required:
     - approveAddress
+OracleRegisterRequest:
+  description: "Request schema for registering a data transfer task. Includes details such as the source and destination DLT networks and contracts."
+  type: object
+  required:
+    - contextID
+    - originNetwork
+    - originContract
+  properties:
+    contextID:
+      type: string
+      format: string
+      example: "123e4567-e89b-12d3-a456-426614174000"
+    originNetwork:
+      type: object
+      properties:
+        dltProtocol:
+          example: HyperledgerFabric
+        dltSubnetworkID:
+          example: subnetwork1
+    destinationNetwork:
+      type: object
+      properties:
+        dltProtocol:
+          example: HyperledgerBesu
+        dltSubnetworkID:
+          example: subnetwork2
+    originContract:
+      type: object
+      properties:
+        contractAddress:
+          type: string
+          description: "The address of the contract on the origin network."
+          example: "0x0000..."
+        contractName:
+          type: string
+          description: "The name of the contract on the origin network."
+    destinationContract:
+      type: object
+      properties:
+        contractAddress:
+          type: string
+          description: "The address of the contract on the destination network."
+          example: "0x0000..."
+        contractName:
+          type: string
+          description: "The name of the contract on the destination network."
+    eventOfInterest:
+      type: object
+      description: "Details about the event of interest in the origin contract for the data transfer task."
+      properties:
+        eventName:
+          type: string
+          description: "The name of the event of interest."
+        eventSignature:
+          type: string
+          description: "The signature of the event of interest."
+    writeFunction:
+      type: object
+      description: "Details about the write function in the destination contract for the data transfer task."
+      properties:
+        functionName:
+          type: string
+          description: "The name of the write function."
+        functionSignature:
+          type: string
+          description: "The signature of the write function."
+OracleRegisterResponse:
+  type: object
+  description: "Response schema for registering a data transfer task."
+  properties:
+    contextID:
+      type: string
+      description: "The unique identifier for the context of the data transfer task."
+    status:
+      type: string
+      description: "The status of the registered data transfer task."
+      enum:
+        - NOT_FOUND
+        - INVALID
+        - PENDING
+        - DONE
+        - FAILED
+      example: DONE
+    substatus:
+      type: string
+      enum:
+        - REGISTERED
+        - UNREGISTERED
+        - UNKNOWN_ERROR
+        - REJECTED
+      example: REGISTERED
+  required:
+    - contextID
+    - status
+    - substatus
+OracleExecuteRequest:
+  description: "Request schema for triggering an immediate transfer task. Includes the task ID, payload, and destination network and contract details."
+  type: object
+  required:
+    - taskID
+    - payload
+    - destinationNetwork
+    - destinationContract
+    - writeFunction 
+  properties:
+    taskID:
+      type: string
+      format: string
+      description: "The unique identifier for the transfer task."
+      example: "123e4567-e89b-12d3-a456-426614174000"
+    payload:
+      type: string
+      description: "The payload to be written to the destination contract."
+      example: '{"data":"example payload"}'
+    destinationNetwork:
+      type: object
+      properties:
+        dltProtocol:
+          example: HyperledgerBesu
+        dltSubnetworkID:
+          example: subnetwork2
+    destinationContract:
+      type: object
+      properties:
+        contractAddress:
+          type: string
+          description: "The address of the contract on the destination network."
+          example: "0x0000..."
+        contractName:
+          type: string
+          description: "The name of the contract on the destination network."
+    writeFunction:
+      type: object
+      description: "Details about the write function in the destination contract for the data transfer task."
+      properties:
+        functionName:
+          type: string
+          description: "The name of the write function."
+        functionSignature:
+          type: string
+          description: "The signature of the write function."
+OracleExecuteResponse:
+  description: "Response schema for an immediate transfer task execution. Includes the task ID, status, and substatus."
+  type: object
+  required:
+    - taskID
+    - status
+    - substatus
+  properties:
+    taskID:
+      type: string
+      description: "The unique identifier for the transfer task."
+    transactionID:
+      type: string
+      description: "The unique identifier for the transaction associated with the transfer task."
+      example: "0x1234567890abcdef"
+    transactionReceipt:
+      type: string
+      description: "The receipt of the transaction associated with the transfer task."
+      example: "0xabcdef1234567890"
+    output:
+      type: string
+      description: "The output of the transfer task execution."
+      example: '{"result":"success"}'
+    status:
+      type: string
+      description: "The status of the transfer task execution."
+      enum:
+        - NOT_FOUND
+        - INVALID
+        - PENDING
+        - DONE
+        - FAILED
+      example: DONE
+    substatus:
+      type: string
+      description: "The substatus of the transfer task execution."
+      enum:
+        - EXECUTING
+        - COMPLETED
+        - REJECTED
+        - UNKNOWN_ERROR
+      example: EXECUTING
+OracleUnregisterRequest:
+  description: "Request schema for unregistering a data transfer task. Includes the context ID of the task to be unregistered."
+  type: object
+  required:
+    - contextID
+  properties:
+    contextID:
+      type: string
+      format: string
+      example: "123e4567-e89b-12d3-a456-426614174000"
+OracleUnregisterResponse:
+  type: object
+  description: "Response schema for unregistering a data transfer task."
+  properties:
+    contextID:
+      type: string
+      description: "The unique identifier for the context of the data transfer task."
+    status:
+      type: string
+      description: "The status of the unregistered data transfer task."
+      enum:
+        - NOT_FOUND
+        - INVALID
+        - PENDING
+        - DONE
+        - FAILED
+      example: DONE
+    substatus:
+      type: string
+      enum:
+        - UNREGISTERED
+        - REGISTERED
+        - UNKNOWN_ERROR
+        - REJECTED
+      example: UNREGISTERED
+OracleStatusRequest:
+  description: "Request schema for checking the status of a data transfer task. Includes the context ID or task ID."
+  type: object
+  properties:
+    contextID:
+      type: string
+      format: string
+      example: "123e4567-e89b-12d3-a456-426614174000"
+    taskID:
+      type: string
+      format: string
+      example: "123e4567-e89b-12d3-a456-426614174000"
+OracleStatusResponse:
+  type: object
+  description: "Response schema for checking the status of a data transfer task. If contextID was provided, the response will include all tasks associated with that context. If taskID was provided, the response will include the status of that specific task."
+  properties:
+    contextID:
+      type: string
+      description: "The unique identifier for the context of the data transfer task."
+    originNetwork:
+      type: object
+      properties:
+        dltProtocol:
+          example: HyperledgerFabric
+        dltSubnetworkID:
+          example: subnetwork1
+    destinationNetwork:
+      type: object
+      properties:
+        dltProtocol:
+          example: HyperledgerBesu
+        dltSubnetworkID:
+          example: subnetwork2
+    originContract:
+      type: object
+      properties:
+        contractAddress:
+          type: string
+          description: "The address of the contract on the origin network."
+          example: "0x0000..."
+        contractName:
+          type: string
+          description: "The name of the contract on the origin network."
+    destinationContract:
+      type: object
+      properties:
+        contractAddress:
+          type: string
+          description: "The address of the contract on the destination network."
+          example: "0x0000..."
+        contractName:
+          type: string
+          description: "The name of the contract on the destination network."
+    eventOfInterest:
+      type: object
+      description: "Details about the event of interest in the origin contract for the data transfer task."
+      properties:
+        eventName:
+          type: string
+          description: "The name of the event of interest."
+        eventSignature:
+          type: string
+          description: "The signature of the event of interest."
+    writeFunction:
+      type: object
+      description: "Details about the write function in the destination contract for the data transfer task."
+      properties:
+        functionName:
+          type: string
+          description: "The name of the write function."
+        functionSignature:
+          type: string
+          description: "The signature of the write function."
+    tasks:
+      type: array
+      items:
+        $ref: ./schemas.yml#/Task
+    status:
+      type: string
+      description: "The status of the data transfer task."
+      enum:
+        - NOT_FOUND
+        - INVALID
+        - RUNNING
+        - FAILED
+      example: RUNNING
+Task:
+  type: object
+  description: "Represents a task with an identifier, timestamp, and status."
+  properties:
+    id:
+      type: string
+      description: "A unique identifier for the task."
+      example: "123e4567-e89b-12d3-a456-426614174000"
+    timestamp:
+      type: string
+      format: date-time
+      description: "The timestamp when the task was created or last updated."
+      example: "2023-01-01T00:00:00Z"
+    status:
+      type: string
+      description: "The current status of the task."
+      enum:
+        - NOT_FOUND
+        - INVALID
+        - PENDING
+        - IN_PROGRESS
+        - COMPLETED
+        - FAILED
+      example: "PENDING"
+  required:
+    - id
+    - timestamp
+    - status
 NetworkId:
   type: object
   description: The network of the DLT being interacted with.

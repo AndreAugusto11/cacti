@@ -95,6 +95,10 @@ Class | Method | HTTP request | Description
 *AdminApi* | [**GetStatus**](docs/AdminApi.md#getstatus) | **Get** /api/v1/@hyperledger/cactus-plugin-satp-hermes/status | Get SATP current session data
 *AdminApi* | [**Pause**](docs/AdminApi.md#pause) | **Post** /api/v1/@hyperledger/cactus-plugin-satp-hermes/pause | Pause a transaction session
 *GetApproveAddressApi* | [**GetApproveAddress**](docs/GetApproveAddressApi.md#getapproveaddress) | **Get** /api/v1/@hyperledger/cactus-plugin-satp-hermes/approve-address | Get approve address
+*OracleApi* | [**OracleExecuteRequest**](docs/OracleApi.md#oracleexecuterequest) | **Post** /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/execute | Execute data transfer task
+*OracleApi* | [**OracleRegisterRequest**](docs/OracleApi.md#oracleregisterrequest) | **Post** /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/register | Register data transfer task
+*OracleApi* | [**OracleStatusRequest**](docs/OracleApi.md#oraclestatusrequest) | **Get** /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/status | Get oracle task status
+*OracleApi* | [**OracleUnregisterRequest**](docs/OracleApi.md#oracleunregisterrequest) | **Post** /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/unregister | Unregister data transfer task
 *TransactionApi* | [**Cancel**](docs/TransactionApi.md#cancel) | **Post** /api/v1/@hyperledger/cactus-plugin-satp-hermes/cancel | Cancel a transaction session
 *TransactionApi* | [**GetIntegrations**](docs/TransactionApi.md#getintegrations) | **Get** /api/v1/@hyperledger/cactus-plugin-satp-hermes/integrations | Get supported integrations
 *TransactionApi* | [**GetRoutes**](docs/TransactionApi.md#getroutes) | **Get** /api/v1/@hyperledger/cactus-plugin-satp-hermes/routes | Get a list of routes for a gateway-to-gateway asset transfer
@@ -149,6 +153,27 @@ Class | Method | HTTP request | Description
  - [IntegrationDetails](docs/IntegrationDetails.md)
  - [IntegrationsResponse](docs/IntegrationsResponse.md)
  - [NetworkId](docs/NetworkId.md)
+ - [OracleExecuteRequest](docs/OracleExecuteRequest.md)
+ - [OracleExecuteRequest200Response](docs/OracleExecuteRequest200Response.md)
+ - [OracleExecuteRequestRequest](docs/OracleExecuteRequestRequest.md)
+ - [OracleExecuteRequestRequestDestinationContract](docs/OracleExecuteRequestRequestDestinationContract.md)
+ - [OracleExecuteRequestRequestWriteFunction](docs/OracleExecuteRequestRequestWriteFunction.md)
+ - [OracleExecuteResponse](docs/OracleExecuteResponse.md)
+ - [OracleRegisterRequest](docs/OracleRegisterRequest.md)
+ - [OracleRegisterRequest200Response](docs/OracleRegisterRequest200Response.md)
+ - [OracleRegisterRequestOracleRegisterRequestParameter](docs/OracleRegisterRequestOracleRegisterRequestParameter.md)
+ - [OracleRegisterResponse](docs/OracleRegisterResponse.md)
+ - [OracleStatusRequest](docs/OracleStatusRequest.md)
+ - [OracleStatusRequest200Response](docs/OracleStatusRequest200Response.md)
+ - [OracleStatusRequest200ResponseEventOfInterest](docs/OracleStatusRequest200ResponseEventOfInterest.md)
+ - [OracleStatusRequest200ResponseOriginContract](docs/OracleStatusRequest200ResponseOriginContract.md)
+ - [OracleStatusRequest200ResponseTasksInner](docs/OracleStatusRequest200ResponseTasksInner.md)
+ - [OracleStatusRequestRequest](docs/OracleStatusRequestRequest.md)
+ - [OracleStatusResponse](docs/OracleStatusResponse.md)
+ - [OracleUnregisterRequest](docs/OracleUnregisterRequest.md)
+ - [OracleUnregisterRequest200Response](docs/OracleUnregisterRequest200Response.md)
+ - [OracleUnregisterRequestRequest](docs/OracleUnregisterRequestRequest.md)
+ - [OracleUnregisterResponse](docs/OracleUnregisterResponse.md)
  - [Pause200Response](docs/Pause200Response.md)
  - [PauseRequest](docs/PauseRequest.md)
  - [PauseResponse](docs/PauseResponse.md)
@@ -156,6 +181,7 @@ Class | Method | HTTP request | Description
  - [RoutesResponse](docs/RoutesResponse.md)
  - [StatusRequest](docs/StatusRequest.md)
  - [StatusResponse](docs/StatusResponse.md)
+ - [Task](docs/Task.md)
  - [Token](docs/Token.md)
  - [TokenType](docs/TokenType.md)
  - [Transact200Response](docs/Transact200Response.md)
