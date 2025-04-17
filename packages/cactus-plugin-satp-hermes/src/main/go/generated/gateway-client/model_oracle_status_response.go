@@ -17,16 +17,16 @@ import (
 // checks if the OracleStatusResponse type satisfies the MappedNullable interface at compile time
 var _ MappedNullable = &OracleStatusResponse{}
 
-// OracleStatusResponse Response schema for checking the status of a data transfer task. If contextID was provided, the response will include all tasks associated with that context. If taskID was provided, the response will include the status of that specific task.
+// OracleStatusResponse Response schema for checking the status of a data transfer task.
 type OracleStatusResponse struct {
 	// The unique identifier for the context of the data transfer task.
-	ContextID *string `json:"contextID,omitempty"`
+	TaskID *string `json:"taskID,omitempty"`
 	OriginNetwork *Transact200ResponseStatusResponseOriginNetwork `json:"originNetwork,omitempty"`
 	DestinationNetwork *Transact200ResponseStatusResponseDestinationNetwork `json:"destinationNetwork,omitempty"`
 	OriginContract *OracleStatusRequest200ResponseOriginContract `json:"originContract,omitempty"`
-	DestinationContract *OracleExecuteRequestRequestDestinationContract `json:"destinationContract,omitempty"`
+	DestinationContract *OracleStatusRequest200ResponseDestinationContract `json:"destinationContract,omitempty"`
 	EventOfInterest *OracleStatusRequest200ResponseEventOfInterest `json:"eventOfInterest,omitempty"`
-	WriteFunction *OracleExecuteRequestRequestWriteFunction `json:"writeFunction,omitempty"`
+	WriteFunction *OracleStatusRequest200ResponseWriteFunction `json:"writeFunction,omitempty"`
 	Tasks []OracleStatusRequest200ResponseTasksInner `json:"tasks,omitempty"`
 	// The status of the data transfer task.
 	Status *string `json:"status,omitempty"`
@@ -49,36 +49,36 @@ func NewOracleStatusResponseWithDefaults() *OracleStatusResponse {
 	return &this
 }
 
-// GetContextID returns the ContextID field value if set, zero value otherwise.
-func (o *OracleStatusResponse) GetContextID() string {
-	if o == nil || IsNil(o.ContextID) {
+// GetTaskID returns the TaskID field value if set, zero value otherwise.
+func (o *OracleStatusResponse) GetTaskID() string {
+	if o == nil || IsNil(o.TaskID) {
 		var ret string
 		return ret
 	}
-	return *o.ContextID
+	return *o.TaskID
 }
 
-// GetContextIDOk returns a tuple with the ContextID field value if set, nil otherwise
+// GetTaskIDOk returns a tuple with the TaskID field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *OracleStatusResponse) GetContextIDOk() (*string, bool) {
-	if o == nil || IsNil(o.ContextID) {
+func (o *OracleStatusResponse) GetTaskIDOk() (*string, bool) {
+	if o == nil || IsNil(o.TaskID) {
 		return nil, false
 	}
-	return o.ContextID, true
+	return o.TaskID, true
 }
 
-// HasContextID returns a boolean if a field has been set.
-func (o *OracleStatusResponse) HasContextID() bool {
-	if o != nil && !IsNil(o.ContextID) {
+// HasTaskID returns a boolean if a field has been set.
+func (o *OracleStatusResponse) HasTaskID() bool {
+	if o != nil && !IsNil(o.TaskID) {
 		return true
 	}
 
 	return false
 }
 
-// SetContextID gets a reference to the given string and assigns it to the ContextID field.
-func (o *OracleStatusResponse) SetContextID(v string) {
-	o.ContextID = &v
+// SetTaskID gets a reference to the given string and assigns it to the TaskID field.
+func (o *OracleStatusResponse) SetTaskID(v string) {
+	o.TaskID = &v
 }
 
 // GetOriginNetwork returns the OriginNetwork field value if set, zero value otherwise.
@@ -178,9 +178,9 @@ func (o *OracleStatusResponse) SetOriginContract(v OracleStatusRequest200Respons
 }
 
 // GetDestinationContract returns the DestinationContract field value if set, zero value otherwise.
-func (o *OracleStatusResponse) GetDestinationContract() OracleExecuteRequestRequestDestinationContract {
+func (o *OracleStatusResponse) GetDestinationContract() OracleStatusRequest200ResponseDestinationContract {
 	if o == nil || IsNil(o.DestinationContract) {
-		var ret OracleExecuteRequestRequestDestinationContract
+		var ret OracleStatusRequest200ResponseDestinationContract
 		return ret
 	}
 	return *o.DestinationContract
@@ -188,7 +188,7 @@ func (o *OracleStatusResponse) GetDestinationContract() OracleExecuteRequestRequ
 
 // GetDestinationContractOk returns a tuple with the DestinationContract field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *OracleStatusResponse) GetDestinationContractOk() (*OracleExecuteRequestRequestDestinationContract, bool) {
+func (o *OracleStatusResponse) GetDestinationContractOk() (*OracleStatusRequest200ResponseDestinationContract, bool) {
 	if o == nil || IsNil(o.DestinationContract) {
 		return nil, false
 	}
@@ -204,8 +204,8 @@ func (o *OracleStatusResponse) HasDestinationContract() bool {
 	return false
 }
 
-// SetDestinationContract gets a reference to the given OracleExecuteRequestRequestDestinationContract and assigns it to the DestinationContract field.
-func (o *OracleStatusResponse) SetDestinationContract(v OracleExecuteRequestRequestDestinationContract) {
+// SetDestinationContract gets a reference to the given OracleStatusRequest200ResponseDestinationContract and assigns it to the DestinationContract field.
+func (o *OracleStatusResponse) SetDestinationContract(v OracleStatusRequest200ResponseDestinationContract) {
 	o.DestinationContract = &v
 }
 
@@ -242,9 +242,9 @@ func (o *OracleStatusResponse) SetEventOfInterest(v OracleStatusRequest200Respon
 }
 
 // GetWriteFunction returns the WriteFunction field value if set, zero value otherwise.
-func (o *OracleStatusResponse) GetWriteFunction() OracleExecuteRequestRequestWriteFunction {
+func (o *OracleStatusResponse) GetWriteFunction() OracleStatusRequest200ResponseWriteFunction {
 	if o == nil || IsNil(o.WriteFunction) {
-		var ret OracleExecuteRequestRequestWriteFunction
+		var ret OracleStatusRequest200ResponseWriteFunction
 		return ret
 	}
 	return *o.WriteFunction
@@ -252,7 +252,7 @@ func (o *OracleStatusResponse) GetWriteFunction() OracleExecuteRequestRequestWri
 
 // GetWriteFunctionOk returns a tuple with the WriteFunction field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *OracleStatusResponse) GetWriteFunctionOk() (*OracleExecuteRequestRequestWriteFunction, bool) {
+func (o *OracleStatusResponse) GetWriteFunctionOk() (*OracleStatusRequest200ResponseWriteFunction, bool) {
 	if o == nil || IsNil(o.WriteFunction) {
 		return nil, false
 	}
@@ -268,8 +268,8 @@ func (o *OracleStatusResponse) HasWriteFunction() bool {
 	return false
 }
 
-// SetWriteFunction gets a reference to the given OracleExecuteRequestRequestWriteFunction and assigns it to the WriteFunction field.
-func (o *OracleStatusResponse) SetWriteFunction(v OracleExecuteRequestRequestWriteFunction) {
+// SetWriteFunction gets a reference to the given OracleStatusRequest200ResponseWriteFunction and assigns it to the WriteFunction field.
+func (o *OracleStatusResponse) SetWriteFunction(v OracleStatusRequest200ResponseWriteFunction) {
 	o.WriteFunction = &v
 }
 
@@ -347,8 +347,8 @@ func (o OracleStatusResponse) MarshalJSON() ([]byte, error) {
 
 func (o OracleStatusResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.ContextID) {
-		toSerialize["contextID"] = o.ContextID
+	if !IsNil(o.TaskID) {
+		toSerialize["taskID"] = o.TaskID
 	}
 	if !IsNil(o.OriginNetwork) {
 		toSerialize["originNetwork"] = o.OriginNetwork

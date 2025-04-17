@@ -5,14 +5,13 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **TaskID** | **string** | The unique identifier for the transfer task. | 
-**Status** | **string** | The status of the transfer task execution. | 
-**Substatus** | **string** | The substatus of the transfer task execution. | 
+**Outputs** | Pointer to **[]string** | The output of the transfer task execution. | [optional] 
 
 ## Methods
 
 ### NewOracleExecuteResponse
 
-`func NewOracleExecuteResponse(taskID string, status string, substatus string, ) *OracleExecuteResponse`
+`func NewOracleExecuteResponse(taskID string, ) *OracleExecuteResponse`
 
 NewOracleExecuteResponse instantiates a new OracleExecuteResponse object
 This constructor will assign default values to properties that have it defined,
@@ -47,45 +46,30 @@ and a boolean to check if the value has been set.
 SetTaskID sets TaskID field to given value.
 
 
-### GetStatus
+### GetOutputs
 
-`func (o *OracleExecuteResponse) GetStatus() string`
+`func (o *OracleExecuteResponse) GetOutputs() []string`
 
-GetStatus returns the Status field if non-nil, zero value otherwise.
+GetOutputs returns the Outputs field if non-nil, zero value otherwise.
 
-### GetStatusOk
+### GetOutputsOk
 
-`func (o *OracleExecuteResponse) GetStatusOk() (*string, bool)`
+`func (o *OracleExecuteResponse) GetOutputsOk() (*[]string, bool)`
 
-GetStatusOk returns a tuple with the Status field if it's non-nil, zero value otherwise
+GetOutputsOk returns a tuple with the Outputs field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetStatus
+### SetOutputs
 
-`func (o *OracleExecuteResponse) SetStatus(v string)`
+`func (o *OracleExecuteResponse) SetOutputs(v []string)`
 
-SetStatus sets Status field to given value.
+SetOutputs sets Outputs field to given value.
 
+### HasOutputs
 
-### GetSubstatus
+`func (o *OracleExecuteResponse) HasOutputs() bool`
 
-`func (o *OracleExecuteResponse) GetSubstatus() string`
-
-GetSubstatus returns the Substatus field if non-nil, zero value otherwise.
-
-### GetSubstatusOk
-
-`func (o *OracleExecuteResponse) GetSubstatusOk() (*string, bool)`
-
-GetSubstatusOk returns a tuple with the Substatus field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetSubstatus
-
-`func (o *OracleExecuteResponse) SetSubstatus(v string)`
-
-SetSubstatus sets Substatus field to given value.
-
+HasOutputs returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

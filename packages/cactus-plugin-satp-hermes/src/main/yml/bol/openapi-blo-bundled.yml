@@ -1995,40 +1995,80 @@ paths:
         http:
           verbLowerCase: post
           path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/register
-      parameters:
-        - name: OracleRegisterRequest
-          in: query
-          schema:
-            type: object
-            description: Request schema for registering a data transfer task. Includes details such as the source and destination DLT networks and contracts.
-            required:
-              - originContract
-            properties:
-              sourceNetwork:
-                type: string
-                description: The source blockchain network identifier.
-                example: EthereumMainnet
-              targetNetwork:
-                type: string
-                description: The target blockchain network identifier.
-                example: HyperledgerFabric
-              originContract:
-                type: string
-                description: The contract address on the source blockchain.
-                example: 1.0392900530792776e+47
-              destinationContract:
-                type: string
-                description: The contract address on the destination blockchain.
-                example: 9.808299006075645e+47
-              eventOfInterest:
-                type: string
-                description: The event of interest on the source blockchain.
-                example: Transfer
-              writeFunction:
-                type: string
-                description: The function to be called on the destination blockchain.
-                example: recordTransfer
-          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              description: Request schema for registering a repeatable task.
+              type: object
+              required:
+                - taskType
+                - taskMode
+              properties:
+                sourceNetwork:
+                  type: string
+                  description: The source blockchain network identifier. Only if taskType is READ or READ_AND_UPDATE.
+                  example: EthereumMainnet
+                targetNetwork:
+                  type: string
+                  description: The target blockchain network identifier. Only if taskType is UPDATE or READ_AND_UPDATE.
+                  example: HyperledgerFabric
+                sourceContract:
+                  type: string
+                  description: The contract address on the source blockchain. Only if taskType is READ or READ_AND_UPDATE.
+                  example: 1.0392900530792776e+47
+                destinationContract:
+                  type: string
+                  description: The contract address on the destination blockchain. Only if taskType is UPDATE or READ_AND_UPDATE.
+                  example: 9.808299006075645e+47
+                eventSignature:
+                  type: string
+                  description: The signature of the event of interest on the source blockchain. Only if taskType is READ or READ_AND_UPDATE.
+                  example: Transfer
+                sourceFunctionName:
+                  type: string
+                  description: The function to be called on the source blockchain. Only if taskType is READ or READ_AND_UPDATE.
+                  example: getTransferDetails
+                sourceFunctionParams:
+                  type: array
+                  items:
+                    type: string
+                  description: The parameters for the function to be called on the source blockchain. Only if taskType is READ or READ_AND_UPDATE.
+                  example:
+                    - param1
+                    - param2
+                destinationFunctionName:
+                  type: string
+                  description: The function to be called on the destination blockchain. Only if taskType is UPDATE or READ_AND_UPDATE.
+                  example: recordTransfer
+                destinationFunctionParams:
+                  type: array
+                  items:
+                    type: string
+                  description: The parameters for the function to be called on the destination blockchain. Only if taskType is UPDATE or READ_AND_UPDATE.
+                  example:
+                    - param1
+                    - param2
+                taskMode:
+                  type: string
+                  description: The mode of operation for the repeatable task.
+                  example: POLLING
+                  enum:
+                    - POLLING
+                    - EVENT_LISTENING
+                taskInterval:
+                  type: integer
+                  description: The interval for polling in milliseconds. Only if taskMode is POLLING.
+                  example: 5000
+                taskType:
+                  type: string
+                  description: The type of task to be registered.
+                  example: READ
+                  enum:
+                    - READ
+                    - UPDATE
+                    - READ_AND_UPDATE
       responses:
         '200':
           description: Response schema for registering a data transfer task.
@@ -2036,33 +2076,21 @@ paths:
             application/json:
               schema:
                 type: object
-                description: Response schema for registering a data transfer task.
+                description: Response schema for registering a repeatable task.
                 properties:
-                  contextID:
+                  taskID:
                     type: string
-                    description: The unique identifier for the context of the data transfer task.
+                    description: The unique identifier for the context of the repeatable task.
                   status:
                     type: string
                     description: The status of the registered data transfer task.
                     enum:
-                      - NOT_FOUND
-                      - INVALID
-                      - PENDING
-                      - DONE
-                      - FAILED
-                    example: DONE
-                  substatus:
-                    type: string
-                    enum:
-                      - REGISTERED
-                      - UNREGISTERED
-                      - UNKNOWN_ERROR
-                      - REJECTED
-                    example: REGISTERED
+                      - SUCCESS
+                      - FAILURE
+                    example: SUCCESS
                 required:
-                  - contextID
+                  - taskID
                   - status
-                  - substatus
         '400':
           description: Bad request
         '404':
@@ -2094,42 +2122,38 @@ paths:
                 - destinationContract
                 - writeFunction
               properties:
-                taskID:
+                sourceNetwork:
                   type: string
-                  format: string
-                  description: The unique identifier for the transfer task.
-                  example: 123e4567-e89b-12d3-a456-426614174000
-                payload:
-                  type: string
-                  description: The payload to be written to the destination contract.
-                  example: '{"data":"example payload"}'
+                  description: The source blockchain network identifier. Only if taskType is READ or READ_AND_UPDATE.
+                  example: EthereumMainnet
                 destinationNetwork:
-                  type: object
-                  properties:
-                    dltProtocol:
-                      example: HyperledgerBesu
-                    dltSubnetworkID:
-                      example: subnetwork2
+                  type: string
+                  description: The target blockchain network identifier. Only if taskType is UPDATE or READ_AND_UPDATE.
+                  example: HyperledgerFabric
+                sourceContract:
+                  type: string
+                  description: The contract address on the source blockchain. Only if taskType is READ or READ_AND_UPDATE.
+                  example: 1.0392900530792776e+47
                 destinationContract:
-                  type: object
-                  properties:
-                    contractAddress:
-                      type: string
-                      description: The address of the contract on the destination network.
-                      example: 0x0000...
-                    contractName:
-                      type: string
-                      description: The name of the contract on the destination network.
+                  type: string
+                  description: The contract address on the destination blockchain. Only if taskType is UPDATE or READ_AND_UPDATE.
+                  example: 9.808299006075645e+47
+                readFunction:
+                  type: string
+                  description: The function to be called on the source blockchain. Only if taskType is READ or READ_AND_UPDATE.
+                  example: getTransferDetails
                 writeFunction:
-                  type: object
-                  description: Details about the write function in the destination contract for the data transfer task.
-                  properties:
-                    functionName:
-                      type: string
-                      description: The name of the write function.
-                    functionSignature:
-                      type: string
-                      description: The signature of the write function.
+                  type: string
+                  description: The function to be called on the destination blockchain. Only if taskType is UPDATE or READ_AND_UPDATE.
+                  example: recordTransfer
+                taskType:
+                  type: string
+                  description: The type of task to be registered.
+                  example: READ
+                  enum:
+                    - READ
+                    - UPDATE
+                    - READ_AND_UPDATE
       responses:
         '200':
           description: Response schema for executing a data transfer task.
@@ -2146,25 +2170,12 @@ paths:
                   taskID:
                     type: string
                     description: The unique identifier for the transfer task.
-                  status:
-                    type: string
-                    description: The status of the transfer task execution.
-                    enum:
-                      - NOT_FOUND
-                      - INVALID
-                      - PENDING
-                      - DONE
-                      - FAILED
-                    example: DONE
-                  substatus:
-                    type: string
-                    description: The substatus of the transfer task execution.
-                    enum:
-                      - EXECUTING
-                      - COMPLETED
-                      - REJECTED
-                      - UNKNOWN_ERROR
-                    example: EXECUTING
+                  outputs:
+                    type: array
+                    items:
+                      type: string
+                    description: The output of the transfer task execution.
+                    example: '[{"result":"success"},{"result":"failure"}]'
         '400':
           description: Bad request
         '404':
@@ -2190,9 +2201,9 @@ paths:
               description: Request schema for unregistering a data transfer task. Includes the context ID of the task to be unregistered.
               type: object
               required:
-                - contextID
+                - taskID
               properties:
-                contextID:
+                taskID:
                   type: string
                   format: string
                   example: 123e4567-e89b-12d3-a456-426614174000
@@ -2205,7 +2216,7 @@ paths:
                 type: object
                 description: Response schema for unregistering a data transfer task.
                 properties:
-                  contextID:
+                  taskID:
                     type: string
                     description: The unique identifier for the context of the data transfer task.
                   status:
@@ -2248,13 +2259,9 @@ paths:
         content:
           application/json:
             schema:
-              description: Request schema for checking the status of a data transfer task. Includes the context ID or task ID.
+              description: Request schema for checking the status of a data transfer task.
               type: object
               properties:
-                contextID:
-                  type: string
-                  format: string
-                  example: 123e4567-e89b-12d3-a456-426614174000
                 taskID:
                   type: string
                   format: string
@@ -2266,9 +2273,9 @@ paths:
             application/json:
               schema:
                 type: object
-                description: 'Response schema for checking the status of a data transfer task. If contextID was provided, the response will include all tasks associated with that context. If taskID was provided, the response will include the status of that specific task.'
+                description: Response schema for checking the status of a data transfer task.
                 properties:
-                  contextID:
+                  taskID:
                     type: string
                     description: The unique identifier for the context of the data transfer task.
                   originNetwork:
@@ -5545,100 +5552,92 @@ components:
       required:
         - approveAddress
     OracleRegisterRequest:
-      description: Request schema for registering a data transfer task. Includes details such as the source and destination DLT networks and contracts.
+      description: Request schema for registering a repeatable task.
       type: object
       required:
-        - contextID
-        - originNetwork
-        - originContract
+        - taskType
+        - taskMode
       properties:
-        contextID:
+        sourceNetwork:
           type: string
-          format: string
-          example: 123e4567-e89b-12d3-a456-426614174000
-        originNetwork:
-          type: object
-          properties:
-            dltProtocol:
-              example: HyperledgerFabric
-            dltSubnetworkID:
-              example: subnetwork1
-        destinationNetwork:
-          type: object
-          properties:
-            dltProtocol:
-              example: HyperledgerBesu
-            dltSubnetworkID:
-              example: subnetwork2
-        originContract:
-          type: object
-          properties:
-            contractAddress:
-              type: string
-              description: The address of the contract on the origin network.
-              example: 0x0000...
-            contractName:
-              type: string
-              description: The name of the contract on the origin network.
+          description: The source blockchain network identifier. Only if taskType is READ or READ_AND_UPDATE.
+          example: EthereumMainnet
+        targetNetwork:
+          type: string
+          description: The target blockchain network identifier. Only if taskType is UPDATE or READ_AND_UPDATE.
+          example: HyperledgerFabric
+        sourceContract:
+          type: string
+          description: The contract address on the source blockchain. Only if taskType is READ or READ_AND_UPDATE.
+          example: 1.0392900530792776e+47
         destinationContract:
-          type: object
-          properties:
-            contractAddress:
-              type: string
-              description: The address of the contract on the destination network.
-              example: 0x0000...
-            contractName:
-              type: string
-              description: The name of the contract on the destination network.
-        eventOfInterest:
-          type: object
-          description: Details about the event of interest in the origin contract for the data transfer task.
-          properties:
-            eventName:
-              type: string
-              description: The name of the event of interest.
-            eventSignature:
-              type: string
-              description: The signature of the event of interest.
-        writeFunction:
-          type: object
-          description: Details about the write function in the destination contract for the data transfer task.
-          properties:
-            functionName:
-              type: string
-              description: The name of the write function.
-            functionSignature:
-              type: string
-              description: The signature of the write function.
+          type: string
+          description: The contract address on the destination blockchain. Only if taskType is UPDATE or READ_AND_UPDATE.
+          example: 9.808299006075645e+47
+        eventSignature:
+          type: string
+          description: The signature of the event of interest on the source blockchain. Only if taskType is READ or READ_AND_UPDATE.
+          example: Transfer
+        sourceFunctionName:
+          type: string
+          description: The function to be called on the source blockchain. Only if taskType is READ or READ_AND_UPDATE.
+          example: getTransferDetails
+        sourceFunctionParams:
+          type: array
+          items:
+            type: string
+          description: The parameters for the function to be called on the source blockchain. Only if taskType is READ or READ_AND_UPDATE.
+          example:
+            - param1
+            - param2
+        destinationFunctionName:
+          type: string
+          description: The function to be called on the destination blockchain. Only if taskType is UPDATE or READ_AND_UPDATE.
+          example: recordTransfer
+        destinationFunctionParams:
+          type: array
+          items:
+            type: string
+          description: The parameters for the function to be called on the destination blockchain. Only if taskType is UPDATE or READ_AND_UPDATE.
+          example:
+            - param1
+            - param2
+        taskMode:
+          type: string
+          description: The mode of operation for the repeatable task.
+          example: POLLING
+          enum:
+            - POLLING
+            - EVENT_LISTENING
+        taskInterval:
+          type: integer
+          description: The interval for polling in milliseconds. Only if taskMode is POLLING.
+          example: 5000
+        taskType:
+          type: string
+          description: The type of task to be registered.
+          example: READ
+          enum:
+            - READ
+            - UPDATE
+            - READ_AND_UPDATE
     OracleRegisterResponse:
       type: object
-      description: Response schema for registering a data transfer task.
+      description: Response schema for registering a repeatable task.
       properties:
-        contextID:
+        taskID:
           type: string
-          description: The unique identifier for the context of the data transfer task.
+          description: The unique identifier for the context of the repeatable task.
         status:
           type: string
           description: The status of the registered data transfer task.
           enum:
-            - NOT_FOUND
-            - INVALID
-            - PENDING
-            - DONE
-            - FAILED
-          example: DONE
-        substatus:
-          type: string
-          enum:
-            - REGISTERED
-            - UNREGISTERED
-            - UNKNOWN_ERROR
-            - REJECTED
-          example: REGISTERED
+            - SUCCESS
+            - FAILURE
+          example: SUCCESS
       required:
-        - contextID
+        - taskID
         - status
-        - substatus
     OracleExecuteRequest:
       description: 'Request schema for triggering an immediate transfer task. Includes the task ID, payload, and destination network and contract details.'
       type: object
@@ -5649,42 +5648,38 @@ components:
         - destinationContract
         - writeFunction
       properties:
-        taskID:
+        sourceNetwork:
           type: string
-          format: string
-          description: The unique identifier for the transfer task.
-          example: 123e4567-e89b-12d3-a456-426614174000
-        payload:
-          type: string
-          description: The payload to be written to the destination contract.
-          example: '{"data":"example payload"}'
+          description: The source blockchain network identifier. Only if taskType is READ or READ_AND_UPDATE.
+          example: EthereumMainnet
         destinationNetwork:
-          type: object
-          properties:
-            dltProtocol:
-              example: HyperledgerBesu
-            dltSubnetworkID:
-              example: subnetwork2
+          type: string
+          description: The target blockchain network identifier. Only if taskType is UPDATE or READ_AND_UPDATE.
+          example: HyperledgerFabric
+        sourceContract:
+          type: string
+          description: The contract address on the source blockchain. Only if taskType is READ or READ_AND_UPDATE.
+          example: 1.0392900530792776e+47
         destinationContract:
-          type: object
-          properties:
-            contractAddress:
-              type: string
-              description: The address of the contract on the destination network.
-              example: 0x0000...
-            contractName:
-              type: string
-              description: The name of the contract on the destination network.
+          type: string
+          description: The contract address on the destination blockchain. Only if taskType is UPDATE or READ_AND_UPDATE.
+          example: 9.808299006075645e+47
+        readFunction:
+          type: string
+          description: The function to be called on the source blockchain. Only if taskType is READ or READ_AND_UPDATE.
+          example: getTransferDetails
         writeFunction:
-          type: object
-          description: Details about the write function in the destination contract for the data transfer task.
-          properties:
-            functionName:
-              type: string
-              description: The name of the write function.
-            functionSignature:
-              type: string
-              description: The signature of the write function.
+          type: string
+          description: The function to be called on the destination blockchain. Only if taskType is UPDATE or READ_AND_UPDATE.
+          example: recordTransfer
+        taskType:
+          type: string
+          description: The type of task to be registered.
+          example: READ
+          enum:
+            - READ
+            - UPDATE
+            - READ_AND_UPDATE
     OracleExecuteResponse:
       description: 'Response schema for an immediate transfer task execution. Includes the task ID, status, and substatus.'
       type: object
@@ -5696,32 +5691,19 @@ components:
         taskID:
           type: string
           description: The unique identifier for the transfer task.
-        status:
-          type: string
-          description: The status of the transfer task execution.
-          enum:
-            - NOT_FOUND
-            - INVALID
-            - PENDING
-            - DONE
-            - FAILED
-          example: DONE
-        substatus:
-          type: string
-          description: The substatus of the transfer task execution.
-          enum:
-            - EXECUTING
-            - COMPLETED
-            - REJECTED
-            - UNKNOWN_ERROR
-          example: EXECUTING
+        outputs:
+          type: array
+          items:
+            type: string
+          description: The output of the transfer task execution.
+          example: '[{"result":"success"},{"result":"failure"}]'
     OracleUnregisterRequest:
       description: Request schema for unregistering a data transfer task. Includes the context ID of the task to be unregistered.
       type: object
       required:
-        - contextID
+        - taskID
       properties:
-        contextID:
+        taskID:
           type: string
           format: string
           example: 123e4567-e89b-12d3-a456-426614174000
@@ -5729,7 +5711,7 @@ components:
       type: object
       description: Response schema for unregistering a data transfer task.
       properties:
-        contextID:
+        taskID:
           type: string
           description: The unique identifier for the context of the data transfer task.
         status:
@@ -5751,22 +5733,18 @@ components:
             - REJECTED
           example: UNREGISTERED
     OracleStatusRequest:
-      description: Request schema for checking the status of a data transfer task. Includes the context ID or task ID.
+      description: Request schema for checking the status of a data transfer task.
       type: object
       properties:
-        contextID:
-          type: string
-          format: string
-          example: 123e4567-e89b-12d3-a456-426614174000
         taskID:
           type: string
           format: string
           example: 123e4567-e89b-12d3-a456-426614174000
     OracleStatusResponse:
       type: object
-      description: 'Response schema for checking the status of a data transfer task. If contextID was provided, the response will include all tasks associated with that context. If taskID was provided, the response will include the status of that specific task.'
+      description: Response schema for checking the status of a data transfer task.
       properties:
-        contextID:
+        taskID:
           type: string
           description: The unique identifier for the context of the data transfer task.
         originNetwork:

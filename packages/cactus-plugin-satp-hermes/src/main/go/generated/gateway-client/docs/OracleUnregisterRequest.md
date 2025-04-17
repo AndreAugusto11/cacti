@@ -4,13 +4,13 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**ContextID** | **string** |  | 
+**TaskID** | **string** |  | 
 
 ## Methods
 
 ### NewOracleUnregisterRequest
 
-`func NewOracleUnregisterRequest(contextID string, ) *OracleUnregisterRequest`
+`func NewOracleUnregisterRequest(taskID string, ) *OracleUnregisterRequest`
 
 NewOracleUnregisterRequest instantiates a new OracleUnregisterRequest object
 This constructor will assign default values to properties that have it defined,
@@ -25,24 +25,24 @@ NewOracleUnregisterRequestWithDefaults instantiates a new OracleUnregisterReques
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
-### GetContextID
+### GetTaskID
 
-`func (o *OracleUnregisterRequest) GetContextID() string`
+`func (o *OracleUnregisterRequest) GetTaskID() string`
 
-GetContextID returns the ContextID field if non-nil, zero value otherwise.
+GetTaskID returns the TaskID field if non-nil, zero value otherwise.
 
-### GetContextIDOk
+### GetTaskIDOk
 
-`func (o *OracleUnregisterRequest) GetContextIDOk() (*string, bool)`
+`func (o *OracleUnregisterRequest) GetTaskIDOk() (*string, bool)`
 
-GetContextIDOk returns a tuple with the ContextID field if it's non-nil, zero value otherwise
+GetTaskIDOk returns a tuple with the TaskID field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetContextID
+### SetTaskID
 
-`func (o *OracleUnregisterRequest) SetContextID(v string)`
+`func (o *OracleUnregisterRequest) SetTaskID(v string)`
 
-SetContextID sets ContextID field to given value.
+SetTaskID sets TaskID field to given value.
 
 
 

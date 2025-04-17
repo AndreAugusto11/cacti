@@ -19,6 +19,12 @@ import type {
   HealthCheckResponse,
   IntegrationsResponse,
   NetworkId,
+  OracleExecuteRequest,
+  OracleExecuteResponse,
+  OracleRegisterRequest,
+  OracleRegisterResponse,
+  OracleStatusRequest,
+  OracleStatusResponse,
   StatusRequest,
   StatusResponse,
   TransactRequest,
@@ -50,6 +56,12 @@ import {
 import { GetApproveAddressEndpointV1 } from "./transaction/get-approve-address-endpoint";
 import { getEnumValueByKey } from "../services/utils";
 
+import { OracleExecuteTaskEndpointV1 } from "./oracle/oracle-execute-task-endpoint";
+import { OracleManager } from "../cross-chain-mechanisms/oracle/oracle-manager";
+import { registerTask } from "./oracle/oracle-register-task-handler-service";
+import { executeTask } from "./oracle/oracle-execute-task-handler-service";
+import { getTaskStatus } from "./oracle/oracle-get-status-handler-service";
+
 export interface BLODispatcherOptions {
   logger: Logger;
   logLevel?: LogLevelDesc;
@@ -73,6 +85,7 @@ export class BLODispatcher {
   private OAPIEndpoints: IWebServiceEndpoint[] | undefined;
   private readonly instanceId: string;
   private manager: SATPManager;
+  private oracleManager: OracleManager;
   private orchestrator: GatewayOrchestrator;
   private ccManager: SATPCrossChainManager;
   private localRepository: ILocalLogRepository;
@@ -113,6 +126,14 @@ export class BLODispatcher {
     };
 
     this.manager = new SATPManager(SATPManagerOpts);
+    this.oracleManager = new OracleManager({
+      logLevel: "DEBUG",
+      instanceId: this.instanceId,
+      fabricConnectorConfig: undefined,
+      ethereumConnectorConfig: undefined,
+      bungee: undefined,
+      initialTasks: [],
+    });
   }
 
   public get className(): string {
@@ -158,6 +179,21 @@ export class BLODispatcher {
       logLevel: this.options.logLevel,
     });
 
+    const oracleExecuteTaskEndpointV1 = new OracleExecuteTaskEndpointV1({
+      dispatcher: this,
+      logLevel: this.options.logLevel,
+    });
+
+    const oracleRegisterTaskEndpointV1 = new OracleExecuteTaskEndpointV1({
+      dispatcher: this,
+      logLevel: this.options.logLevel,
+    });
+
+    const oracleGetStatusEndpointV1 = new GetStatusEndpointV1({
+      dispatcher: this,
+      logLevel: this.options.logLevel,
+    });
+
     // TODO: keep getter; add an admin endpoint to get identity of connected gateway to BLO
     const endpoints = [
       getStatusEndpointV1,
@@ -166,6 +202,9 @@ export class BLODispatcher {
       getSessionIdsEndpointV1,
       getApproveAddressEndpointV1,
       transactEndpointV1,
+      oracleExecuteTaskEndpointV1,
+      oracleRegisterTaskEndpointV1,
+      oracleGetStatusEndpointV1,
     ];
     this.endpoints = endpoints;
     return endpoints;
@@ -269,6 +308,48 @@ export class BLODispatcher {
   public async getManager(): Promise<SATPManager> {
     this.logger.info(`Get SATP Manager request`);
     return this.manager;
+  }
+
+  // Oracle related methods
+  public async getOracleManager(): Promise<OracleManager> {
+    this.logger.info(`Get Oracle Manager request`);
+    return this.oracleManager;
+  }
+
+  public async OracleExecuteTask(
+    req: OracleExecuteRequest,
+  ): Promise<OracleExecuteResponse> {
+    this.logger.info(`Oracle Execute Task request: ${req}`);
+    if (this.isShuttingDown) {
+      throw new GatewayShuttingDownError(
+        `${BLODispatcher.CLASS_NAME}#OracleExecuteTask()`,
+      );
+    }
+    return await executeTask(this.level, req, this.oracleManager);
+  }
+
+  public async OracleRegisterTask(
+    req: OracleRegisterRequest,
+  ): Promise<OracleRegisterResponse> {
+    this.logger.info(`Oracle Register Request: ${req}`);
+    if (this.isShuttingDown) {
+      throw new GatewayShuttingDownError(
+        `${BLODispatcher.CLASS_NAME}#OracleRegisterTask()`,
+      );
+    }
+    return await registerTask(this.level, req, this.oracleManager);
+  }
+
+  public async OracleGetTaskStatus(
+    req: OracleStatusRequest,
+  ): Promise<OracleStatusResponse> {
+    this.logger.info(`Oracle Get Status request: ${req}`);
+    if (this.isShuttingDown) {
+      throw new GatewayShuttingDownError(
+        `${BLODispatcher.CLASS_NAME}#OracleGetStatus()`,
+      );
+    }
+    return await getTaskStatus(this.level, req, this.oracleManager);
   }
 
   /**

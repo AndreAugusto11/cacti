@@ -20,7 +20,7 @@ var _ MappedNullable = &OracleUnregisterRequest200Response{}
 // OracleUnregisterRequest200Response Response schema for unregistering a data transfer task.
 type OracleUnregisterRequest200Response struct {
 	// The unique identifier for the context of the data transfer task.
-	ContextID *string `json:"contextID,omitempty"`
+	TaskID *string `json:"taskID,omitempty"`
 	// The status of the unregistered data transfer task.
 	Status *string `json:"status,omitempty"`
 	Substatus *string `json:"substatus,omitempty"`
@@ -43,36 +43,36 @@ func NewOracleUnregisterRequest200ResponseWithDefaults() *OracleUnregisterReques
 	return &this
 }
 
-// GetContextID returns the ContextID field value if set, zero value otherwise.
-func (o *OracleUnregisterRequest200Response) GetContextID() string {
-	if o == nil || IsNil(o.ContextID) {
+// GetTaskID returns the TaskID field value if set, zero value otherwise.
+func (o *OracleUnregisterRequest200Response) GetTaskID() string {
+	if o == nil || IsNil(o.TaskID) {
 		var ret string
 		return ret
 	}
-	return *o.ContextID
+	return *o.TaskID
 }
 
-// GetContextIDOk returns a tuple with the ContextID field value if set, nil otherwise
+// GetTaskIDOk returns a tuple with the TaskID field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *OracleUnregisterRequest200Response) GetContextIDOk() (*string, bool) {
-	if o == nil || IsNil(o.ContextID) {
+func (o *OracleUnregisterRequest200Response) GetTaskIDOk() (*string, bool) {
+	if o == nil || IsNil(o.TaskID) {
 		return nil, false
 	}
-	return o.ContextID, true
+	return o.TaskID, true
 }
 
-// HasContextID returns a boolean if a field has been set.
-func (o *OracleUnregisterRequest200Response) HasContextID() bool {
-	if o != nil && !IsNil(o.ContextID) {
+// HasTaskID returns a boolean if a field has been set.
+func (o *OracleUnregisterRequest200Response) HasTaskID() bool {
+	if o != nil && !IsNil(o.TaskID) {
 		return true
 	}
 
 	return false
 }
 
-// SetContextID gets a reference to the given string and assigns it to the ContextID field.
-func (o *OracleUnregisterRequest200Response) SetContextID(v string) {
-	o.ContextID = &v
+// SetTaskID gets a reference to the given string and assigns it to the TaskID field.
+func (o *OracleUnregisterRequest200Response) SetTaskID(v string) {
+	o.TaskID = &v
 }
 
 // GetStatus returns the Status field value if set, zero value otherwise.
@@ -149,8 +149,8 @@ func (o OracleUnregisterRequest200Response) MarshalJSON() ([]byte, error) {
 
 func (o OracleUnregisterRequest200Response) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.ContextID) {
-		toSerialize["contextID"] = o.ContextID
+	if !IsNil(o.TaskID) {
+		toSerialize["taskID"] = o.TaskID
 	}
 	if !IsNil(o.Status) {
 		toSerialize["status"] = o.Status

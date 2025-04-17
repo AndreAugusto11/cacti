@@ -6,9 +6,22 @@ import {
 import type {
   OracleFabric,
   ReadEntryArgs as FabricReadArgs,
-} from "./oracle-fabric";
-import type { OracleEVM, ReadEntryArgs as EVMReadArgs } from "./oracle-evm";
-import { type IOracleTask, OracleTaskType } from "./oracle-manager";
+} from "./leafs/oracle-fabric";
+import type {
+  OracleEVM,
+  ReadEntryArgs as EVMReadArgs,
+} from "./leafs/oracle-evm";
+import type { IOracleTask, IOracleResponse } from "./oracle-types";
+
+import {
+  IOracleOperation,
+  IOracleOperationType,
+  OracleOperationStatusEnum,
+  OracleTaskType,
+} from "./oracle-types";
+import { ReadEntryArgsBase } from "./leafs/oracle-abstract";
+import { v4 as uuidv4 } from "uuid";
+import { updateOracleOperation } from "./oracle-utils";
 
 export interface IOracleListener {
   taskId: string;
@@ -30,195 +43,348 @@ export type ScheduledOracleTask = IOracleTask & {
 
 export interface OracleRelayerOptions {
   logger: Logger;
-  fabric: OracleFabric;
-  evm: OracleEVM;
-  scheduledTasks?: ScheduledOracleTask[];
+  oracleFabric?: OracleFabric;
+  oracleEVM?: OracleEVM;
 }
 
 export class OracleRelayer {
   public static readonly CLASS_NAME = "OracleRelayer";
   public readonly log: Logger;
-  private readonly fabric: OracleFabric;
-  private readonly evm: OracleEVM;
+  private fabric?: OracleFabric;
+  private evm?: OracleEVM;
   // Scheduler fields.
-  private scheduledTasks: ScheduledOracleTask[] = [];
-  private listeners: IOracleListener[] = [];
-  private pollerId: NodeJS.Timer | undefined;
+  // private scheduledTasks: ScheduledOracleTask[] = [];
+  // private listeners: IOracleListener[] = [];
+  // private pollerId: NodeJS.Timer | undefined;
 
   constructor(options: OracleRelayerOptions, level?: LogLevelDesc) {
     const label = OracleRelayer.CLASS_NAME;
     level = level || "INFO";
     this.log = options.logger ?? LoggerProvider.getOrCreate({ label, level });
-    this.fabric = options.fabric;
-    this.evm = options.evm;
-    if (options.scheduledTasks) {
-      this.scheduledTasks = options.scheduledTasks;
-    }
+    this.fabric = options.oracleFabric ? options.oracleFabric : undefined;
+    this.evm = options.oracleEVM ? options.oracleEVM : undefined;
     this.log.debug(`${label}#constructor: OracleRelayer initialized.`);
   }
 
+  get fabricOracle(): OracleFabric {
+    if (!this.fabric) {
+      throw new Error("Fabric oracle not initialized");
+    }
+    return this.fabric;
+  }
+
+  get evmOracle(): OracleEVM {
+    if (!this.evm) {
+      throw new Error("EVM oracle not initialized");
+    }
+    return this.evm;
+  }
+
+  public async processTask(task: IOracleTask): Promise<void> {
+    const fnTag = `${OracleRelayer.CLASS_NAME}#relayTask`;
+    this.log.debug(`${fnTag}: Processing task ${task.id}`);
+
+    // here, we decompose a task into multiple operations as needed and then call
+    // relayOperation for each operation. A READ or UPDATE task are decomposed into
+    // only one operation, but a READ_AND_UPDATE task is decomposed into two operations,
+    // one READ and one UPDATE with the data read from the first operation.
+
+    const operations: IOracleOperation[] = [];
+
+    if (task.type === OracleTaskType.READ) {
+      const operation = {
+        id: uuidv4(),
+        type: IOracleOperationType.READ,
+        networkId: task.srcNetworkId,
+        contractAddress: task.srcContractAddress,
+        functionName: task.srcFunctionName,
+        functionParams: task.srcFunctionParams,
+        status: OracleOperationStatusEnum.PENDING,
+        output: task,
+        timestamp: Date.now(),
+      } as IOracleOperation;
+
+      await this.relayOperation(operation);
+      operations.push(operation);
+    } else if (task.type === OracleTaskType.UPDATE) {
+      const operation = {
+        id: uuidv4(),
+        type: IOracleOperationType.UPDATE,
+        networkId: task.dstNetworkId,
+        contractAddress: task.dstContractAddress,
+        functionName: task.dstFunctionName,
+        functionParams: task.dstFunctionParams,
+        status: OracleOperationStatusEnum.PENDING,
+        output: task,
+        timestamp: Date.now(),
+      } as IOracleOperation;
+
+      await this.relayOperation(operation);
+      operations.push(operation);
+    } else if (task.type === OracleTaskType.READ_AND_UPDATE) {
+      const readOperation = {
+        id: uuidv4(),
+        type: IOracleOperationType.READ,
+        networkId: task.srcNetworkId,
+        contractAddress: task.srcContractAddress,
+        functionName: task.srcFunctionName,
+        functionParams: task.srcFunctionParams,
+        status: OracleOperationStatusEnum.PENDING,
+        output: task,
+        timestamp: Date.now(),
+      } as IOracleOperation;
+
+      await this.relayOperation(readOperation);
+      operations.push(readOperation);
+
+      const updateOperation = {
+        id: uuidv4(),
+        type: IOracleOperationType.UPDATE,
+        networkId: task.dstNetworkId,
+        contractAddress: task.dstContractAddress,
+        functionName: task.dstFunctionName,
+        functionParams: [readOperation.output?.output],
+        status: OracleOperationStatusEnum.PENDING,
+        output: task,
+        timestamp: Date.now(),
+      } as IOracleOperation;
+
+      await this.relayOperation(updateOperation);
+      operations.push(updateOperation);
+    }
+
+    task.operations = operations;
+    task.timestamp = Date.now();
+    this.log.debug(
+      `${fnTag}: Task ${task.id} processed with operations: ${JSON.stringify(
+        operations,
+      )}`,
+    );
+  }
+
   /**
-   * Immediately dispatches a task to the appropriate oracle.
+   * Immediately dispatches an operation to the appropriate oracle.
    */
-  public async relayTask(task: IOracleTask): Promise<void> {
+  public async relayOperation(
+    operation: IOracleOperation,
+  ): Promise<IOracleResponse> {
     const fnTag = `${OracleRelayer.CLASS_NAME}#relayTask`;
     this.log.debug(
-      `${fnTag}: Relaying task ${task.id} to target ${task.targetChainId}`,
+      `${fnTag}: Relaying operation ${operation.id} to network ${operation.networkId}`,
     );
-    try {
-      if (task.targetChainId.toLowerCase().includes("fabric")) {
-        const entry = {
-          channelName: this.fabric.network, // or derive from task details
-          header: {
-            targetChainId: task.targetChainId,
-            sequenceNumber: Date.now(),
-          },
-          payload: JSON.stringify(task),
-        };
-        const { transactionResponse } = await this.fabric.updateEntry(entry);
-        this.log.debug(
-          `${fnTag}: Fabric transaction ${transactionResponse.transactionId} completed.`,
-        );
-      } else if (task.targetChainId.toLowerCase().includes("ethereum")) {
-        const entry = {
-          header: {
-            targetChainId: task.targetChainId,
-            sequenceNumber: Date.now(),
-          },
-          payload: JSON.stringify(task),
-        };
-        const { transactionResponse } = await this.evm.updateEntry(entry);
-        this.log.debug(
-          `${fnTag}: EVM transaction ${transactionResponse.transactionId} completed.`,
-        );
-      } else {
-        this.log.warn(`${fnTag}: Unknown target chain: ${task.targetChainId}`);
-      }
-    } catch (error) {
-      this.log.error(`${fnTag}: Failed to relay task.`, error);
-      throw error;
-    }
-  }
 
-  protected isTriggered(condition?: OracleTaskTriggerCondition): boolean {
-    if (!condition) return false;
-    if (condition.scheduleTime && condition.scheduleTime <= new Date())
-      return true;
-    return false;
-  }
+    if (operation.type === IOracleOperationType.READ) {
+      const readArgs = {
+        chainId: operation.networkId,
+        contractId: operation.contractAddress,
+        methodName: operation.functionName,
+        params: operation.functionParams,
+      } as ReadEntryArgsBase;
 
-  private async executeTask(
-    task: ScheduledOracleTask,
-    chain: "fabric" | "evm",
-    oracleEVM: OracleEVM,
-    oracleFabric: OracleFabric,
-    readArgs: EVMReadArgs | FabricReadArgs,
-  ): Promise<void> {
-    const fnTag = `${OracleRelayer.CLASS_NAME}#executeTask`;
-    if (!this.isTriggered(task.triggerCondition)) return;
-    this.log.debug(`${fnTag}: Executing scheduled task ${task.id}`);
-    if (task.type === OracleTaskType.READ) {
-      if (chain === "fabric") {
-        const result = await oracleFabric.readEntry(readArgs as FabricReadArgs);
+      this.log.debug(`${fnTag}: Executing read operation ${operation.id}`);
+
+      if (operation.networkId.toLowerCase().includes("fabric")) {
+        const result = await this.fabricOracle.readEntry(
+          readArgs as FabricReadArgs,
+        );
         this.log.debug(
-          `${fnTag}: Fabric read result for task ${task.id}`,
+          `${fnTag}: Fabric read result for operation ${operation.id}`,
           result,
         );
-      } else {
-        const result = await oracleEVM.readEntry(readArgs as EVMReadArgs);
-        this.log.debug(`${fnTag}: EVM read result for task ${task.id}`, result);
-      }
-    } else {
-      // For UPDATE tasks, use immediate relay.
-      await this.relayTask(task);
-    }
-  }
-
-  /**
-   * Starts a polling mechanism that checks all listeners at a regular interval.
-   */
-  private pollAllTasks(intervalMs: number): void {
-    const fnTag = `${OracleRelayer.CLASS_NAME}#pollAllTasks`;
-    this.pollerId = setInterval(async () => {
-      for (const listener of this.listeners) {
-        const scheduledTask = this.scheduledTasks.find(
-          (t) => t.id === listener.taskId,
+        updateOracleOperation(operation, OracleOperationStatusEnum.SUCCESS, {
+          output: result,
+        });
+        return {
+          transactionId: "",
+          transactionReceipt: "Read operation completed successfully",
+          output: result,
+        };
+      } else if (operation.networkId.toLowerCase().includes("ethereum")) {
+        const result = await this.evmOracle.readEntry(readArgs as EVMReadArgs);
+        this.log.debug(
+          `${fnTag}: EVM read result for operation ${operation.id}`,
+          result,
         );
-        if (!scheduledTask) {
-          this.log.warn(
-            `${fnTag}: No scheduled task found for listener ${listener.taskId}`,
-          );
-          continue;
-        }
-        try {
-          await this.executeTask(
-            scheduledTask,
-            listener.chain,
-            listener.oracleEVM,
-            listener.oracleFabric,
-            listener.readArgs,
-          );
-        } catch (err) {
-          this.log.error(
-            `${fnTag}: Error polling task ${listener.taskId}`,
-            err,
-          );
-        }
+        updateOracleOperation(operation, OracleOperationStatusEnum.SUCCESS, {
+          output: result,
+        });
+        return {
+          transactionId: "",
+          transactionReceipt: "Read operation completed successfully",
+          output: result,
+        };
+      } else {
+        this.log.warn(`${fnTag}: Unknown target chain: ${operation.networkId}`);
+        updateOracleOperation(operation, OracleOperationStatusEnum.FAILED, {});
+        return {
+          transactionId: "",
+          transactionReceipt: "Read operation failed",
+          output: "Unknown target chain",
+        };
       }
-    }, intervalMs);
-  }
+    } else if (operation.type === IOracleOperationType.UPDATE) {
+      try {
+        if (operation.networkId.toLowerCase().includes("fabric")) {
+          const entry = {
+            channelName: "mychannel", // derive from operation details
+            header: {
+              targetChainId: operation.networkId,
+              sequenceNumber: Date.now(),
+            },
+            payload: JSON.stringify(operation),
+          };
+          const { transactionResponse } =
+            await this.fabricOracle.updateEntry(entry);
+          this.log.debug(
+            `${fnTag}: Fabric transaction ${transactionResponse.transactionId} completed.`,
+          );
 
-  public addListener(
-    task: IOracleTask,
-    chain: "fabric" | "evm",
-    oracleEVM: OracleEVM,
-    oracleFabric: OracleFabric,
-    intervalMs: number,
-    readArgs: EVMReadArgs | FabricReadArgs,
-    triggerCondition?: OracleTaskTriggerCondition,
-  ): void {
-    const fnTag = `${OracleRelayer.CLASS_NAME}#addListener`;
-    const scheduledTask: ScheduledOracleTask = { ...task, triggerCondition };
-    if (!this.scheduledTasks.find((t) => t.id === task.id)) {
-      this.scheduledTasks.push(scheduledTask);
-    }
-    this.listeners.push({
-      taskId: task.id,
-      chain,
-      oracleEVM,
-      oracleFabric,
-      readArgs,
-      taskType: task.type,
-    });
-    if (this.listeners.length === 1) {
-      // Start polling if first listener is added.
-      this.pollAllTasks(intervalMs);
-    }
-    this.log.debug(`${fnTag}: Listener added for task ${task.id}`);
-  }
+          updateOracleOperation(operation, OracleOperationStatusEnum.SUCCESS, {
+            output: transactionResponse,
+          });
+          return {
+            transactionId: transactionResponse.transactionId,
+            transactionReceipt: "Transaction executed successfully",
+            output: transactionResponse,
+          };
+        } else if (operation.networkId.toLowerCase().includes("ethereum")) {
+          const entry = {
+            header: {
+              targetChainId: operation.networkId,
+              sequenceNumber: Date.now(),
+            },
+            payload: JSON.stringify(operation),
+          };
+          const { transactionResponse } =
+            await this.evmOracle.updateEntry(entry);
+          this.log.debug(
+            `${fnTag}: EVM transaction ${transactionResponse.transactionId} completed.`,
+          );
 
-  public removeListener(taskId: string): void {
-    const fnTag = `${OracleRelayer.CLASS_NAME}#removeListener`;
-    const idx = this.listeners.findIndex((l) => l.taskId === taskId);
-    if (idx !== -1) {
-      this.listeners.splice(idx, 1);
-      this.log.debug(`${fnTag}: Removed listener for task ${taskId}`);
-      if (this.listeners.length === 0 && this.pollerId) {
-        clearInterval(this.pollerId);
-        this.pollerId = undefined;
+          updateOracleOperation(operation, OracleOperationStatusEnum.SUCCESS, {
+            output: transactionResponse,
+          });
+          return {
+            transactionId: transactionResponse.transactionId,
+            transactionReceipt: "Transaction executed successfully",
+            output: transactionResponse,
+          };
+        } else {
+          this.log.warn(
+            `${fnTag}: Unknown target chain: ${operation.networkId}`,
+          );
+
+          updateOracleOperation(
+            operation,
+            OracleOperationStatusEnum.FAILED,
+            {},
+          );
+          return {
+            transactionId: "",
+            transactionReceipt: "Transaction failed",
+            output: "Unknown target chain",
+          };
+        }
+      } catch (error) {
+        this.log.error(`${fnTag}: Failed to relay operation.`, error);
+        throw error;
       }
     } else {
-      this.log.debug(`${fnTag}: No active listener for task ${taskId}`);
+      this.log.warn(`${fnTag}: Unknown operation type: ${operation.type}`);
+      return {
+        transactionId: "",
+        transactionReceipt: "Task execution failed",
+        output: "Unknown operation type",
+      };
     }
   }
 
-  public async shutdown(): Promise<void> {
-    const fnTag = `${OracleRelayer.CLASS_NAME}#shutdown`;
-    this.log.debug(`${fnTag}: Shutting down relayer scheduler.`);
-    if (this.pollerId) {
-      clearInterval(this.pollerId);
-      this.pollerId = undefined;
-    }
-    this.listeners = [];
-  }
+  // protected isTriggered(condition?: OracleTaskTriggerCondition): boolean {
+  //   if (!condition) return false;
+  //   if (condition.scheduleTime && condition.scheduleTime <= new Date())
+  //     return true;
+  //   return false;
+  // }
+
+  // /**
+  //  * Starts a polling mechanism that checks all listeners at a regular interval.
+  //  */
+  // private pollAllTasks(intervalMs: number): void {
+  //   const fnTag = `${OracleRelayer.CLASS_NAME}#pollAllTasks`;
+  //   this.pollerId = setInterval(async () => {
+  //     for (const listener of this.listeners) {
+  //       const scheduledTask = this.scheduledTasks.find(
+  //         (t) => t.id === listener.taskId,
+  //       );
+  //       if (!scheduledTask) {
+  //         this.log.warn(
+  //           `${fnTag}: No scheduled task found for listener ${listener.taskId}`,
+  //         );
+  //         continue;
+  //       }
+  //       try {
+  //         this.relayOperation(scheduledTask);
+  //       } catch (err) {
+  //         this.log.error(
+  //           `${fnTag}: Error polling task ${listener.taskId}`,
+  //           err,
+  //         );
+  //       }
+  //     }
+  //   }, intervalMs);
+  // }
+
+  // public addListener(
+  //   task: IOracleRepeatableTask,
+  //   chain: "fabric" | "evm",
+  //   oracleEVM: OracleEVM,
+  //   oracleFabric: OracleFabric,
+  //   intervalMs: number,
+  //   readArgs: EVMReadArgs | FabricReadArgs,
+  //   triggerCondition?: OracleTaskTriggerCondition,
+  // ): void {
+  //   const fnTag = `${OracleRelayer.CLASS_NAME}#addListener`;
+  //   const scheduledTask: ScheduledOracleTask = { ...task, triggerCondition };
+  //   if (!this.scheduledTasks.find((t) => t.id === task.id)) {
+  //     this.scheduledTasks.push(scheduledTask);
+  //   }
+  //   this.listeners.push({
+  //     taskId: task.id,
+  //     chain,
+  //     oracleEVM,
+  //     oracleFabric,
+  //     readArgs,
+  //     taskType: task.type,
+  //   });
+  //   if (this.listeners.length === 1) {
+  //     // Start polling if first listener is added.
+  //     this.pollAllTasks(intervalMs);
+  //   }
+  //   this.log.debug(`${fnTag}: Listener added for task ${task.id}`);
+  // }
+
+  // public removeListener(taskId: string): void {
+  //   const fnTag = `${OracleRelayer.CLASS_NAME}#removeListener`;
+  //   const idx = this.listeners.findIndex((l) => l.taskId === taskId);
+  //   if (idx !== -1) {
+  //     this.listeners.splice(idx, 1);
+  //     this.log.debug(`${fnTag}: Removed listener for task ${taskId}`);
+  //     if (this.listeners.length === 0 && this.pollerId) {
+  //       clearInterval(this.pollerId);
+  //       this.pollerId = undefined;
+  //     }
+  //   } else {
+  //     this.log.debug(`${fnTag}: No active listener for task ${taskId}`);
+  //   }
+  // }
+
+  // public async shutdown(): Promise<void> {
+  //   const fnTag = `${OracleRelayer.CLASS_NAME}#shutdown`;
+  //   this.log.debug(`${fnTag}: Shutting down relayer scheduler.`);
+  //   if (this.pollerId) {
+  //     clearInterval(this.pollerId);
+  //     this.pollerId = undefined;
+  //   }
+  //   this.listeners = [];
+  // }
 }

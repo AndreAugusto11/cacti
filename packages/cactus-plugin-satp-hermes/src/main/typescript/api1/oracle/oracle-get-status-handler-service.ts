@@ -7,40 +7,29 @@ returns a status and useful data to confirm such status (eg bungee notarizations
 */
 
 import { LoggerProvider, LogLevelDesc } from "@hyperledger/cactus-common";
-// import { SATPManager } from "../../services/gateway/satp-manager";
+import { OracleManager } from "../../cross-chain-mechanisms/oracle/oracle-manager";
 import { OracleStatusRequest, OracleStatusResponse } from "../../public-api";
 
-export async function executeGetOracleStatus(
+export async function getTaskStatus(
   logLevel: LogLevelDesc,
   req: OracleStatusRequest,
-  // manager: SATPManager,
+  manager: OracleManager,
 ): Promise<OracleStatusResponse> {
-  const fnTag = `executeGetOracleStatus()`;
+  const fnTag = `executeTask()`;
   const logger = LoggerProvider.getOrCreate({
     label: fnTag,
     level: logLevel,
   });
 
-  if (req.contextID === null && req.taskID === null) {
-    throw new Error(`${fnTag}, contextID or taskID must be provided.`);
+  logger.info(`${fnTag}, executing task status endpoint`);
+
+  if (!req.taskID) {
+    throw new Error(`${fnTag} - missing required parameters for task status`);
   }
 
-  if (req.contextID !== null) {
-    logger.info(`${fnTag}, Obtaining status for contextID=${req.contextID}`);
-  } else {
-    logger.info(`${fnTag}, Obtaining status for taskID=${req.taskID}`);
-  }
+  const result = await manager.getTask(req.taskID);
 
-  try {
-    // const result = await getOracleStatusService(logLevel, req, manager);
-    return {} as OracleStatusResponse;
-  } catch (error) {
-    if (error instanceof Error) {
-      logger.error(`${fnTag}, Error getting status: ${error.message}`);
-      throw error;
-    } else {
-      logger.error(`${fnTag}, Unexpected error: ${error.message}`);
-      throw new Error("An unexpected error occurred while obtaining status.");
-    }
-  }
+  return {
+    taskID: result.id,
+  };
 }

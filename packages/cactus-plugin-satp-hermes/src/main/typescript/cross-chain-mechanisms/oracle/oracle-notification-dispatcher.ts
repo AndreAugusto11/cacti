@@ -6,7 +6,11 @@ import {
   LoggerProvider,
   type LogLevelDesc,
 } from "@hyperledger/cactus-common";
-import type { OracleTaskStatusEnum } from "./oracle-manager";
+import {
+  OracleRepeatableTaskMode,
+  OracleTaskType,
+  OracleTaskStatusEnum,
+} from "./oracle-types";
 
 export interface OracleNotificationDispatcherOptions {
   logger: Logger;
@@ -14,6 +18,8 @@ export interface OracleNotificationDispatcherOptions {
 
 export interface OracleNotification {
   taskId: string;
+  taskType: OracleTaskType;
+  mode?: OracleRepeatableTaskMode;
   status: OracleTaskStatusEnum;
   message: string;
   details?: any;

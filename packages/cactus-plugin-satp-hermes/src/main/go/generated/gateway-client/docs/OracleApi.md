@@ -32,7 +32,7 @@ import (
 )
 
 func main() {
-    oracleExecuteRequestRequest := *openapiclient.NewOracleExecuteRequestRequest("123e4567-e89b-12d3-a456-426614174000", "{"data":"example payload"}", *openapiclient.NewTransact200ResponseStatusResponseDestinationNetwork(), *openapiclient.NewOracleExecuteRequestRequestDestinationContract(), *openapiclient.NewOracleExecuteRequestRequestWriteFunction()) // OracleExecuteRequestRequest | 
+    oracleExecuteRequestRequest := *openapiclient.NewOracleExecuteRequestRequest("HyperledgerFabric", "9.808299006075645E+47", "recordTransfer") // OracleExecuteRequestRequest | 
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
@@ -79,7 +79,7 @@ No authorization required
 
 ## OracleRegisterRequest
 
-> OracleRegisterRequest200Response OracleRegisterRequest(ctx).OracleRegisterRequest(oracleRegisterRequest).Execute()
+> OracleRegisterRequest200Response OracleRegisterRequest(ctx).OracleRegisterRequestRequest(oracleRegisterRequestRequest).Execute()
 
 Register data transfer task
 
@@ -98,11 +98,11 @@ import (
 )
 
 func main() {
-    oracleRegisterRequest := map[string][]openapiclient.OracleRegisterRequestOracleRegisterRequestParameter{ ... } // OracleRegisterRequestOracleRegisterRequestParameter | 
+    oracleRegisterRequestRequest := *openapiclient.NewOracleRegisterRequestRequest("POLLING", "READ") // OracleRegisterRequestRequest | 
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.OracleApi.OracleRegisterRequest(context.Background()).OracleRegisterRequest(oracleRegisterRequest).Execute()
+    resp, r, err := apiClient.OracleApi.OracleRegisterRequest(context.Background()).OracleRegisterRequestRequest(oracleRegisterRequestRequest).Execute()
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `OracleApi.OracleRegisterRequest``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
@@ -123,7 +123,7 @@ Other parameters are passed through a pointer to a apiOracleRegisterRequestReque
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **oracleRegisterRequest** | [**OracleRegisterRequestOracleRegisterRequestParameter**](OracleRegisterRequestOracleRegisterRequestParameter.md) |  | 
+ **oracleRegisterRequestRequest** | [**OracleRegisterRequestRequest**](OracleRegisterRequestRequest.md) |  | 
 
 ### Return type
 
@@ -135,7 +135,7 @@ No authorization required
 
 ### HTTP request headers
 
-- **Content-Type**: Not defined
+- **Content-Type**: application/json
 - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)

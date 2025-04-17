@@ -194,11 +194,11 @@ func (a *OracleApiService) OracleExecuteRequestExecute(r ApiOracleExecuteRequest
 type ApiOracleRegisterRequestRequest struct {
 	ctx context.Context
 	ApiService OracleApi
-	oracleRegisterRequest *OracleRegisterRequestOracleRegisterRequestParameter
+	oracleRegisterRequestRequest *OracleRegisterRequestRequest
 }
 
-func (r ApiOracleRegisterRequestRequest) OracleRegisterRequest(oracleRegisterRequest OracleRegisterRequestOracleRegisterRequestParameter) ApiOracleRegisterRequestRequest {
-	r.oracleRegisterRequest = &oracleRegisterRequest
+func (r ApiOracleRegisterRequestRequest) OracleRegisterRequestRequest(oracleRegisterRequestRequest OracleRegisterRequestRequest) ApiOracleRegisterRequestRequest {
+	r.oracleRegisterRequestRequest = &oracleRegisterRequestRequest
 	return r
 }
 
@@ -241,13 +241,12 @@ func (a *OracleApiService) OracleRegisterRequestExecute(r ApiOracleRegisterReque
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
-	if r.oracleRegisterRequest == nil {
-		return localVarReturnValue, nil, reportError("oracleRegisterRequest is required and must be specified")
+	if r.oracleRegisterRequestRequest == nil {
+		return localVarReturnValue, nil, reportError("oracleRegisterRequestRequest is required and must be specified")
 	}
 
-	parameterAddToHeaderOrQuery(localVarQueryParams, "OracleRegisterRequest", r.oracleRegisterRequest, "")
 	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{}
+	localVarHTTPContentTypes := []string{"application/json"}
 
 	// set Content-Type header
 	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
@@ -263,6 +262,8 @@ func (a *OracleApiService) OracleRegisterRequestExecute(r ApiOracleRegisterReque
 	if localVarHTTPHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
+	// body params
+	localVarPostBody = r.oracleRegisterRequestRequest
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return localVarReturnValue, nil, err

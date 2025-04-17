@@ -20,7 +20,7 @@ import type {
   PluginBungeeHermes,
 } from "@hyperledger/cactus-plugin-bungee-hermes";
 import type { IPluginLedgerConnectorEthereumOptions } from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
-import { OracleResponse } from "./oracle-types";
+import { IOracleResponse } from "../oracle-types";
 
 export interface UpdateEVMOracleTransactionConfig {
   contractName: string;
@@ -64,7 +64,7 @@ export class OracleEVM extends OracleAbstract {
 
   public async updateEntry(
     entry: UpdateEVMOracleEntry,
-  ): Promise<{ transactionResponse: OracleResponse; proof: any }> {
+  ): Promise<{ transactionResponse: IOracleResponse; proof: any }> {
     const fnTag = `${OracleEVM.CLASS_NAME}#updateEntry`;
     this.logger.debug(
       `${fnTag}: Updating entry with header: ${safeStableStringify(entry.header)}`,
@@ -91,7 +91,7 @@ export class OracleEVM extends OracleAbstract {
       throw new Error(`${fnTag}: EVM transaction failed`);
     }
 
-    const transactionResponse: OracleResponse = {
+    const transactionResponse: IOracleResponse = {
       transactionId: response.out.transactionReceipt.transactionHash ?? "",
       transactionReceipt:
         safeStableStringify(response.out.transactionReceipt) ?? "",

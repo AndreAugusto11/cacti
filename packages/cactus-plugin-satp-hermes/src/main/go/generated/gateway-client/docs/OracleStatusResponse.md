@@ -4,13 +4,13 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**ContextID** | Pointer to **string** | The unique identifier for the context of the data transfer task. | [optional] 
+**TaskID** | Pointer to **string** | The unique identifier for the context of the data transfer task. | [optional] 
 **OriginNetwork** | Pointer to [**Transact200ResponseStatusResponseOriginNetwork**](Transact200ResponseStatusResponseOriginNetwork.md) |  | [optional] 
 **DestinationNetwork** | Pointer to [**Transact200ResponseStatusResponseDestinationNetwork**](Transact200ResponseStatusResponseDestinationNetwork.md) |  | [optional] 
 **OriginContract** | Pointer to [**OracleStatusRequest200ResponseOriginContract**](OracleStatusRequest200ResponseOriginContract.md) |  | [optional] 
-**DestinationContract** | Pointer to [**OracleExecuteRequestRequestDestinationContract**](OracleExecuteRequestRequestDestinationContract.md) |  | [optional] 
+**DestinationContract** | Pointer to [**OracleStatusRequest200ResponseDestinationContract**](OracleStatusRequest200ResponseDestinationContract.md) |  | [optional] 
 **EventOfInterest** | Pointer to [**OracleStatusRequest200ResponseEventOfInterest**](OracleStatusRequest200ResponseEventOfInterest.md) |  | [optional] 
-**WriteFunction** | Pointer to [**OracleExecuteRequestRequestWriteFunction**](OracleExecuteRequestRequestWriteFunction.md) |  | [optional] 
+**WriteFunction** | Pointer to [**OracleStatusRequest200ResponseWriteFunction**](OracleStatusRequest200ResponseWriteFunction.md) |  | [optional] 
 **Tasks** | Pointer to [**[]OracleStatusRequest200ResponseTasksInner**](OracleStatusRequest200ResponseTasksInner.md) |  | [optional] 
 **Status** | Pointer to **string** | The status of the data transfer task. | [optional] 
 
@@ -33,30 +33,30 @@ NewOracleStatusResponseWithDefaults instantiates a new OracleStatusResponse obje
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
-### GetContextID
+### GetTaskID
 
-`func (o *OracleStatusResponse) GetContextID() string`
+`func (o *OracleStatusResponse) GetTaskID() string`
 
-GetContextID returns the ContextID field if non-nil, zero value otherwise.
+GetTaskID returns the TaskID field if non-nil, zero value otherwise.
 
-### GetContextIDOk
+### GetTaskIDOk
 
-`func (o *OracleStatusResponse) GetContextIDOk() (*string, bool)`
+`func (o *OracleStatusResponse) GetTaskIDOk() (*string, bool)`
 
-GetContextIDOk returns a tuple with the ContextID field if it's non-nil, zero value otherwise
+GetTaskIDOk returns a tuple with the TaskID field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetContextID
+### SetTaskID
 
-`func (o *OracleStatusResponse) SetContextID(v string)`
+`func (o *OracleStatusResponse) SetTaskID(v string)`
 
-SetContextID sets ContextID field to given value.
+SetTaskID sets TaskID field to given value.
 
-### HasContextID
+### HasTaskID
 
-`func (o *OracleStatusResponse) HasContextID() bool`
+`func (o *OracleStatusResponse) HasTaskID() bool`
 
-HasContextID returns a boolean if a field has been set.
+HasTaskID returns a boolean if a field has been set.
 
 ### GetOriginNetwork
 
@@ -135,20 +135,20 @@ HasOriginContract returns a boolean if a field has been set.
 
 ### GetDestinationContract
 
-`func (o *OracleStatusResponse) GetDestinationContract() OracleExecuteRequestRequestDestinationContract`
+`func (o *OracleStatusResponse) GetDestinationContract() OracleStatusRequest200ResponseDestinationContract`
 
 GetDestinationContract returns the DestinationContract field if non-nil, zero value otherwise.
 
 ### GetDestinationContractOk
 
-`func (o *OracleStatusResponse) GetDestinationContractOk() (*OracleExecuteRequestRequestDestinationContract, bool)`
+`func (o *OracleStatusResponse) GetDestinationContractOk() (*OracleStatusRequest200ResponseDestinationContract, bool)`
 
 GetDestinationContractOk returns a tuple with the DestinationContract field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetDestinationContract
 
-`func (o *OracleStatusResponse) SetDestinationContract(v OracleExecuteRequestRequestDestinationContract)`
+`func (o *OracleStatusResponse) SetDestinationContract(v OracleStatusRequest200ResponseDestinationContract)`
 
 SetDestinationContract sets DestinationContract field to given value.
 
@@ -185,20 +185,20 @@ HasEventOfInterest returns a boolean if a field has been set.
 
 ### GetWriteFunction
 
-`func (o *OracleStatusResponse) GetWriteFunction() OracleExecuteRequestRequestWriteFunction`
+`func (o *OracleStatusResponse) GetWriteFunction() OracleStatusRequest200ResponseWriteFunction`
 
 GetWriteFunction returns the WriteFunction field if non-nil, zero value otherwise.
 
 ### GetWriteFunctionOk
 
-`func (o *OracleStatusResponse) GetWriteFunctionOk() (*OracleExecuteRequestRequestWriteFunction, bool)`
+`func (o *OracleStatusResponse) GetWriteFunctionOk() (*OracleStatusRequest200ResponseWriteFunction, bool)`
 
 GetWriteFunctionOk returns a tuple with the WriteFunction field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetWriteFunction
 
-`func (o *OracleStatusResponse) SetWriteFunction(v OracleExecuteRequestRequestWriteFunction)`
+`func (o *OracleStatusResponse) SetWriteFunction(v OracleStatusRequest200ResponseWriteFunction)`
 
 SetWriteFunction sets WriteFunction field to given value.
 

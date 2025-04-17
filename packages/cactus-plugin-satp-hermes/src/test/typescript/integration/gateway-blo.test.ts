@@ -12,7 +12,11 @@ import {
 
 import type { SATPGatewayConfig } from "../../../main/typescript/plugin-satp-hermes-gateway";
 import { createClient } from "../test-utils";
-import { HealthCheckResponseStatusEnum } from "../../../main/typescript";
+import {
+  HealthCheckResponseStatusEnum,
+  OracleRegisterRequestRequestTaskModeEnum,
+  OracleRegisterRequestRequestTaskTypeEnum,
+} from "../../../main/typescript";
 import {
   knexClientConnection,
   knexSourceRemoteConnection,
@@ -131,6 +135,49 @@ describe("GetStatus Endpoint and Functionality testing", () => {
       expect(result.status).toBe(200);
       expect(result.data.integrations).toBeDefined();
       expect(result.data.integrations.length).toBe(0); // No integrations yet
+    } finally {
+      await gateway.shutdown();
+    }
+  });
+
+  test("Oracle endpoints work", async () => {
+    const gateway = await factory.create(options);
+
+    try {
+      await gateway.startup();
+      const address = options.gid!.address!;
+      const port = options.gid!.gatewayOapiPort!;
+
+      await gateway.getOrCreateHttpServer();
+
+      const oracleApiClient = createClient("OracleApi", address, port, logger);
+
+      const result = await oracleApiClient.oracleStatusRequest({
+        taskID: "test-task-id",
+      });
+
+      expect(result).toBeDefined();
+      expect(result.status).toBe(200);
+      expect(result.data.taskID).toBe("test-task-id");
+
+      const register = await oracleApiClient.oracleRegisterRequest({
+        sourceNetwork: "source-network-id",
+        targetNetwork: "target-network-id",
+        sourceContract: "source-contract-address",
+        destinationContract: "destination-contract-address",
+        sourceFunctionName: "source-function-name",
+        sourceFunctionParams: ["param1", "param2"],
+        destinationFunctionName: "destination-function-name",
+        destinationFunctionParams: ["paramA", "paramB"],
+        taskMode: OracleRegisterRequestRequestTaskModeEnum.EventListening,
+        taskInterval: 5000,
+        taskType: OracleRegisterRequestRequestTaskTypeEnum.Read,
+      });
+
+      expect(register).toBeDefined();
+      expect(register.status).toBe(200);
+      expect(register.data.taskID).toBeDefined();
+      expect(register.data.status).toBe("SUCCESS");
     } finally {
       await gateway.shutdown();
     }

@@ -4,7 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**ContextID** | Pointer to **string** | The unique identifier for the context of the data transfer task. | [optional] 
+**TaskID** | Pointer to **string** | The unique identifier for the context of the data transfer task. | [optional] 
 **Status** | Pointer to **string** | The status of the unregistered data transfer task. | [optional] 
 **Substatus** | Pointer to **string** |  | [optional] 
 
@@ -27,30 +27,30 @@ NewOracleUnregisterRequest200ResponseWithDefaults instantiates a new OracleUnreg
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
-### GetContextID
+### GetTaskID
 
-`func (o *OracleUnregisterRequest200Response) GetContextID() string`
+`func (o *OracleUnregisterRequest200Response) GetTaskID() string`
 
-GetContextID returns the ContextID field if non-nil, zero value otherwise.
+GetTaskID returns the TaskID field if non-nil, zero value otherwise.
 
-### GetContextIDOk
+### GetTaskIDOk
 
-`func (o *OracleUnregisterRequest200Response) GetContextIDOk() (*string, bool)`
+`func (o *OracleUnregisterRequest200Response) GetTaskIDOk() (*string, bool)`
 
-GetContextIDOk returns a tuple with the ContextID field if it's non-nil, zero value otherwise
+GetTaskIDOk returns a tuple with the TaskID field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetContextID
+### SetTaskID
 
-`func (o *OracleUnregisterRequest200Response) SetContextID(v string)`
+`func (o *OracleUnregisterRequest200Response) SetTaskID(v string)`
 
-SetContextID sets ContextID field to given value.
+SetTaskID sets TaskID field to given value.
 
-### HasContextID
+### HasTaskID
 
-`func (o *OracleUnregisterRequest200Response) HasContextID() bool`
+`func (o *OracleUnregisterRequest200Response) HasTaskID() bool`
 
-HasContextID returns a boolean if a field has been set.
+HasTaskID returns a boolean if a field has been set.
 
 ### GetStatus
 

@@ -16,10 +16,17 @@ import {
   type IAsyncProvider,
 } from "@hyperledger/cactus-common";
 
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+import {
+  handleRestEndpointException,
+  registerWebServiceEndpoint,
+} from "@hyperledger/cactus-core";
 
 import OAS from "../../../json/openapi-blo-bundled.json";
 import type { IRequestOptions } from "../../core/types";
+import { OracleStatusRequest } from "../../public-api";
+import { getEnumKeyByValue } from "../../services/utils";
+import { SATPInternalError } from "../../core/errors/satp-errors";
+import { Error as SATPErrorType } from "../../generated/proto/cacti/satp/v02/common/message_pb";
 
 export class GetOracleStatusEndpointV1 implements IWebServiceEndpoint {
   public static readonly CLASS_NAME = "GetOracleStatusEndpointV1";
@@ -81,27 +88,19 @@ export class GetOracleStatusEndpointV1 implements IWebServiceEndpoint {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async handleRequest(req: Request, res: Response): Promise<void> {
+    const fnTag = `${this.className}#handleRequest()`;
     const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;
     this.log.debug(reqTag);
-    // try {
-    //   const sessionId = req.query.SessionID as string;
-    //   if (!sessionId) {
-    //     res
-    //       .status(400)
-    //       .json({ message: "SessionID query parameter is required." });
-    //     return;
-    //   }
-    //   const statusRequest: StatusRequest = {
-    //     sessionID: sessionId,
-    //   };
-    //   const result = await this.options.dispatcher.GetStatus(statusRequest);
-    //   res.status(200).json(result);
-    // } catch (ex) {
-    //   this.log.error(`Crash while serving ${reqTag}`, ex);
-    //   res.status(500).json({
-    //     message: "Internal Server Error",
-    //     error: ex?.stack || ex?.message,
-    //   });
-    // }
+
+    const reqBody: OracleStatusRequest = req.body;
+    this.log.debug("reqBody: ", reqBody);
+
+    try {
+      const result = await this.options.dispatcher.OracleGetTaskStatus(reqBody);
+      res.status(200).json(result);
+    } catch (ex) {
+      const errorMsg = `${reqTag} ${fnTag} Failed to execute task: ${getEnumKeyByValue(SATPErrorType, (ex as SATPInternalError).getSATPErrorType())}`;
+      handleRestEndpointException({ errorMsg, log: this.log, error: ex, res });
+    }
   }
 }

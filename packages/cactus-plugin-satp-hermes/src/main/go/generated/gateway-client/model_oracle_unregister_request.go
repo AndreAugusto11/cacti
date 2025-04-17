@@ -19,16 +19,16 @@ var _ MappedNullable = &OracleUnregisterRequest{}
 
 // OracleUnregisterRequest Request schema for unregistering a data transfer task. Includes the context ID of the task to be unregistered.
 type OracleUnregisterRequest struct {
-	ContextID string `json:"contextID"`
+	TaskID string `json:"taskID"`
 }
 
 // NewOracleUnregisterRequest instantiates a new OracleUnregisterRequest object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewOracleUnregisterRequest(contextID string) *OracleUnregisterRequest {
+func NewOracleUnregisterRequest(taskID string) *OracleUnregisterRequest {
 	this := OracleUnregisterRequest{}
-	this.ContextID = contextID
+	this.TaskID = taskID
 	return &this
 }
 
@@ -40,28 +40,28 @@ func NewOracleUnregisterRequestWithDefaults() *OracleUnregisterRequest {
 	return &this
 }
 
-// GetContextID returns the ContextID field value
-func (o *OracleUnregisterRequest) GetContextID() string {
+// GetTaskID returns the TaskID field value
+func (o *OracleUnregisterRequest) GetTaskID() string {
 	if o == nil {
 		var ret string
 		return ret
 	}
 
-	return o.ContextID
+	return o.TaskID
 }
 
-// GetContextIDOk returns a tuple with the ContextID field value
+// GetTaskIDOk returns a tuple with the TaskID field value
 // and a boolean to check if the value has been set.
-func (o *OracleUnregisterRequest) GetContextIDOk() (*string, bool) {
+func (o *OracleUnregisterRequest) GetTaskIDOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
-	return &o.ContextID, true
+	return &o.TaskID, true
 }
 
-// SetContextID sets field value
-func (o *OracleUnregisterRequest) SetContextID(v string) {
-	o.ContextID = v
+// SetTaskID sets field value
+func (o *OracleUnregisterRequest) SetTaskID(v string) {
+	o.TaskID = v
 }
 
 func (o OracleUnregisterRequest) MarshalJSON() ([]byte, error) {
@@ -74,7 +74,7 @@ func (o OracleUnregisterRequest) MarshalJSON() ([]byte, error) {
 
 func (o OracleUnregisterRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	toSerialize["contextID"] = o.ContextID
+	toSerialize["taskID"] = o.TaskID
 	return toSerialize, nil
 }
 

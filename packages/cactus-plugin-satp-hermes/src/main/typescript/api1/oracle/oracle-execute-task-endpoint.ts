@@ -23,18 +23,18 @@ import {
 
 import OAS from "../../../json/openapi-blo-bundled.json";
 import type { IRequestOptions } from "../../core/types";
-import { OracleRegisterRequest } from "../../public-api";
+import { OracleExecuteRequest } from "../../public-api";
 import { SATPInternalError } from "../../core/errors/satp-errors";
 import { getEnumKeyByValue } from "../../services/utils";
 import { Error as SATPErrorType } from "../../generated/proto/cacti/satp/v02/common/message_pb";
 
-export class OracleRegisterTaskEndpointV1 implements IWebServiceEndpoint {
-  public static readonly CLASS_NAME = "OracleRegisterTaskEndpointV1";
+export class OracleExecuteTaskEndpointV1 implements IWebServiceEndpoint {
+  public static readonly CLASS_NAME = "OracleExecuteTaskEndpointV1";
 
   private readonly log: Logger;
 
   public get className(): string {
-    return OracleRegisterTaskEndpointV1.CLASS_NAME;
+    return OracleExecuteTaskEndpointV1.CLASS_NAME;
   }
 
   constructor(public readonly options: IRequestOptions) {
@@ -50,7 +50,7 @@ export class OracleRegisterTaskEndpointV1 implements IWebServiceEndpoint {
   public getPath(): string {
     const apiPath =
       OAS.paths[
-        "/api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/register"
+        "/api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/execute"
       ];
     return apiPath.post["x-hyperledger-cacti"].http.path;
   }
@@ -58,14 +58,14 @@ export class OracleRegisterTaskEndpointV1 implements IWebServiceEndpoint {
   public getVerbLowerCase(): string {
     const apiPath =
       OAS.paths[
-        "/api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/register"
+        "/api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/execute"
       ];
     return apiPath.post["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getOperationId(): string {
     return OAS.paths[
-      "/api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/register"
+      "/api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/execute"
     ].post.operationId;
   }
 
@@ -96,11 +96,11 @@ export class OracleRegisterTaskEndpointV1 implements IWebServiceEndpoint {
     const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;
     this.log.debug(reqTag);
 
-    const reqBody: OracleRegisterRequest = req.body;
+    const reqBody: OracleExecuteRequest = req.body;
     this.log.debug("reqBody: ", reqBody);
 
     try {
-      const result = await this.options.dispatcher.OracleRegisterTask(reqBody);
+      const result = await this.options.dispatcher.OracleExecuteTask(reqBody);
       res.status(200).json(result);
     } catch (ex) {
       const errorMsg = `${reqTag} ${fnTag} Failed to execute task: ${getEnumKeyByValue(SATPErrorType, (ex as SATPInternalError).getSATPErrorType())}`;

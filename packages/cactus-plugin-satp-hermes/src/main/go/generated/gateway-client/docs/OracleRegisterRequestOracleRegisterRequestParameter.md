@@ -4,18 +4,22 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**SourceNetwork** | Pointer to **string** | The source blockchain network identifier. | [optional] 
-**TargetNetwork** | Pointer to **string** | The target blockchain network identifier. | [optional] 
-**OriginContract** | **string** | The contract address on the source blockchain. | 
-**DestinationContract** | Pointer to **string** | The contract address on the destination blockchain. | [optional] 
-**EventOfInterest** | Pointer to **string** | The event of interest on the source blockchain. | [optional] 
-**WriteFunction** | Pointer to **string** | The function to be called on the destination blockchain. | [optional] 
+**SourceNetwork** | Pointer to **string** | The source blockchain network identifier. Only if taskType is READ or READ_AND_UPDATE. | [optional] 
+**TargetNetwork** | Pointer to **string** | The target blockchain network identifier. Only if taskType is UPDATE or READ_AND_UPDATE. | [optional] 
+**OriginContract** | Pointer to **string** | The contract address on the source blockchain. Only if taskType is READ or READ_AND_UPDATE. | [optional] 
+**DestinationContract** | Pointer to **string** | The contract address on the destination blockchain. Only if taskType is UPDATE or READ_AND_UPDATE. | [optional] 
+**EventSignature** | Pointer to **string** | The signature of the event of interest on the source blockchain. Only if taskType is READ or READ_AND_UPDATE. | [optional] 
+**ReadFunction** | Pointer to **string** | The function to be called on the source blockchain. Only if taskType is READ or READ_AND_UPDATE. | [optional] 
+**WriteFunction** | Pointer to **string** | The function to be called on the destination blockchain. Only if taskType is UPDATE or READ_AND_UPDATE. | [optional] 
+**TaskMode** | **string** | The mode of operation for the task. | 
+**TaskInterval** | Pointer to **int32** | The interval for polling in milliseconds. Only if taskMode is POLLING. | [optional] 
+**TaskType** | **string** | The type of task to be registered. | 
 
 ## Methods
 
 ### NewOracleRegisterRequestOracleRegisterRequestParameter
 
-`func NewOracleRegisterRequestOracleRegisterRequestParameter(originContract string, ) *OracleRegisterRequestOracleRegisterRequestParameter`
+`func NewOracleRegisterRequestOracleRegisterRequestParameter(taskMode string, taskType string, ) *OracleRegisterRequestOracleRegisterRequestParameter`
 
 NewOracleRegisterRequestOracleRegisterRequestParameter instantiates a new OracleRegisterRequestOracleRegisterRequestParameter object
 This constructor will assign default values to properties that have it defined,
@@ -99,6 +103,11 @@ and a boolean to check if the value has been set.
 
 SetOriginContract sets OriginContract field to given value.
 
+### HasOriginContract
+
+`func (o *OracleRegisterRequestOracleRegisterRequestParameter) HasOriginContract() bool`
+
+HasOriginContract returns a boolean if a field has been set.
 
 ### GetDestinationContract
 
@@ -125,30 +134,55 @@ SetDestinationContract sets DestinationContract field to given value.
 
 HasDestinationContract returns a boolean if a field has been set.
 
-### GetEventOfInterest
+### GetEventSignature
 
-`func (o *OracleRegisterRequestOracleRegisterRequestParameter) GetEventOfInterest() string`
+`func (o *OracleRegisterRequestOracleRegisterRequestParameter) GetEventSignature() string`
 
-GetEventOfInterest returns the EventOfInterest field if non-nil, zero value otherwise.
+GetEventSignature returns the EventSignature field if non-nil, zero value otherwise.
 
-### GetEventOfInterestOk
+### GetEventSignatureOk
 
-`func (o *OracleRegisterRequestOracleRegisterRequestParameter) GetEventOfInterestOk() (*string, bool)`
+`func (o *OracleRegisterRequestOracleRegisterRequestParameter) GetEventSignatureOk() (*string, bool)`
 
-GetEventOfInterestOk returns a tuple with the EventOfInterest field if it's non-nil, zero value otherwise
+GetEventSignatureOk returns a tuple with the EventSignature field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetEventOfInterest
+### SetEventSignature
 
-`func (o *OracleRegisterRequestOracleRegisterRequestParameter) SetEventOfInterest(v string)`
+`func (o *OracleRegisterRequestOracleRegisterRequestParameter) SetEventSignature(v string)`
 
-SetEventOfInterest sets EventOfInterest field to given value.
+SetEventSignature sets EventSignature field to given value.
 
-### HasEventOfInterest
+### HasEventSignature
 
-`func (o *OracleRegisterRequestOracleRegisterRequestParameter) HasEventOfInterest() bool`
+`func (o *OracleRegisterRequestOracleRegisterRequestParameter) HasEventSignature() bool`
 
-HasEventOfInterest returns a boolean if a field has been set.
+HasEventSignature returns a boolean if a field has been set.
+
+### GetReadFunction
+
+`func (o *OracleRegisterRequestOracleRegisterRequestParameter) GetReadFunction() string`
+
+GetReadFunction returns the ReadFunction field if non-nil, zero value otherwise.
+
+### GetReadFunctionOk
+
+`func (o *OracleRegisterRequestOracleRegisterRequestParameter) GetReadFunctionOk() (*string, bool)`
+
+GetReadFunctionOk returns a tuple with the ReadFunction field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetReadFunction
+
+`func (o *OracleRegisterRequestOracleRegisterRequestParameter) SetReadFunction(v string)`
+
+SetReadFunction sets ReadFunction field to given value.
+
+### HasReadFunction
+
+`func (o *OracleRegisterRequestOracleRegisterRequestParameter) HasReadFunction() bool`
+
+HasReadFunction returns a boolean if a field has been set.
 
 ### GetWriteFunction
 
@@ -174,6 +208,71 @@ SetWriteFunction sets WriteFunction field to given value.
 `func (o *OracleRegisterRequestOracleRegisterRequestParameter) HasWriteFunction() bool`
 
 HasWriteFunction returns a boolean if a field has been set.
+
+### GetTaskMode
+
+`func (o *OracleRegisterRequestOracleRegisterRequestParameter) GetTaskMode() string`
+
+GetTaskMode returns the TaskMode field if non-nil, zero value otherwise.
+
+### GetTaskModeOk
+
+`func (o *OracleRegisterRequestOracleRegisterRequestParameter) GetTaskModeOk() (*string, bool)`
+
+GetTaskModeOk returns a tuple with the TaskMode field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetTaskMode
+
+`func (o *OracleRegisterRequestOracleRegisterRequestParameter) SetTaskMode(v string)`
+
+SetTaskMode sets TaskMode field to given value.
+
+
+### GetTaskInterval
+
+`func (o *OracleRegisterRequestOracleRegisterRequestParameter) GetTaskInterval() int32`
+
+GetTaskInterval returns the TaskInterval field if non-nil, zero value otherwise.
+
+### GetTaskIntervalOk
+
+`func (o *OracleRegisterRequestOracleRegisterRequestParameter) GetTaskIntervalOk() (*int32, bool)`
+
+GetTaskIntervalOk returns a tuple with the TaskInterval field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetTaskInterval
+
+`func (o *OracleRegisterRequestOracleRegisterRequestParameter) SetTaskInterval(v int32)`
+
+SetTaskInterval sets TaskInterval field to given value.
+
+### HasTaskInterval
+
+`func (o *OracleRegisterRequestOracleRegisterRequestParameter) HasTaskInterval() bool`
+
+HasTaskInterval returns a boolean if a field has been set.
+
+### GetTaskType
+
+`func (o *OracleRegisterRequestOracleRegisterRequestParameter) GetTaskType() string`
+
+GetTaskType returns the TaskType field if non-nil, zero value otherwise.
+
+### GetTaskTypeOk
+
+`func (o *OracleRegisterRequestOracleRegisterRequestParameter) GetTaskTypeOk() (*string, bool)`
+
+GetTaskTypeOk returns a tuple with the TaskType field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetTaskType
+
+`func (o *OracleRegisterRequestOracleRegisterRequestParameter) SetTaskType(v string)`
+
+SetTaskType sets TaskType field to given value.
+
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

@@ -17,24 +17,22 @@ import (
 // checks if the OracleRegisterRequest200Response type satisfies the MappedNullable interface at compile time
 var _ MappedNullable = &OracleRegisterRequest200Response{}
 
-// OracleRegisterRequest200Response Response schema for registering a data transfer task.
+// OracleRegisterRequest200Response Response schema for registering a repeatable task.
 type OracleRegisterRequest200Response struct {
-	// The unique identifier for the context of the data transfer task.
-	ContextID string `json:"contextID"`
+	// The unique identifier for the context of the repeatable task.
+	TaskID string `json:"taskID"`
 	// The status of the registered data transfer task.
 	Status string `json:"status"`
-	Substatus string `json:"substatus"`
 }
 
 // NewOracleRegisterRequest200Response instantiates a new OracleRegisterRequest200Response object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewOracleRegisterRequest200Response(contextID string, status string, substatus string) *OracleRegisterRequest200Response {
+func NewOracleRegisterRequest200Response(taskID string, status string) *OracleRegisterRequest200Response {
 	this := OracleRegisterRequest200Response{}
-	this.ContextID = contextID
+	this.TaskID = taskID
 	this.Status = status
-	this.Substatus = substatus
 	return &this
 }
 
@@ -46,28 +44,28 @@ func NewOracleRegisterRequest200ResponseWithDefaults() *OracleRegisterRequest200
 	return &this
 }
 
-// GetContextID returns the ContextID field value
-func (o *OracleRegisterRequest200Response) GetContextID() string {
+// GetTaskID returns the TaskID field value
+func (o *OracleRegisterRequest200Response) GetTaskID() string {
 	if o == nil {
 		var ret string
 		return ret
 	}
 
-	return o.ContextID
+	return o.TaskID
 }
 
-// GetContextIDOk returns a tuple with the ContextID field value
+// GetTaskIDOk returns a tuple with the TaskID field value
 // and a boolean to check if the value has been set.
-func (o *OracleRegisterRequest200Response) GetContextIDOk() (*string, bool) {
+func (o *OracleRegisterRequest200Response) GetTaskIDOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
-	return &o.ContextID, true
+	return &o.TaskID, true
 }
 
-// SetContextID sets field value
-func (o *OracleRegisterRequest200Response) SetContextID(v string) {
-	o.ContextID = v
+// SetTaskID sets field value
+func (o *OracleRegisterRequest200Response) SetTaskID(v string) {
+	o.TaskID = v
 }
 
 // GetStatus returns the Status field value
@@ -94,30 +92,6 @@ func (o *OracleRegisterRequest200Response) SetStatus(v string) {
 	o.Status = v
 }
 
-// GetSubstatus returns the Substatus field value
-func (o *OracleRegisterRequest200Response) GetSubstatus() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.Substatus
-}
-
-// GetSubstatusOk returns a tuple with the Substatus field value
-// and a boolean to check if the value has been set.
-func (o *OracleRegisterRequest200Response) GetSubstatusOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.Substatus, true
-}
-
-// SetSubstatus sets field value
-func (o *OracleRegisterRequest200Response) SetSubstatus(v string) {
-	o.Substatus = v
-}
-
 func (o OracleRegisterRequest200Response) MarshalJSON() ([]byte, error) {
 	toSerialize,err := o.ToMap()
 	if err != nil {
@@ -128,9 +102,8 @@ func (o OracleRegisterRequest200Response) MarshalJSON() ([]byte, error) {
 
 func (o OracleRegisterRequest200Response) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	toSerialize["contextID"] = o.ContextID
+	toSerialize["taskID"] = o.TaskID
 	toSerialize["status"] = o.Status
-	toSerialize["substatus"] = o.Substatus
 	return toSerialize, nil
 }
 

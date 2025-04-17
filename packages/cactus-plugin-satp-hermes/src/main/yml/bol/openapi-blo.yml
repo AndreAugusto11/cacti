@@ -412,40 +412,12 @@ paths:
         http:
           verbLowerCase: post
           path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/register
-      parameters:
-        - name: OracleRegisterRequest
-          in: query
-          schema:
-            type: object
-            description: Request schema for registering a data transfer task. Includes details such as the source and destination DLT networks and contracts.
-            required:
-              - originContract
-            properties:
-              sourceNetwork:
-                type: string
-                description: The source blockchain network identifier.
-                example: EthereumMainnet
-              targetNetwork:
-                type: string
-                description: The target blockchain network identifier.
-                example: HyperledgerFabric
-              originContract:
-                type: string
-                description: The contract address on the source blockchain.
-                example: 0x1234567890abcdef1234567890abcdef12345678
-              destinationContract:
-                type: string
-                description: The contract address on the destination blockchain.
-                example: 0xabcdef1234567890abcdef1234567890abcdef12
-              eventOfInterest:
-                type: string
-                description: The event of interest on the source blockchain.
-                example: Transfer
-              writeFunction:
-                type: string
-                description: The function to be called on the destination blockchain.
-                example: recordTransfer
-          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ./schemas.yml#/OracleRegisterRequest
       responses:
         '200':
           description: Response schema for registering a data transfer task.

@@ -4,7 +4,6 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**ContextID** | Pointer to **string** |  | [optional] 
 **TaskID** | Pointer to **string** |  | [optional] 
 
 ## Methods
@@ -25,31 +24,6 @@ will change when the set of required properties is changed
 NewOracleStatusRequestRequestWithDefaults instantiates a new OracleStatusRequestRequest object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
-
-### GetContextID
-
-`func (o *OracleStatusRequestRequest) GetContextID() string`
-
-GetContextID returns the ContextID field if non-nil, zero value otherwise.
-
-### GetContextIDOk
-
-`func (o *OracleStatusRequestRequest) GetContextIDOk() (*string, bool)`
-
-GetContextIDOk returns a tuple with the ContextID field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetContextID
-
-`func (o *OracleStatusRequestRequest) SetContextID(v string)`
-
-SetContextID sets ContextID field to given value.
-
-### HasContextID
-
-`func (o *OracleStatusRequestRequest) HasContextID() bool`
-
-HasContextID returns a boolean if a field has been set.
 
 ### GetTaskID
 

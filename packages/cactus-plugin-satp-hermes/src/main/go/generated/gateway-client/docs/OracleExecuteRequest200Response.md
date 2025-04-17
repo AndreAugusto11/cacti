@@ -5,14 +5,13 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **TaskID** | **string** | The unique identifier for the transfer task. | 
-**Status** | **string** | The status of the transfer task execution. | 
-**Substatus** | **string** | The substatus of the transfer task execution. | 
+**Outputs** | Pointer to **[]string** | The output of the transfer task execution. | [optional] 
 
 ## Methods
 
 ### NewOracleExecuteRequest200Response
 
-`func NewOracleExecuteRequest200Response(taskID string, status string, substatus string, ) *OracleExecuteRequest200Response`
+`func NewOracleExecuteRequest200Response(taskID string, ) *OracleExecuteRequest200Response`
 
 NewOracleExecuteRequest200Response instantiates a new OracleExecuteRequest200Response object
 This constructor will assign default values to properties that have it defined,
@@ -47,45 +46,30 @@ and a boolean to check if the value has been set.
 SetTaskID sets TaskID field to given value.
 
 
-### GetStatus
+### GetOutputs
 
-`func (o *OracleExecuteRequest200Response) GetStatus() string`
+`func (o *OracleExecuteRequest200Response) GetOutputs() []string`
 
-GetStatus returns the Status field if non-nil, zero value otherwise.
+GetOutputs returns the Outputs field if non-nil, zero value otherwise.
 
-### GetStatusOk
+### GetOutputsOk
 
-`func (o *OracleExecuteRequest200Response) GetStatusOk() (*string, bool)`
+`func (o *OracleExecuteRequest200Response) GetOutputsOk() (*[]string, bool)`
 
-GetStatusOk returns a tuple with the Status field if it's non-nil, zero value otherwise
+GetOutputsOk returns a tuple with the Outputs field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetStatus
+### SetOutputs
 
-`func (o *OracleExecuteRequest200Response) SetStatus(v string)`
+`func (o *OracleExecuteRequest200Response) SetOutputs(v []string)`
 
-SetStatus sets Status field to given value.
+SetOutputs sets Outputs field to given value.
 
+### HasOutputs
 
-### GetSubstatus
+`func (o *OracleExecuteRequest200Response) HasOutputs() bool`
 
-`func (o *OracleExecuteRequest200Response) GetSubstatus() string`
-
-GetSubstatus returns the Substatus field if non-nil, zero value otherwise.
-
-### GetSubstatusOk
-
-`func (o *OracleExecuteRequest200Response) GetSubstatusOk() (*string, bool)`
-
-GetSubstatusOk returns a tuple with the Substatus field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetSubstatus
-
-`func (o *OracleExecuteRequest200Response) SetSubstatus(v string)`
-
-SetSubstatus sets Substatus field to given value.
-
+HasOutputs returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

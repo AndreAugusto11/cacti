@@ -19,23 +19,28 @@ var _ MappedNullable = &OracleExecuteRequestRequest{}
 
 // OracleExecuteRequestRequest Request schema for triggering an immediate transfer task. Includes the task ID, payload, and destination network and contract details.
 type OracleExecuteRequestRequest struct {
-	// The unique identifier for the transfer task.
-	TaskID string `json:"taskID"`
-	// The payload to be written to the destination contract.
-	Payload string `json:"payload"`
-	DestinationNetwork Transact200ResponseStatusResponseDestinationNetwork `json:"destinationNetwork"`
-	DestinationContract OracleExecuteRequestRequestDestinationContract `json:"destinationContract"`
-	WriteFunction OracleExecuteRequestRequestWriteFunction `json:"writeFunction"`
+	// The source blockchain network identifier. Only if taskType is READ or READ_AND_UPDATE.
+	SourceNetwork *string `json:"sourceNetwork,omitempty"`
+	// The target blockchain network identifier. Only if taskType is UPDATE or READ_AND_UPDATE.
+	DestinationNetwork string `json:"destinationNetwork"`
+	// The contract address on the source blockchain. Only if taskType is READ or READ_AND_UPDATE.
+	SourceContract *string `json:"sourceContract,omitempty"`
+	// The contract address on the destination blockchain. Only if taskType is UPDATE or READ_AND_UPDATE.
+	DestinationContract string `json:"destinationContract"`
+	// The function to be called on the source blockchain. Only if taskType is READ or READ_AND_UPDATE.
+	ReadFunction *string `json:"readFunction,omitempty"`
+	// The function to be called on the destination blockchain. Only if taskType is UPDATE or READ_AND_UPDATE.
+	WriteFunction string `json:"writeFunction"`
+	// The type of task to be registered.
+	TaskType *string `json:"taskType,omitempty"`
 }
 
 // NewOracleExecuteRequestRequest instantiates a new OracleExecuteRequestRequest object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewOracleExecuteRequestRequest(taskID string, payload string, destinationNetwork Transact200ResponseStatusResponseDestinationNetwork, destinationContract OracleExecuteRequestRequestDestinationContract, writeFunction OracleExecuteRequestRequestWriteFunction) *OracleExecuteRequestRequest {
+func NewOracleExecuteRequestRequest(destinationNetwork string, destinationContract string, writeFunction string) *OracleExecuteRequestRequest {
 	this := OracleExecuteRequestRequest{}
-	this.TaskID = taskID
-	this.Payload = payload
 	this.DestinationNetwork = destinationNetwork
 	this.DestinationContract = destinationContract
 	this.WriteFunction = writeFunction
@@ -50,58 +55,42 @@ func NewOracleExecuteRequestRequestWithDefaults() *OracleExecuteRequestRequest {
 	return &this
 }
 
-// GetTaskID returns the TaskID field value
-func (o *OracleExecuteRequestRequest) GetTaskID() string {
-	if o == nil {
+// GetSourceNetwork returns the SourceNetwork field value if set, zero value otherwise.
+func (o *OracleExecuteRequestRequest) GetSourceNetwork() string {
+	if o == nil || IsNil(o.SourceNetwork) {
 		var ret string
 		return ret
 	}
-
-	return o.TaskID
+	return *o.SourceNetwork
 }
 
-// GetTaskIDOk returns a tuple with the TaskID field value
+// GetSourceNetworkOk returns a tuple with the SourceNetwork field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *OracleExecuteRequestRequest) GetTaskIDOk() (*string, bool) {
-	if o == nil {
+func (o *OracleExecuteRequestRequest) GetSourceNetworkOk() (*string, bool) {
+	if o == nil || IsNil(o.SourceNetwork) {
 		return nil, false
 	}
-	return &o.TaskID, true
+	return o.SourceNetwork, true
 }
 
-// SetTaskID sets field value
-func (o *OracleExecuteRequestRequest) SetTaskID(v string) {
-	o.TaskID = v
-}
-
-// GetPayload returns the Payload field value
-func (o *OracleExecuteRequestRequest) GetPayload() string {
-	if o == nil {
-		var ret string
-		return ret
+// HasSourceNetwork returns a boolean if a field has been set.
+func (o *OracleExecuteRequestRequest) HasSourceNetwork() bool {
+	if o != nil && !IsNil(o.SourceNetwork) {
+		return true
 	}
 
-	return o.Payload
+	return false
 }
 
-// GetPayloadOk returns a tuple with the Payload field value
-// and a boolean to check if the value has been set.
-func (o *OracleExecuteRequestRequest) GetPayloadOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.Payload, true
-}
-
-// SetPayload sets field value
-func (o *OracleExecuteRequestRequest) SetPayload(v string) {
-	o.Payload = v
+// SetSourceNetwork gets a reference to the given string and assigns it to the SourceNetwork field.
+func (o *OracleExecuteRequestRequest) SetSourceNetwork(v string) {
+	o.SourceNetwork = &v
 }
 
 // GetDestinationNetwork returns the DestinationNetwork field value
-func (o *OracleExecuteRequestRequest) GetDestinationNetwork() Transact200ResponseStatusResponseDestinationNetwork {
+func (o *OracleExecuteRequestRequest) GetDestinationNetwork() string {
 	if o == nil {
-		var ret Transact200ResponseStatusResponseDestinationNetwork
+		var ret string
 		return ret
 	}
 
@@ -110,7 +99,7 @@ func (o *OracleExecuteRequestRequest) GetDestinationNetwork() Transact200Respons
 
 // GetDestinationNetworkOk returns a tuple with the DestinationNetwork field value
 // and a boolean to check if the value has been set.
-func (o *OracleExecuteRequestRequest) GetDestinationNetworkOk() (*Transact200ResponseStatusResponseDestinationNetwork, bool) {
+func (o *OracleExecuteRequestRequest) GetDestinationNetworkOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -118,14 +107,46 @@ func (o *OracleExecuteRequestRequest) GetDestinationNetworkOk() (*Transact200Res
 }
 
 // SetDestinationNetwork sets field value
-func (o *OracleExecuteRequestRequest) SetDestinationNetwork(v Transact200ResponseStatusResponseDestinationNetwork) {
+func (o *OracleExecuteRequestRequest) SetDestinationNetwork(v string) {
 	o.DestinationNetwork = v
 }
 
+// GetSourceContract returns the SourceContract field value if set, zero value otherwise.
+func (o *OracleExecuteRequestRequest) GetSourceContract() string {
+	if o == nil || IsNil(o.SourceContract) {
+		var ret string
+		return ret
+	}
+	return *o.SourceContract
+}
+
+// GetSourceContractOk returns a tuple with the SourceContract field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *OracleExecuteRequestRequest) GetSourceContractOk() (*string, bool) {
+	if o == nil || IsNil(o.SourceContract) {
+		return nil, false
+	}
+	return o.SourceContract, true
+}
+
+// HasSourceContract returns a boolean if a field has been set.
+func (o *OracleExecuteRequestRequest) HasSourceContract() bool {
+	if o != nil && !IsNil(o.SourceContract) {
+		return true
+	}
+
+	return false
+}
+
+// SetSourceContract gets a reference to the given string and assigns it to the SourceContract field.
+func (o *OracleExecuteRequestRequest) SetSourceContract(v string) {
+	o.SourceContract = &v
+}
+
 // GetDestinationContract returns the DestinationContract field value
-func (o *OracleExecuteRequestRequest) GetDestinationContract() OracleExecuteRequestRequestDestinationContract {
+func (o *OracleExecuteRequestRequest) GetDestinationContract() string {
 	if o == nil {
-		var ret OracleExecuteRequestRequestDestinationContract
+		var ret string
 		return ret
 	}
 
@@ -134,7 +155,7 @@ func (o *OracleExecuteRequestRequest) GetDestinationContract() OracleExecuteRequ
 
 // GetDestinationContractOk returns a tuple with the DestinationContract field value
 // and a boolean to check if the value has been set.
-func (o *OracleExecuteRequestRequest) GetDestinationContractOk() (*OracleExecuteRequestRequestDestinationContract, bool) {
+func (o *OracleExecuteRequestRequest) GetDestinationContractOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -142,14 +163,46 @@ func (o *OracleExecuteRequestRequest) GetDestinationContractOk() (*OracleExecute
 }
 
 // SetDestinationContract sets field value
-func (o *OracleExecuteRequestRequest) SetDestinationContract(v OracleExecuteRequestRequestDestinationContract) {
+func (o *OracleExecuteRequestRequest) SetDestinationContract(v string) {
 	o.DestinationContract = v
 }
 
+// GetReadFunction returns the ReadFunction field value if set, zero value otherwise.
+func (o *OracleExecuteRequestRequest) GetReadFunction() string {
+	if o == nil || IsNil(o.ReadFunction) {
+		var ret string
+		return ret
+	}
+	return *o.ReadFunction
+}
+
+// GetReadFunctionOk returns a tuple with the ReadFunction field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *OracleExecuteRequestRequest) GetReadFunctionOk() (*string, bool) {
+	if o == nil || IsNil(o.ReadFunction) {
+		return nil, false
+	}
+	return o.ReadFunction, true
+}
+
+// HasReadFunction returns a boolean if a field has been set.
+func (o *OracleExecuteRequestRequest) HasReadFunction() bool {
+	if o != nil && !IsNil(o.ReadFunction) {
+		return true
+	}
+
+	return false
+}
+
+// SetReadFunction gets a reference to the given string and assigns it to the ReadFunction field.
+func (o *OracleExecuteRequestRequest) SetReadFunction(v string) {
+	o.ReadFunction = &v
+}
+
 // GetWriteFunction returns the WriteFunction field value
-func (o *OracleExecuteRequestRequest) GetWriteFunction() OracleExecuteRequestRequestWriteFunction {
+func (o *OracleExecuteRequestRequest) GetWriteFunction() string {
 	if o == nil {
-		var ret OracleExecuteRequestRequestWriteFunction
+		var ret string
 		return ret
 	}
 
@@ -158,7 +211,7 @@ func (o *OracleExecuteRequestRequest) GetWriteFunction() OracleExecuteRequestReq
 
 // GetWriteFunctionOk returns a tuple with the WriteFunction field value
 // and a boolean to check if the value has been set.
-func (o *OracleExecuteRequestRequest) GetWriteFunctionOk() (*OracleExecuteRequestRequestWriteFunction, bool) {
+func (o *OracleExecuteRequestRequest) GetWriteFunctionOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -166,8 +219,40 @@ func (o *OracleExecuteRequestRequest) GetWriteFunctionOk() (*OracleExecuteReques
 }
 
 // SetWriteFunction sets field value
-func (o *OracleExecuteRequestRequest) SetWriteFunction(v OracleExecuteRequestRequestWriteFunction) {
+func (o *OracleExecuteRequestRequest) SetWriteFunction(v string) {
 	o.WriteFunction = v
+}
+
+// GetTaskType returns the TaskType field value if set, zero value otherwise.
+func (o *OracleExecuteRequestRequest) GetTaskType() string {
+	if o == nil || IsNil(o.TaskType) {
+		var ret string
+		return ret
+	}
+	return *o.TaskType
+}
+
+// GetTaskTypeOk returns a tuple with the TaskType field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *OracleExecuteRequestRequest) GetTaskTypeOk() (*string, bool) {
+	if o == nil || IsNil(o.TaskType) {
+		return nil, false
+	}
+	return o.TaskType, true
+}
+
+// HasTaskType returns a boolean if a field has been set.
+func (o *OracleExecuteRequestRequest) HasTaskType() bool {
+	if o != nil && !IsNil(o.TaskType) {
+		return true
+	}
+
+	return false
+}
+
+// SetTaskType gets a reference to the given string and assigns it to the TaskType field.
+func (o *OracleExecuteRequestRequest) SetTaskType(v string) {
+	o.TaskType = &v
 }
 
 func (o OracleExecuteRequestRequest) MarshalJSON() ([]byte, error) {
@@ -180,11 +265,21 @@ func (o OracleExecuteRequestRequest) MarshalJSON() ([]byte, error) {
 
 func (o OracleExecuteRequestRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	toSerialize["taskID"] = o.TaskID
-	toSerialize["payload"] = o.Payload
+	if !IsNil(o.SourceNetwork) {
+		toSerialize["sourceNetwork"] = o.SourceNetwork
+	}
 	toSerialize["destinationNetwork"] = o.DestinationNetwork
+	if !IsNil(o.SourceContract) {
+		toSerialize["sourceContract"] = o.SourceContract
+	}
 	toSerialize["destinationContract"] = o.DestinationContract
+	if !IsNil(o.ReadFunction) {
+		toSerialize["readFunction"] = o.ReadFunction
+	}
 	toSerialize["writeFunction"] = o.WriteFunction
+	if !IsNil(o.TaskType) {
+		toSerialize["taskType"] = o.TaskType
+	}
 	return toSerialize, nil
 }
 

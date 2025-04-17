@@ -4,15 +4,14 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**ContextID** | **string** | The unique identifier for the context of the data transfer task. | 
+**TaskID** | **string** | The unique identifier for the context of the repeatable task. | 
 **Status** | **string** | The status of the registered data transfer task. | 
-**Substatus** | **string** |  | 
 
 ## Methods
 
 ### NewOracleRegisterResponse
 
-`func NewOracleRegisterResponse(contextID string, status string, substatus string, ) *OracleRegisterResponse`
+`func NewOracleRegisterResponse(taskID string, status string, ) *OracleRegisterResponse`
 
 NewOracleRegisterResponse instantiates a new OracleRegisterResponse object
 This constructor will assign default values to properties that have it defined,
@@ -27,24 +26,24 @@ NewOracleRegisterResponseWithDefaults instantiates a new OracleRegisterResponse 
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
-### GetContextID
+### GetTaskID
 
-`func (o *OracleRegisterResponse) GetContextID() string`
+`func (o *OracleRegisterResponse) GetTaskID() string`
 
-GetContextID returns the ContextID field if non-nil, zero value otherwise.
+GetTaskID returns the TaskID field if non-nil, zero value otherwise.
 
-### GetContextIDOk
+### GetTaskIDOk
 
-`func (o *OracleRegisterResponse) GetContextIDOk() (*string, bool)`
+`func (o *OracleRegisterResponse) GetTaskIDOk() (*string, bool)`
 
-GetContextIDOk returns a tuple with the ContextID field if it's non-nil, zero value otherwise
+GetTaskIDOk returns a tuple with the TaskID field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetContextID
+### SetTaskID
 
-`func (o *OracleRegisterResponse) SetContextID(v string)`
+`func (o *OracleRegisterResponse) SetTaskID(v string)`
 
-SetContextID sets ContextID field to given value.
+SetTaskID sets TaskID field to given value.
 
 
 ### GetStatus
@@ -65,26 +64,6 @@ and a boolean to check if the value has been set.
 `func (o *OracleRegisterResponse) SetStatus(v string)`
 
 SetStatus sets Status field to given value.
-
-
-### GetSubstatus
-
-`func (o *OracleRegisterResponse) GetSubstatus() string`
-
-GetSubstatus returns the Substatus field if non-nil, zero value otherwise.
-
-### GetSubstatusOk
-
-`func (o *OracleRegisterResponse) GetSubstatusOk() (*string, bool)`
-
-GetSubstatusOk returns a tuple with the Substatus field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetSubstatus
-
-`func (o *OracleRegisterResponse) SetSubstatus(v string)`
-
-SetSubstatus sets Substatus field to given value.
 
 
 

@@ -21,21 +21,17 @@ var _ MappedNullable = &OracleExecuteResponse{}
 type OracleExecuteResponse struct {
 	// The unique identifier for the transfer task.
 	TaskID string `json:"taskID"`
-	// The status of the transfer task execution.
-	Status string `json:"status"`
-	// The substatus of the transfer task execution.
-	Substatus string `json:"substatus"`
+	// The output of the transfer task execution.
+	Outputs []string `json:"outputs,omitempty"`
 }
 
 // NewOracleExecuteResponse instantiates a new OracleExecuteResponse object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewOracleExecuteResponse(taskID string, status string, substatus string) *OracleExecuteResponse {
+func NewOracleExecuteResponse(taskID string) *OracleExecuteResponse {
 	this := OracleExecuteResponse{}
 	this.TaskID = taskID
-	this.Status = status
-	this.Substatus = substatus
 	return &this
 }
 
@@ -71,52 +67,36 @@ func (o *OracleExecuteResponse) SetTaskID(v string) {
 	o.TaskID = v
 }
 
-// GetStatus returns the Status field value
-func (o *OracleExecuteResponse) GetStatus() string {
-	if o == nil {
-		var ret string
+// GetOutputs returns the Outputs field value if set, zero value otherwise.
+func (o *OracleExecuteResponse) GetOutputs() []string {
+	if o == nil || IsNil(o.Outputs) {
+		var ret []string
 		return ret
 	}
-
-	return o.Status
+	return o.Outputs
 }
 
-// GetStatusOk returns a tuple with the Status field value
+// GetOutputsOk returns a tuple with the Outputs field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *OracleExecuteResponse) GetStatusOk() (*string, bool) {
-	if o == nil {
+func (o *OracleExecuteResponse) GetOutputsOk() ([]string, bool) {
+	if o == nil || IsNil(o.Outputs) {
 		return nil, false
 	}
-	return &o.Status, true
+	return o.Outputs, true
 }
 
-// SetStatus sets field value
-func (o *OracleExecuteResponse) SetStatus(v string) {
-	o.Status = v
-}
-
-// GetSubstatus returns the Substatus field value
-func (o *OracleExecuteResponse) GetSubstatus() string {
-	if o == nil {
-		var ret string
-		return ret
+// HasOutputs returns a boolean if a field has been set.
+func (o *OracleExecuteResponse) HasOutputs() bool {
+	if o != nil && !IsNil(o.Outputs) {
+		return true
 	}
 
-	return o.Substatus
+	return false
 }
 
-// GetSubstatusOk returns a tuple with the Substatus field value
-// and a boolean to check if the value has been set.
-func (o *OracleExecuteResponse) GetSubstatusOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.Substatus, true
-}
-
-// SetSubstatus sets field value
-func (o *OracleExecuteResponse) SetSubstatus(v string) {
-	o.Substatus = v
+// SetOutputs gets a reference to the given []string and assigns it to the Outputs field.
+func (o *OracleExecuteResponse) SetOutputs(v []string) {
+	o.Outputs = v
 }
 
 func (o OracleExecuteResponse) MarshalJSON() ([]byte, error) {
@@ -130,8 +110,9 @@ func (o OracleExecuteResponse) MarshalJSON() ([]byte, error) {
 func (o OracleExecuteResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["taskID"] = o.TaskID
-	toSerialize["status"] = o.Status
-	toSerialize["substatus"] = o.Substatus
+	if !IsNil(o.Outputs) {
+		toSerialize["outputs"] = o.Outputs
+	}
 	return toSerialize, nil
 }
 

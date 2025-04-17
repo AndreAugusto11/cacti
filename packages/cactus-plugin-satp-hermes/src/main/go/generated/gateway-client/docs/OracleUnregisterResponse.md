@@ -4,7 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**ContextID** | Pointer to **string** | The unique identifier for the context of the data transfer task. | [optional] 
+**TaskID** | Pointer to **string** | The unique identifier for the context of the data transfer task. | [optional] 
 **Status** | Pointer to **string** | The status of the unregistered data transfer task. | [optional] 
 **Substatus** | Pointer to **string** |  | [optional] 
 
@@ -27,30 +27,30 @@ NewOracleUnregisterResponseWithDefaults instantiates a new OracleUnregisterRespo
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
-### GetContextID
+### GetTaskID
 
-`func (o *OracleUnregisterResponse) GetContextID() string`
+`func (o *OracleUnregisterResponse) GetTaskID() string`
 
-GetContextID returns the ContextID field if non-nil, zero value otherwise.
+GetTaskID returns the TaskID field if non-nil, zero value otherwise.
 
-### GetContextIDOk
+### GetTaskIDOk
 
-`func (o *OracleUnregisterResponse) GetContextIDOk() (*string, bool)`
+`func (o *OracleUnregisterResponse) GetTaskIDOk() (*string, bool)`
 
-GetContextIDOk returns a tuple with the ContextID field if it's non-nil, zero value otherwise
+GetTaskIDOk returns a tuple with the TaskID field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetContextID
+### SetTaskID
 
-`func (o *OracleUnregisterResponse) SetContextID(v string)`
+`func (o *OracleUnregisterResponse) SetTaskID(v string)`
 
-SetContextID sets ContextID field to given value.
+SetTaskID sets TaskID field to given value.
 
-### HasContextID
+### HasTaskID
 
-`func (o *OracleUnregisterResponse) HasContextID() bool`
+`func (o *OracleUnregisterResponse) HasTaskID() bool`
 
-HasContextID returns a boolean if a field has been set.
+HasTaskID returns a boolean if a field has been set.
 
 ### GetStatus
 
