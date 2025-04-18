@@ -1,12 +1,12 @@
-import { LogLevelDesc } from "@hyperledger/cactus-common";
-import { BLODispatcher } from "../api1/dispatcher";
-import { SATPSession } from "./satp-session";
-import { ConnectRouter } from "@connectrpc/connect";
-import { SATPGateway } from "../plugin-satp-hermes-gateway";
-import { SATPService } from "../types/satp-protocol";
-import { Client as ConnectClient } from "@connectrpc/connect";
+import type { LogLevelDesc } from "@hyperledger/cactus-common";
+import type { BLODispatcher } from "../api1/dispatcher";
+import type { SATPSession } from "./satp-session";
+import type { ConnectRouter } from "@connectrpc/connect";
+import type { SATPGateway } from "../plugin-satp-hermes-gateway";
+import type { SATPService } from "../types/satp-protocol";
+import type { Client as ConnectClient } from "@connectrpc/connect";
 import { SATPServiceInstance } from "./stage-services/satp-service";
-import { NetworkId } from "../public-api";
+import type { NetworkId } from "../public-api";
 
 export type SATPConnectHandler = (
   gateway: SATPGateway,

@@ -1,8 +1,8 @@
 import {
   Checks,
-  JsObjectSigner,
-  LogLevelDesc,
-  Logger,
+  type JsObjectSigner,
+  type LogLevelDesc,
+  type Logger,
   LoggerProvider,
 } from "@hyperledger/cactus-common";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
@@ -15,28 +15,28 @@ import { Stage1ServerService } from "../../core/stage-services/server/stage1-ser
 import { Stage2ServerService } from "../../core/stage-services/server/stage2-server-service";
 import { Stage3ServerService } from "../../core/stage-services/server/stage3-server-service";
 import { SATPSession } from "../../core/satp-session";
-import { GatewayIdentity } from "../../core/types";
+import type { GatewayIdentity } from "../../core/types";
 import { Stage0ClientService } from "../../core/stage-services/client/stage0-client-service";
 import { Stage1ClientService } from "../../core/stage-services/client/stage1-client-service";
 import { Stage2ClientService } from "../../core/stage-services/client/stage2-client-service";
 import { Stage3ClientService } from "../../core/stage-services/client/stage3-client-service";
 import {
-  SATPService,
-  SATPHandler,
+  type SATPService,
+  type SATPHandler,
   SATPServiceType,
-  SATPHandlerOptions,
+  type SATPHandlerOptions,
   SATPHandlerType,
-  SATPHandlerInstance,
+  type SATPHandlerInstance,
 } from "../../types/satp-protocol";
-import {
+import type {
   ISATPServiceOptions,
   SATPServiceInstance,
   SATPStagesV02,
 } from "../../core/stage-services/satp-service";
 import { Stage2SATPHandler } from "../../core/stage-handlers/stage2-handler";
 import { Stage3SATPHandler } from "../../core/stage-handlers/stage3-handler";
-import { SATPCrossChainManager } from "../../cross-chain-mechanisms/satp-cc-manager";
-import { GatewayOrchestrator } from "./gateway-orchestrator";
+import type { SATPCrossChainManager } from "../../cross-chain-mechanisms/satp-cc-manager";
+import type { GatewayOrchestrator } from "./gateway-orchestrator";
 import { State } from "../../generated/proto/cacti/satp/v02/common/session_pb";
 import type { SessionData } from "../../generated/proto/cacti/satp/v02/common/session_pb";
 import type { SatpStage0Service } from "../../generated/proto/cacti/satp/v02/service/stage_0_pb";
@@ -49,17 +49,17 @@ import {
   MessageType,
 } from "../../generated/proto/cacti/satp/v02/common/message_pb";
 import { getMessageInSessionData } from "../../core/session-utils";
-import {
+import type {
   TransferProposalRequest,
   TransferProposalResponse,
   TransferCommenceRequest,
   TransferCommenceResponse,
 } from "../../generated/proto/cacti/satp/v02/service/stage_1_pb";
-import {
+import type {
   LockAssertionRequest,
   LockAssertionResponse,
 } from "../../generated/proto/cacti/satp/v02/service/stage_2_pb";
-import {
+import type {
   CommitPreparationRequest,
   CommitPreparationResponse,
   CommitFinalAssertionRequest,
@@ -67,7 +67,7 @@ import {
   TransferCompleteRequest,
   TransferCompleteResponse,
 } from "../../generated/proto/cacti/satp/v02/service/stage_3_pb";
-import {
+import type {
   NewSessionRequest,
   NewSessionResponse,
   PreSATPTransferRequest,
@@ -82,13 +82,13 @@ import {
 import { getMessageTypeName } from "../../core/satp-utils";
 import {
   HealthCheckResponseStatusEnum,
-  NetworkId,
+  type NetworkId,
 } from "../../generated/gateway-client/typescript-axios";
-import {
+import type {
   ILocalLogRepository,
   IRemoteLogRepository,
 } from "../../database/repository/interfaces/repository";
-import { ISATPLoggerConfig, SATPLogger } from "../../logging";
+import { type ISATPLoggerConfig, SATPLogger } from "../../logging";
 import { MonitorService } from "../monitoring/monitor";
 
 export interface ISATPManagerOptions {
@@ -242,7 +242,7 @@ export class SATPManager {
     stageID: string,
   ): SATPService {
     // we assume stages are numbers
-    if (isNaN(Number(stageID))) {
+    if (Number.isNaN(Number(stageID))) {
       throw new Error("Invalid stageId");
     }
 
@@ -252,7 +252,7 @@ export class SATPManager {
 
     const service = this.satpServices.get(stageID)?.get(serviceType);
 
-    if (service == undefined) {
+    if (service === undefined) {
       throw new Error(
         `Service not found for stageId=${stageID} and serviceType=${serviceType}`,
       );
@@ -299,7 +299,7 @@ export class SATPManager {
 
     try {
       this.logger.debug(`${fnTag} retrieving session: ${sessionId}`);
-      if (this.sessions == undefined) {
+      if (this.sessions === undefined) {
         return undefined;
       }
       return this.sessions.get(sessionId);
@@ -344,10 +344,9 @@ export class SATPManager {
         throw new Error("ContextID missing");
       }
       return this.createNewSession(contextID || "MOCK_CONTEXT_ID");
-    } else {
+    }
       const existingSession = this.sessions.get(sessionId);
       return existingSession || this.createNewSession("MOCK_CONTEXT_ID");
-    }
   }
 
   private createNewSession(contextID: string): SATPSession {
@@ -500,14 +499,19 @@ export class SATPManager {
   }
 
   private loadPubKeys(gateways: Map<string, GatewayIdentity>): void {
-    gateways.forEach((gateway) => {
+    for (const gateway of gateways.values()) {
       if (gateway.pubKey) {
         this.gatewaysPubKeys.set(gateway.id, gateway.pubKey);
       }
-    });
+    }
+    if (!this.orchestrator.ourGateway.pubKey) {
+      throw new Error(
+        "Orchestrator gateway public key not found. Cannot proceed.",
+      );
+    }
     this.gatewaysPubKeys.set(
       this.orchestrator.getSelfId(),
-      this.orchestrator.ourGateway.pubKey!,
+      this.orchestrator.ourGateway.pubKey,
     );
   }
 
@@ -527,7 +531,7 @@ export class SATPManager {
 
       const clientSessionData = session.getClientSessionData();
       const clientSessionDataJson = safeStableStringify(clientSessionData);
-      this.logger.debug(`clientSessionDataJson=%s`, clientSessionDataJson);
+      this.logger.debug("clientSessionDataJson = ", clientSessionDataJson);
 
       if (!clientSessionData) {
         throw new Error(`${fnTag}, Session not found`);
@@ -623,7 +627,7 @@ export class SATPManager {
               getMessageTypeName(MessageType.NEW_SESSION_REQUEST),
             );
           }
-
+          break;
         case MessageType.NEW_SESSION_RESPONSE:
           if (!newSessionRequest) {
             this.logger.debug(
@@ -655,7 +659,7 @@ export class SATPManager {
               getMessageTypeName(MessageType.NEW_SESSION_RESPONSE),
             );
           }
-
+          break;
         case MessageType.PRE_SATP_TRANSFER_REQUEST:
           if (!newSessionResponse) {
             this.logger.debug(
@@ -684,7 +688,7 @@ export class SATPManager {
               getMessageTypeName(MessageType.PRE_SATP_TRANSFER_REQUEST),
             );
           }
-
+          break;
         case MessageType.PRE_SATP_TRANSFER_RESPONSE:
           if (!preSATPTransferRequest) {
             this.logger.debug(
@@ -717,7 +721,7 @@ export class SATPManager {
               getMessageTypeName(MessageType.PRE_SATP_TRANSFER_RESPONSE),
             );
           }
-
+          break;
         case MessageType.INIT_PROPOSAL:
           if (!preSATPTransferResponse) {
             this.logger.debug(
@@ -751,6 +755,7 @@ export class SATPManager {
               getMessageTypeName(MessageType.INIT_PROPOSAL),
             );
           }
+          break;
         case MessageType.INIT_RECEIPT:
         case MessageType.INIT_REJECT:
           if (!transferProposalRequest) {
@@ -784,6 +789,7 @@ export class SATPManager {
               getMessageTypeName(MessageType.INIT_RECEIPT),
             );
           }
+          break;
         case MessageType.TRANSFER_COMMENCE_REQUEST:
           if (!transferProposalResponse) {
             this.logger.debug(
@@ -812,6 +818,7 @@ export class SATPManager {
               getMessageTypeName(MessageType.TRANSFER_COMMENCE_REQUEST),
             );
           }
+          break;
         case MessageType.TRANSFER_COMMENCE_RESPONSE:
           if (!transferCommenceRequest) {
             this.logger.debug(
@@ -844,6 +851,7 @@ export class SATPManager {
               getMessageTypeName(MessageType.TRANSFER_COMMENCE_RESPONSE),
             );
           }
+          break;
         case MessageType.LOCK_ASSERT:
           if (!transferCommenceResponse) {
             this.logger.debug(
@@ -874,6 +882,7 @@ export class SATPManager {
               getMessageTypeName(MessageType.LOCK_ASSERT),
             );
           }
+          break;
         case MessageType.ASSERTION_RECEIPT:
           if (!lockAssertionRequest) {
             this.logger.debug(
@@ -905,6 +914,7 @@ export class SATPManager {
               getMessageTypeName(MessageType.ASSERTION_RECEIPT),
             );
           }
+          break;
         case MessageType.COMMIT_PREPARE:
           if (!lockAssertionResponse) {
             this.logger.debug(
@@ -935,6 +945,7 @@ export class SATPManager {
               getMessageTypeName(MessageType.COMMIT_PREPARE),
             );
           }
+          break;
         case MessageType.COMMIT_READY:
           if (!commitPreparationRequest) {
             this.logger.debug(
@@ -966,7 +977,8 @@ export class SATPManager {
               fnTag,
               getMessageTypeName(MessageType.COMMIT_READY),
             );
-          }
+          } 
+          break;
         case MessageType.COMMIT_FINAL:
           if (!commitReadyResponse) {
             this.logger.debug(
@@ -995,7 +1007,7 @@ export class SATPManager {
               getMessageTypeName(MessageType.COMMIT_FINAL),
             );
           }
-
+          break;
         case MessageType.ACK_COMMIT_FINAL:
           if (!commitFinalAssertionRequest) {
             this.logger.debug(
@@ -1029,6 +1041,7 @@ export class SATPManager {
               getMessageTypeName(MessageType.ACK_COMMIT_FINAL),
             );
           }
+          break;
         case MessageType.COMMIT_TRANSFER_COMPLETE:
           if (!commitFinalAcknowledgementReceiptResponse) {
             this.logger.debug(
@@ -1057,6 +1070,7 @@ export class SATPManager {
               getMessageTypeName(MessageType.COMMIT_TRANSFER_COMPLETE),
             );
           }
+          break;
         case MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE:
           if (!transferCompleteRequest) {
             this.logger.debug(
