@@ -9206,7 +9206,7 @@ __metadata:
     "@opentelemetry/sdk-metrics": "npm:1.30.1"
     "@opentelemetry/sdk-node": "npm:0.57.2"
     "@opentelemetry/sdk-trace-node": "npm:1.30.1"
-    "@openzeppelin/contracts": "npm:5.0.2"
+    "@openzeppelin/contracts": "npm:5.3.0"
     "@quobix/vacuum": "npm:0.9.16"
     "@types/body-parser": "npm:1.19.4"
     "@types/crypto-js": "npm:4.0.1"
@@ -9231,10 +9231,12 @@ __metadata:
     crypto-js: "npm:4.2.0"
     dockerode: "npm:3.3.0"
     dotenv: "npm:16.4.5"
+    ds-test: "github:dapphub/ds-test"
     ethereum-abi-types-generator: "npm:1.3.4"
     ethers: "npm:6.13.1"
     express: "npm:4.21.2"
     fabric-network: "npm:2.2.20"
+    forge-std: "github:foundry-rs/forge-std"
     fs-extra: "npm:11.2.0"
     google-protobuf: "npm:3.21.2"
     grpc-tools: "npm:1.12.4"
@@ -9254,6 +9256,7 @@ __metadata:
     safe-stable-stringify: "npm:2.5.0"
     secp256k1: "npm:5.0.1"
     socket.io: "npm:4.6.2"
+    solmate: "npm:6.8.0"
     sqlite3: "npm:5.1.5"
     swagger-cli: "npm:4.0.4"
     swagger-ui-express: "npm:5.0.0"
@@ -13650,10 +13653,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openzeppelin/contracts@npm:5.0.2":
-  version: 5.0.2
-  resolution: "@openzeppelin/contracts@npm:5.0.2"
-  checksum: 10/938ebffbdade7dc59ea3df5b562c0e457bbefde9d82be8fa2acfd11da887df11653ac07922f41746b80cdbc106430e1e6978ce244fe99b00a7d9dc1418fc7670
+"@openzeppelin/contracts@npm:5.3.0":
+  version: 5.3.0
+  resolution: "@openzeppelin/contracts@npm:5.3.0"
+  checksum: 10/d1b379a56eb443b6ba2caee51f38bd3e2d5be2d3b2c935a083ed3311c106aa3903d7cadd05457999b24175bb80cc405dd6c70297c9825b15471b38051021fd88
   languageName: node
   linkType: hard
 
@@ -26165,7 +26168,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ds-test@https://github.com/dapphub/ds-test.git#e282159d5170298eb2455a6c05280ab5a73a4ef0":
+"ds-test@github:dapphub/ds-test, ds-test@https://github.com/dapphub/ds-test.git#e282159d5170298eb2455a6c05280ab5a73a4ef0":
   version: 1.0.0
   resolution: "ds-test@https://github.com/dapphub/ds-test.git#commit=e282159d5170298eb2455a6c05280ab5a73a4ef0"
   checksum: 10/a63cada107d8f2775934bc580f04cb6f6509f843cb41cbc3a617e77b2e628a86d7fd858f964e7e2d6f41c3797c0e16ec2d87a6cb4c6187c5b6c2bc969ccae4b3
@@ -30002,6 +30005,13 @@ __metadata:
   version: 0.6.1
   resolution: "forever-agent@npm:0.6.1"
   checksum: 10/c1e1644d5e074ac063ecbc3fb8582013ef91fff0e3fa41e76db23d2f62bc6d9677aac86db950917deed4fe1fdd772df780cfaa352075f23deec9c015313afb97
+  languageName: node
+  linkType: hard
+
+"forge-std@github:foundry-rs/forge-std":
+  version: 1.9.6
+  resolution: "forge-std@https://github.com/foundry-rs/forge-std.git#commit=6abf66980050ab03a35b52bdab814f55001d6929"
+  checksum: 10/b6cb26bad477c8c013c888aa606c21fe44f9c183ab4b69222ceeaa4db308321523dbd09b379c654d5cb58eb9e15c300316b67b9e769ec996ac19112d24e88d7d
   languageName: node
   linkType: hard
 
@@ -48184,6 +48194,13 @@ __metadata:
   bin:
     solcjs: solcjs
   checksum: 10/27c665d182baf9120e489ac1ce1dc2b66237801d4386328b734d37bb44e596e687aacbc140b19bf4531c2549c2779a53f95ac25078ae24dcd0be8823e2081f17
+  languageName: node
+  linkType: hard
+
+"solmate@npm:6.8.0":
+  version: 6.8.0
+  resolution: "solmate@npm:6.8.0"
+  checksum: 10/92b6a8e509a7da4a05e3c6ae0e508b6c7a243d9aef1ccba2387e5eeccfdd49f79dbec934e9e6e99a7e9209d420b19f2582502c75db6a95353ea9dc06da02dcf9
   languageName: node
   linkType: hard
 

@@ -38,11 +38,13 @@ In the root of the project to install the dependencies execute the command:
 yarn run configure
 ```
 
-For Solidity smart contract development (SATP bridge development) install Foundry:
+For Solidity smart contract development (SATP bridge development) install Foundry v1.0.1 (used with solidity v0.8.29):
 ```sh
 curl -L https://foundry.paradigm.xyz | bash
 foundryup
 ```
+
+To compile the contracts, run `yarn foundry:build`. To test the contracts, run `yarn foundry:test`. Foundry uses the configurations at `foundry.toml` and `remappings.txt`.
 
 
 Know how to use the following plugins of the project:
