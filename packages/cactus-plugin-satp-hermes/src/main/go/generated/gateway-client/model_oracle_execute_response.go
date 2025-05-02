@@ -17,21 +17,40 @@ import (
 // checks if the OracleExecuteResponse type satisfies the MappedNullable interface at compile time
 var _ MappedNullable = &OracleExecuteResponse{}
 
-// OracleExecuteResponse Response schema for an immediate transfer task execution. Includes the task ID, status, and substatus.
+// OracleExecuteResponse Response schema for executing a data transfer task. Includes the task ID and status of the execution.
 type OracleExecuteResponse struct {
-	// The unique identifier for the transfer task.
-	TaskID string `json:"taskID"`
-	// The output of the transfer task execution.
-	Outputs []string `json:"outputs,omitempty"`
+	TaskID *string `json:"taskID,omitempty"`
+	// The type of the Oracle task.
+	Type Enum `json:"type"`
+	SrcNetworkId *TransactRequestSourceAssetNetworkId `json:"srcNetworkId,omitempty"`
+	SrcContract ExecuteOracleTask200ResponseSrcContract `json:"srcContract"`
+	DstNetworkId *TransactRequestSourceAssetNetworkId `json:"dstNetworkId,omitempty"`
+	DstContract ExecuteOracleTask200ResponseDstContract `json:"dstContract"`
+	// The timestamp when the Oracle task was created or last updated.
+	Timestamp int64 `json:"timestamp"`
+	// The list of operations performed by the Oracle task.
+	Operations []ExecuteOracleTask200ResponseOperationsInner `json:"operations"`
+	// The current status of the Oracle task.
+	Status Enum `json:"status"`
+	// The mode of operation for registered tasks.
+	Mode string `json:"mode"`
+	// The interval for polling in milliseconds. Only if taskMode is POLLING.
+	PollingInterval *int32 `json:"pollingInterval,omitempty"`
 }
 
 // NewOracleExecuteResponse instantiates a new OracleExecuteResponse object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewOracleExecuteResponse(taskID string) *OracleExecuteResponse {
+func NewOracleExecuteResponse(type_ Enum, srcContract ExecuteOracleTask200ResponseSrcContract, dstContract ExecuteOracleTask200ResponseDstContract, timestamp int64, operations []ExecuteOracleTask200ResponseOperationsInner, status Enum, mode string) *OracleExecuteResponse {
 	this := OracleExecuteResponse{}
-	this.TaskID = taskID
+	this.Type = type_
+	this.SrcContract = srcContract
+	this.DstContract = dstContract
+	this.Timestamp = timestamp
+	this.Operations = operations
+	this.Status = status
+	this.Mode = mode
 	return &this
 }
 
@@ -43,60 +62,300 @@ func NewOracleExecuteResponseWithDefaults() *OracleExecuteResponse {
 	return &this
 }
 
-// GetTaskID returns the TaskID field value
+// GetTaskID returns the TaskID field value if set, zero value otherwise.
 func (o *OracleExecuteResponse) GetTaskID() string {
-	if o == nil {
+	if o == nil || IsNil(o.TaskID) {
 		var ret string
 		return ret
 	}
-
-	return o.TaskID
+	return *o.TaskID
 }
 
-// GetTaskIDOk returns a tuple with the TaskID field value
+// GetTaskIDOk returns a tuple with the TaskID field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OracleExecuteResponse) GetTaskIDOk() (*string, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.TaskID) {
 		return nil, false
 	}
-	return &o.TaskID, true
+	return o.TaskID, true
 }
 
-// SetTaskID sets field value
-func (o *OracleExecuteResponse) SetTaskID(v string) {
-	o.TaskID = v
-}
-
-// GetOutputs returns the Outputs field value if set, zero value otherwise.
-func (o *OracleExecuteResponse) GetOutputs() []string {
-	if o == nil || IsNil(o.Outputs) {
-		var ret []string
-		return ret
-	}
-	return o.Outputs
-}
-
-// GetOutputsOk returns a tuple with the Outputs field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *OracleExecuteResponse) GetOutputsOk() ([]string, bool) {
-	if o == nil || IsNil(o.Outputs) {
-		return nil, false
-	}
-	return o.Outputs, true
-}
-
-// HasOutputs returns a boolean if a field has been set.
-func (o *OracleExecuteResponse) HasOutputs() bool {
-	if o != nil && !IsNil(o.Outputs) {
+// HasTaskID returns a boolean if a field has been set.
+func (o *OracleExecuteResponse) HasTaskID() bool {
+	if o != nil && !IsNil(o.TaskID) {
 		return true
 	}
 
 	return false
 }
 
-// SetOutputs gets a reference to the given []string and assigns it to the Outputs field.
-func (o *OracleExecuteResponse) SetOutputs(v []string) {
-	o.Outputs = v
+// SetTaskID gets a reference to the given string and assigns it to the TaskID field.
+func (o *OracleExecuteResponse) SetTaskID(v string) {
+	o.TaskID = &v
+}
+
+// GetType returns the Type field value
+func (o *OracleExecuteResponse) GetType() Enum {
+	if o == nil {
+		var ret Enum
+		return ret
+	}
+
+	return o.Type
+}
+
+// GetTypeOk returns a tuple with the Type field value
+// and a boolean to check if the value has been set.
+func (o *OracleExecuteResponse) GetTypeOk() (*Enum, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.Type, true
+}
+
+// SetType sets field value
+func (o *OracleExecuteResponse) SetType(v Enum) {
+	o.Type = v
+}
+
+// GetSrcNetworkId returns the SrcNetworkId field value if set, zero value otherwise.
+func (o *OracleExecuteResponse) GetSrcNetworkId() TransactRequestSourceAssetNetworkId {
+	if o == nil || IsNil(o.SrcNetworkId) {
+		var ret TransactRequestSourceAssetNetworkId
+		return ret
+	}
+	return *o.SrcNetworkId
+}
+
+// GetSrcNetworkIdOk returns a tuple with the SrcNetworkId field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *OracleExecuteResponse) GetSrcNetworkIdOk() (*TransactRequestSourceAssetNetworkId, bool) {
+	if o == nil || IsNil(o.SrcNetworkId) {
+		return nil, false
+	}
+	return o.SrcNetworkId, true
+}
+
+// HasSrcNetworkId returns a boolean if a field has been set.
+func (o *OracleExecuteResponse) HasSrcNetworkId() bool {
+	if o != nil && !IsNil(o.SrcNetworkId) {
+		return true
+	}
+
+	return false
+}
+
+// SetSrcNetworkId gets a reference to the given TransactRequestSourceAssetNetworkId and assigns it to the SrcNetworkId field.
+func (o *OracleExecuteResponse) SetSrcNetworkId(v TransactRequestSourceAssetNetworkId) {
+	o.SrcNetworkId = &v
+}
+
+// GetSrcContract returns the SrcContract field value
+func (o *OracleExecuteResponse) GetSrcContract() ExecuteOracleTask200ResponseSrcContract {
+	if o == nil {
+		var ret ExecuteOracleTask200ResponseSrcContract
+		return ret
+	}
+
+	return o.SrcContract
+}
+
+// GetSrcContractOk returns a tuple with the SrcContract field value
+// and a boolean to check if the value has been set.
+func (o *OracleExecuteResponse) GetSrcContractOk() (*ExecuteOracleTask200ResponseSrcContract, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.SrcContract, true
+}
+
+// SetSrcContract sets field value
+func (o *OracleExecuteResponse) SetSrcContract(v ExecuteOracleTask200ResponseSrcContract) {
+	o.SrcContract = v
+}
+
+// GetDstNetworkId returns the DstNetworkId field value if set, zero value otherwise.
+func (o *OracleExecuteResponse) GetDstNetworkId() TransactRequestSourceAssetNetworkId {
+	if o == nil || IsNil(o.DstNetworkId) {
+		var ret TransactRequestSourceAssetNetworkId
+		return ret
+	}
+	return *o.DstNetworkId
+}
+
+// GetDstNetworkIdOk returns a tuple with the DstNetworkId field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *OracleExecuteResponse) GetDstNetworkIdOk() (*TransactRequestSourceAssetNetworkId, bool) {
+	if o == nil || IsNil(o.DstNetworkId) {
+		return nil, false
+	}
+	return o.DstNetworkId, true
+}
+
+// HasDstNetworkId returns a boolean if a field has been set.
+func (o *OracleExecuteResponse) HasDstNetworkId() bool {
+	if o != nil && !IsNil(o.DstNetworkId) {
+		return true
+	}
+
+	return false
+}
+
+// SetDstNetworkId gets a reference to the given TransactRequestSourceAssetNetworkId and assigns it to the DstNetworkId field.
+func (o *OracleExecuteResponse) SetDstNetworkId(v TransactRequestSourceAssetNetworkId) {
+	o.DstNetworkId = &v
+}
+
+// GetDstContract returns the DstContract field value
+func (o *OracleExecuteResponse) GetDstContract() ExecuteOracleTask200ResponseDstContract {
+	if o == nil {
+		var ret ExecuteOracleTask200ResponseDstContract
+		return ret
+	}
+
+	return o.DstContract
+}
+
+// GetDstContractOk returns a tuple with the DstContract field value
+// and a boolean to check if the value has been set.
+func (o *OracleExecuteResponse) GetDstContractOk() (*ExecuteOracleTask200ResponseDstContract, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.DstContract, true
+}
+
+// SetDstContract sets field value
+func (o *OracleExecuteResponse) SetDstContract(v ExecuteOracleTask200ResponseDstContract) {
+	o.DstContract = v
+}
+
+// GetTimestamp returns the Timestamp field value
+func (o *OracleExecuteResponse) GetTimestamp() int64 {
+	if o == nil {
+		var ret int64
+		return ret
+	}
+
+	return o.Timestamp
+}
+
+// GetTimestampOk returns a tuple with the Timestamp field value
+// and a boolean to check if the value has been set.
+func (o *OracleExecuteResponse) GetTimestampOk() (*int64, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.Timestamp, true
+}
+
+// SetTimestamp sets field value
+func (o *OracleExecuteResponse) SetTimestamp(v int64) {
+	o.Timestamp = v
+}
+
+// GetOperations returns the Operations field value
+func (o *OracleExecuteResponse) GetOperations() []ExecuteOracleTask200ResponseOperationsInner {
+	if o == nil {
+		var ret []ExecuteOracleTask200ResponseOperationsInner
+		return ret
+	}
+
+	return o.Operations
+}
+
+// GetOperationsOk returns a tuple with the Operations field value
+// and a boolean to check if the value has been set.
+func (o *OracleExecuteResponse) GetOperationsOk() ([]ExecuteOracleTask200ResponseOperationsInner, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return o.Operations, true
+}
+
+// SetOperations sets field value
+func (o *OracleExecuteResponse) SetOperations(v []ExecuteOracleTask200ResponseOperationsInner) {
+	o.Operations = v
+}
+
+// GetStatus returns the Status field value
+func (o *OracleExecuteResponse) GetStatus() Enum {
+	if o == nil {
+		var ret Enum
+		return ret
+	}
+
+	return o.Status
+}
+
+// GetStatusOk returns a tuple with the Status field value
+// and a boolean to check if the value has been set.
+func (o *OracleExecuteResponse) GetStatusOk() (*Enum, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.Status, true
+}
+
+// SetStatus sets field value
+func (o *OracleExecuteResponse) SetStatus(v Enum) {
+	o.Status = v
+}
+
+// GetMode returns the Mode field value
+func (o *OracleExecuteResponse) GetMode() string {
+	if o == nil {
+		var ret string
+		return ret
+	}
+
+	return o.Mode
+}
+
+// GetModeOk returns a tuple with the Mode field value
+// and a boolean to check if the value has been set.
+func (o *OracleExecuteResponse) GetModeOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.Mode, true
+}
+
+// SetMode sets field value
+func (o *OracleExecuteResponse) SetMode(v string) {
+	o.Mode = v
+}
+
+// GetPollingInterval returns the PollingInterval field value if set, zero value otherwise.
+func (o *OracleExecuteResponse) GetPollingInterval() int32 {
+	if o == nil || IsNil(o.PollingInterval) {
+		var ret int32
+		return ret
+	}
+	return *o.PollingInterval
+}
+
+// GetPollingIntervalOk returns a tuple with the PollingInterval field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *OracleExecuteResponse) GetPollingIntervalOk() (*int32, bool) {
+	if o == nil || IsNil(o.PollingInterval) {
+		return nil, false
+	}
+	return o.PollingInterval, true
+}
+
+// HasPollingInterval returns a boolean if a field has been set.
+func (o *OracleExecuteResponse) HasPollingInterval() bool {
+	if o != nil && !IsNil(o.PollingInterval) {
+		return true
+	}
+
+	return false
+}
+
+// SetPollingInterval gets a reference to the given int32 and assigns it to the PollingInterval field.
+func (o *OracleExecuteResponse) SetPollingInterval(v int32) {
+	o.PollingInterval = &v
 }
 
 func (o OracleExecuteResponse) MarshalJSON() ([]byte, error) {
@@ -109,9 +368,24 @@ func (o OracleExecuteResponse) MarshalJSON() ([]byte, error) {
 
 func (o OracleExecuteResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	toSerialize["taskID"] = o.TaskID
-	if !IsNil(o.Outputs) {
-		toSerialize["outputs"] = o.Outputs
+	if !IsNil(o.TaskID) {
+		toSerialize["taskID"] = o.TaskID
+	}
+	toSerialize["type"] = o.Type
+	if !IsNil(o.SrcNetworkId) {
+		toSerialize["srcNetworkId"] = o.SrcNetworkId
+	}
+	toSerialize["srcContract"] = o.SrcContract
+	if !IsNil(o.DstNetworkId) {
+		toSerialize["dstNetworkId"] = o.DstNetworkId
+	}
+	toSerialize["dstContract"] = o.DstContract
+	toSerialize["timestamp"] = o.Timestamp
+	toSerialize["operations"] = o.Operations
+	toSerialize["status"] = o.Status
+	toSerialize["mode"] = o.Mode
+	if !IsNil(o.PollingInterval) {
+		toSerialize["pollingInterval"] = o.PollingInterval
 	}
 	return toSerialize, nil
 }

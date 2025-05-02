@@ -19,28 +19,14 @@ var _ MappedNullable = &OracleRegisterRequest{}
 
 // OracleRegisterRequest Request schema for registering a repeatable task.
 type OracleRegisterRequest struct {
-	// The source blockchain network identifier. Only if taskType is READ or READ_AND_UPDATE.
-	SourceNetwork *string `json:"sourceNetwork,omitempty"`
-	// The target blockchain network identifier. Only if taskType is UPDATE or READ_AND_UPDATE.
-	TargetNetwork *string `json:"targetNetwork,omitempty"`
-	// The contract address on the source blockchain. Only if taskType is READ or READ_AND_UPDATE.
-	SourceContract *string `json:"sourceContract,omitempty"`
-	// The contract address on the destination blockchain. Only if taskType is UPDATE or READ_AND_UPDATE.
-	DestinationContract *string `json:"destinationContract,omitempty"`
-	// The signature of the event of interest on the source blockchain. Only if taskType is READ or READ_AND_UPDATE.
-	EventSignature *string `json:"eventSignature,omitempty"`
-	// The function to be called on the source blockchain. Only if taskType is READ or READ_AND_UPDATE.
-	SourceFunctionName *string `json:"sourceFunctionName,omitempty"`
-	// The parameters for the function to be called on the source blockchain. Only if taskType is READ or READ_AND_UPDATE.
-	SourceFunctionParams []string `json:"sourceFunctionParams,omitempty"`
-	// The function to be called on the destination blockchain. Only if taskType is UPDATE or READ_AND_UPDATE.
-	DestinationFunctionName *string `json:"destinationFunctionName,omitempty"`
-	// The parameters for the function to be called on the destination blockchain. Only if taskType is UPDATE or READ_AND_UPDATE.
-	DestinationFunctionParams []string `json:"destinationFunctionParams,omitempty"`
+	SourceNetworkId *TransactRequestSourceAssetNetworkId `json:"sourceNetworkId,omitempty"`
+	DestinationNetworkId *TransactRequestSourceAssetNetworkId `json:"destinationNetworkId,omitempty"`
+	SourceContract *RegisterOracleTaskRequestSourceContract `json:"sourceContract,omitempty"`
+	DestinationContract *RegisterOracleTaskRequestDestinationContract `json:"destinationContract,omitempty"`
 	// The mode of operation for the repeatable task.
 	TaskMode string `json:"taskMode"`
 	// The interval for polling in milliseconds. Only if taskMode is POLLING.
-	TaskInterval *int32 `json:"taskInterval,omitempty"`
+	PollingInterval *int32 `json:"pollingInterval,omitempty"`
 	// The type of task to be registered.
 	TaskType string `json:"taskType"`
 }
@@ -64,74 +50,74 @@ func NewOracleRegisterRequestWithDefaults() *OracleRegisterRequest {
 	return &this
 }
 
-// GetSourceNetwork returns the SourceNetwork field value if set, zero value otherwise.
-func (o *OracleRegisterRequest) GetSourceNetwork() string {
-	if o == nil || IsNil(o.SourceNetwork) {
-		var ret string
+// GetSourceNetworkId returns the SourceNetworkId field value if set, zero value otherwise.
+func (o *OracleRegisterRequest) GetSourceNetworkId() TransactRequestSourceAssetNetworkId {
+	if o == nil || IsNil(o.SourceNetworkId) {
+		var ret TransactRequestSourceAssetNetworkId
 		return ret
 	}
-	return *o.SourceNetwork
+	return *o.SourceNetworkId
 }
 
-// GetSourceNetworkOk returns a tuple with the SourceNetwork field value if set, nil otherwise
+// GetSourceNetworkIdOk returns a tuple with the SourceNetworkId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *OracleRegisterRequest) GetSourceNetworkOk() (*string, bool) {
-	if o == nil || IsNil(o.SourceNetwork) {
+func (o *OracleRegisterRequest) GetSourceNetworkIdOk() (*TransactRequestSourceAssetNetworkId, bool) {
+	if o == nil || IsNil(o.SourceNetworkId) {
 		return nil, false
 	}
-	return o.SourceNetwork, true
+	return o.SourceNetworkId, true
 }
 
-// HasSourceNetwork returns a boolean if a field has been set.
-func (o *OracleRegisterRequest) HasSourceNetwork() bool {
-	if o != nil && !IsNil(o.SourceNetwork) {
+// HasSourceNetworkId returns a boolean if a field has been set.
+func (o *OracleRegisterRequest) HasSourceNetworkId() bool {
+	if o != nil && !IsNil(o.SourceNetworkId) {
 		return true
 	}
 
 	return false
 }
 
-// SetSourceNetwork gets a reference to the given string and assigns it to the SourceNetwork field.
-func (o *OracleRegisterRequest) SetSourceNetwork(v string) {
-	o.SourceNetwork = &v
+// SetSourceNetworkId gets a reference to the given TransactRequestSourceAssetNetworkId and assigns it to the SourceNetworkId field.
+func (o *OracleRegisterRequest) SetSourceNetworkId(v TransactRequestSourceAssetNetworkId) {
+	o.SourceNetworkId = &v
 }
 
-// GetTargetNetwork returns the TargetNetwork field value if set, zero value otherwise.
-func (o *OracleRegisterRequest) GetTargetNetwork() string {
-	if o == nil || IsNil(o.TargetNetwork) {
-		var ret string
+// GetDestinationNetworkId returns the DestinationNetworkId field value if set, zero value otherwise.
+func (o *OracleRegisterRequest) GetDestinationNetworkId() TransactRequestSourceAssetNetworkId {
+	if o == nil || IsNil(o.DestinationNetworkId) {
+		var ret TransactRequestSourceAssetNetworkId
 		return ret
 	}
-	return *o.TargetNetwork
+	return *o.DestinationNetworkId
 }
 
-// GetTargetNetworkOk returns a tuple with the TargetNetwork field value if set, nil otherwise
+// GetDestinationNetworkIdOk returns a tuple with the DestinationNetworkId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *OracleRegisterRequest) GetTargetNetworkOk() (*string, bool) {
-	if o == nil || IsNil(o.TargetNetwork) {
+func (o *OracleRegisterRequest) GetDestinationNetworkIdOk() (*TransactRequestSourceAssetNetworkId, bool) {
+	if o == nil || IsNil(o.DestinationNetworkId) {
 		return nil, false
 	}
-	return o.TargetNetwork, true
+	return o.DestinationNetworkId, true
 }
 
-// HasTargetNetwork returns a boolean if a field has been set.
-func (o *OracleRegisterRequest) HasTargetNetwork() bool {
-	if o != nil && !IsNil(o.TargetNetwork) {
+// HasDestinationNetworkId returns a boolean if a field has been set.
+func (o *OracleRegisterRequest) HasDestinationNetworkId() bool {
+	if o != nil && !IsNil(o.DestinationNetworkId) {
 		return true
 	}
 
 	return false
 }
 
-// SetTargetNetwork gets a reference to the given string and assigns it to the TargetNetwork field.
-func (o *OracleRegisterRequest) SetTargetNetwork(v string) {
-	o.TargetNetwork = &v
+// SetDestinationNetworkId gets a reference to the given TransactRequestSourceAssetNetworkId and assigns it to the DestinationNetworkId field.
+func (o *OracleRegisterRequest) SetDestinationNetworkId(v TransactRequestSourceAssetNetworkId) {
+	o.DestinationNetworkId = &v
 }
 
 // GetSourceContract returns the SourceContract field value if set, zero value otherwise.
-func (o *OracleRegisterRequest) GetSourceContract() string {
+func (o *OracleRegisterRequest) GetSourceContract() RegisterOracleTaskRequestSourceContract {
 	if o == nil || IsNil(o.SourceContract) {
-		var ret string
+		var ret RegisterOracleTaskRequestSourceContract
 		return ret
 	}
 	return *o.SourceContract
@@ -139,7 +125,7 @@ func (o *OracleRegisterRequest) GetSourceContract() string {
 
 // GetSourceContractOk returns a tuple with the SourceContract field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *OracleRegisterRequest) GetSourceContractOk() (*string, bool) {
+func (o *OracleRegisterRequest) GetSourceContractOk() (*RegisterOracleTaskRequestSourceContract, bool) {
 	if o == nil || IsNil(o.SourceContract) {
 		return nil, false
 	}
@@ -155,15 +141,15 @@ func (o *OracleRegisterRequest) HasSourceContract() bool {
 	return false
 }
 
-// SetSourceContract gets a reference to the given string and assigns it to the SourceContract field.
-func (o *OracleRegisterRequest) SetSourceContract(v string) {
+// SetSourceContract gets a reference to the given RegisterOracleTaskRequestSourceContract and assigns it to the SourceContract field.
+func (o *OracleRegisterRequest) SetSourceContract(v RegisterOracleTaskRequestSourceContract) {
 	o.SourceContract = &v
 }
 
 // GetDestinationContract returns the DestinationContract field value if set, zero value otherwise.
-func (o *OracleRegisterRequest) GetDestinationContract() string {
+func (o *OracleRegisterRequest) GetDestinationContract() RegisterOracleTaskRequestDestinationContract {
 	if o == nil || IsNil(o.DestinationContract) {
-		var ret string
+		var ret RegisterOracleTaskRequestDestinationContract
 		return ret
 	}
 	return *o.DestinationContract
@@ -171,7 +157,7 @@ func (o *OracleRegisterRequest) GetDestinationContract() string {
 
 // GetDestinationContractOk returns a tuple with the DestinationContract field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *OracleRegisterRequest) GetDestinationContractOk() (*string, bool) {
+func (o *OracleRegisterRequest) GetDestinationContractOk() (*RegisterOracleTaskRequestDestinationContract, bool) {
 	if o == nil || IsNil(o.DestinationContract) {
 		return nil, false
 	}
@@ -187,169 +173,9 @@ func (o *OracleRegisterRequest) HasDestinationContract() bool {
 	return false
 }
 
-// SetDestinationContract gets a reference to the given string and assigns it to the DestinationContract field.
-func (o *OracleRegisterRequest) SetDestinationContract(v string) {
+// SetDestinationContract gets a reference to the given RegisterOracleTaskRequestDestinationContract and assigns it to the DestinationContract field.
+func (o *OracleRegisterRequest) SetDestinationContract(v RegisterOracleTaskRequestDestinationContract) {
 	o.DestinationContract = &v
-}
-
-// GetEventSignature returns the EventSignature field value if set, zero value otherwise.
-func (o *OracleRegisterRequest) GetEventSignature() string {
-	if o == nil || IsNil(o.EventSignature) {
-		var ret string
-		return ret
-	}
-	return *o.EventSignature
-}
-
-// GetEventSignatureOk returns a tuple with the EventSignature field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *OracleRegisterRequest) GetEventSignatureOk() (*string, bool) {
-	if o == nil || IsNil(o.EventSignature) {
-		return nil, false
-	}
-	return o.EventSignature, true
-}
-
-// HasEventSignature returns a boolean if a field has been set.
-func (o *OracleRegisterRequest) HasEventSignature() bool {
-	if o != nil && !IsNil(o.EventSignature) {
-		return true
-	}
-
-	return false
-}
-
-// SetEventSignature gets a reference to the given string and assigns it to the EventSignature field.
-func (o *OracleRegisterRequest) SetEventSignature(v string) {
-	o.EventSignature = &v
-}
-
-// GetSourceFunctionName returns the SourceFunctionName field value if set, zero value otherwise.
-func (o *OracleRegisterRequest) GetSourceFunctionName() string {
-	if o == nil || IsNil(o.SourceFunctionName) {
-		var ret string
-		return ret
-	}
-	return *o.SourceFunctionName
-}
-
-// GetSourceFunctionNameOk returns a tuple with the SourceFunctionName field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *OracleRegisterRequest) GetSourceFunctionNameOk() (*string, bool) {
-	if o == nil || IsNil(o.SourceFunctionName) {
-		return nil, false
-	}
-	return o.SourceFunctionName, true
-}
-
-// HasSourceFunctionName returns a boolean if a field has been set.
-func (o *OracleRegisterRequest) HasSourceFunctionName() bool {
-	if o != nil && !IsNil(o.SourceFunctionName) {
-		return true
-	}
-
-	return false
-}
-
-// SetSourceFunctionName gets a reference to the given string and assigns it to the SourceFunctionName field.
-func (o *OracleRegisterRequest) SetSourceFunctionName(v string) {
-	o.SourceFunctionName = &v
-}
-
-// GetSourceFunctionParams returns the SourceFunctionParams field value if set, zero value otherwise.
-func (o *OracleRegisterRequest) GetSourceFunctionParams() []string {
-	if o == nil || IsNil(o.SourceFunctionParams) {
-		var ret []string
-		return ret
-	}
-	return o.SourceFunctionParams
-}
-
-// GetSourceFunctionParamsOk returns a tuple with the SourceFunctionParams field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *OracleRegisterRequest) GetSourceFunctionParamsOk() ([]string, bool) {
-	if o == nil || IsNil(o.SourceFunctionParams) {
-		return nil, false
-	}
-	return o.SourceFunctionParams, true
-}
-
-// HasSourceFunctionParams returns a boolean if a field has been set.
-func (o *OracleRegisterRequest) HasSourceFunctionParams() bool {
-	if o != nil && !IsNil(o.SourceFunctionParams) {
-		return true
-	}
-
-	return false
-}
-
-// SetSourceFunctionParams gets a reference to the given []string and assigns it to the SourceFunctionParams field.
-func (o *OracleRegisterRequest) SetSourceFunctionParams(v []string) {
-	o.SourceFunctionParams = v
-}
-
-// GetDestinationFunctionName returns the DestinationFunctionName field value if set, zero value otherwise.
-func (o *OracleRegisterRequest) GetDestinationFunctionName() string {
-	if o == nil || IsNil(o.DestinationFunctionName) {
-		var ret string
-		return ret
-	}
-	return *o.DestinationFunctionName
-}
-
-// GetDestinationFunctionNameOk returns a tuple with the DestinationFunctionName field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *OracleRegisterRequest) GetDestinationFunctionNameOk() (*string, bool) {
-	if o == nil || IsNil(o.DestinationFunctionName) {
-		return nil, false
-	}
-	return o.DestinationFunctionName, true
-}
-
-// HasDestinationFunctionName returns a boolean if a field has been set.
-func (o *OracleRegisterRequest) HasDestinationFunctionName() bool {
-	if o != nil && !IsNil(o.DestinationFunctionName) {
-		return true
-	}
-
-	return false
-}
-
-// SetDestinationFunctionName gets a reference to the given string and assigns it to the DestinationFunctionName field.
-func (o *OracleRegisterRequest) SetDestinationFunctionName(v string) {
-	o.DestinationFunctionName = &v
-}
-
-// GetDestinationFunctionParams returns the DestinationFunctionParams field value if set, zero value otherwise.
-func (o *OracleRegisterRequest) GetDestinationFunctionParams() []string {
-	if o == nil || IsNil(o.DestinationFunctionParams) {
-		var ret []string
-		return ret
-	}
-	return o.DestinationFunctionParams
-}
-
-// GetDestinationFunctionParamsOk returns a tuple with the DestinationFunctionParams field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *OracleRegisterRequest) GetDestinationFunctionParamsOk() ([]string, bool) {
-	if o == nil || IsNil(o.DestinationFunctionParams) {
-		return nil, false
-	}
-	return o.DestinationFunctionParams, true
-}
-
-// HasDestinationFunctionParams returns a boolean if a field has been set.
-func (o *OracleRegisterRequest) HasDestinationFunctionParams() bool {
-	if o != nil && !IsNil(o.DestinationFunctionParams) {
-		return true
-	}
-
-	return false
-}
-
-// SetDestinationFunctionParams gets a reference to the given []string and assigns it to the DestinationFunctionParams field.
-func (o *OracleRegisterRequest) SetDestinationFunctionParams(v []string) {
-	o.DestinationFunctionParams = v
 }
 
 // GetTaskMode returns the TaskMode field value
@@ -376,36 +202,36 @@ func (o *OracleRegisterRequest) SetTaskMode(v string) {
 	o.TaskMode = v
 }
 
-// GetTaskInterval returns the TaskInterval field value if set, zero value otherwise.
-func (o *OracleRegisterRequest) GetTaskInterval() int32 {
-	if o == nil || IsNil(o.TaskInterval) {
+// GetPollingInterval returns the PollingInterval field value if set, zero value otherwise.
+func (o *OracleRegisterRequest) GetPollingInterval() int32 {
+	if o == nil || IsNil(o.PollingInterval) {
 		var ret int32
 		return ret
 	}
-	return *o.TaskInterval
+	return *o.PollingInterval
 }
 
-// GetTaskIntervalOk returns a tuple with the TaskInterval field value if set, nil otherwise
+// GetPollingIntervalOk returns a tuple with the PollingInterval field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *OracleRegisterRequest) GetTaskIntervalOk() (*int32, bool) {
-	if o == nil || IsNil(o.TaskInterval) {
+func (o *OracleRegisterRequest) GetPollingIntervalOk() (*int32, bool) {
+	if o == nil || IsNil(o.PollingInterval) {
 		return nil, false
 	}
-	return o.TaskInterval, true
+	return o.PollingInterval, true
 }
 
-// HasTaskInterval returns a boolean if a field has been set.
-func (o *OracleRegisterRequest) HasTaskInterval() bool {
-	if o != nil && !IsNil(o.TaskInterval) {
+// HasPollingInterval returns a boolean if a field has been set.
+func (o *OracleRegisterRequest) HasPollingInterval() bool {
+	if o != nil && !IsNil(o.PollingInterval) {
 		return true
 	}
 
 	return false
 }
 
-// SetTaskInterval gets a reference to the given int32 and assigns it to the TaskInterval field.
-func (o *OracleRegisterRequest) SetTaskInterval(v int32) {
-	o.TaskInterval = &v
+// SetPollingInterval gets a reference to the given int32 and assigns it to the PollingInterval field.
+func (o *OracleRegisterRequest) SetPollingInterval(v int32) {
+	o.PollingInterval = &v
 }
 
 // GetTaskType returns the TaskType field value
@@ -442,11 +268,11 @@ func (o OracleRegisterRequest) MarshalJSON() ([]byte, error) {
 
 func (o OracleRegisterRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.SourceNetwork) {
-		toSerialize["sourceNetwork"] = o.SourceNetwork
+	if !IsNil(o.SourceNetworkId) {
+		toSerialize["sourceNetworkId"] = o.SourceNetworkId
 	}
-	if !IsNil(o.TargetNetwork) {
-		toSerialize["targetNetwork"] = o.TargetNetwork
+	if !IsNil(o.DestinationNetworkId) {
+		toSerialize["destinationNetworkId"] = o.DestinationNetworkId
 	}
 	if !IsNil(o.SourceContract) {
 		toSerialize["sourceContract"] = o.SourceContract
@@ -454,24 +280,9 @@ func (o OracleRegisterRequest) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.DestinationContract) {
 		toSerialize["destinationContract"] = o.DestinationContract
 	}
-	if !IsNil(o.EventSignature) {
-		toSerialize["eventSignature"] = o.EventSignature
-	}
-	if !IsNil(o.SourceFunctionName) {
-		toSerialize["sourceFunctionName"] = o.SourceFunctionName
-	}
-	if !IsNil(o.SourceFunctionParams) {
-		toSerialize["sourceFunctionParams"] = o.SourceFunctionParams
-	}
-	if !IsNil(o.DestinationFunctionName) {
-		toSerialize["destinationFunctionName"] = o.DestinationFunctionName
-	}
-	if !IsNil(o.DestinationFunctionParams) {
-		toSerialize["destinationFunctionParams"] = o.DestinationFunctionParams
-	}
 	toSerialize["taskMode"] = o.TaskMode
-	if !IsNil(o.TaskInterval) {
-		toSerialize["taskInterval"] = o.TaskInterval
+	if !IsNil(o.PollingInterval) {
+		toSerialize["pollingInterval"] = o.PollingInterval
 	}
 	toSerialize["taskType"] = o.TaskType
 	return toSerialize, nil

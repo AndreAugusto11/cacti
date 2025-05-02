@@ -21,8 +21,8 @@ var _ MappedNullable = &OracleStatusRequest200Response{}
 type OracleStatusRequest200Response struct {
 	// The unique identifier for the context of the data transfer task.
 	TaskID *string `json:"taskID,omitempty"`
-	OriginNetwork *Transact200ResponseStatusResponseOriginNetwork `json:"originNetwork,omitempty"`
-	DestinationNetwork *Transact200ResponseStatusResponseDestinationNetwork `json:"destinationNetwork,omitempty"`
+	SourceNetwork *TransactRequestSourceAssetNetworkId `json:"sourceNetwork,omitempty"`
+	DestinationNetwork *TransactRequestSourceAssetNetworkId `json:"destinationNetwork,omitempty"`
 	OriginContract *OracleStatusRequest200ResponseOriginContract `json:"originContract,omitempty"`
 	DestinationContract *OracleStatusRequest200ResponseDestinationContract `json:"destinationContract,omitempty"`
 	EventOfInterest *OracleStatusRequest200ResponseEventOfInterest `json:"eventOfInterest,omitempty"`
@@ -81,42 +81,42 @@ func (o *OracleStatusRequest200Response) SetTaskID(v string) {
 	o.TaskID = &v
 }
 
-// GetOriginNetwork returns the OriginNetwork field value if set, zero value otherwise.
-func (o *OracleStatusRequest200Response) GetOriginNetwork() Transact200ResponseStatusResponseOriginNetwork {
-	if o == nil || IsNil(o.OriginNetwork) {
-		var ret Transact200ResponseStatusResponseOriginNetwork
+// GetSourceNetwork returns the SourceNetwork field value if set, zero value otherwise.
+func (o *OracleStatusRequest200Response) GetSourceNetwork() TransactRequestSourceAssetNetworkId {
+	if o == nil || IsNil(o.SourceNetwork) {
+		var ret TransactRequestSourceAssetNetworkId
 		return ret
 	}
-	return *o.OriginNetwork
+	return *o.SourceNetwork
 }
 
-// GetOriginNetworkOk returns a tuple with the OriginNetwork field value if set, nil otherwise
+// GetSourceNetworkOk returns a tuple with the SourceNetwork field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *OracleStatusRequest200Response) GetOriginNetworkOk() (*Transact200ResponseStatusResponseOriginNetwork, bool) {
-	if o == nil || IsNil(o.OriginNetwork) {
+func (o *OracleStatusRequest200Response) GetSourceNetworkOk() (*TransactRequestSourceAssetNetworkId, bool) {
+	if o == nil || IsNil(o.SourceNetwork) {
 		return nil, false
 	}
-	return o.OriginNetwork, true
+	return o.SourceNetwork, true
 }
 
-// HasOriginNetwork returns a boolean if a field has been set.
-func (o *OracleStatusRequest200Response) HasOriginNetwork() bool {
-	if o != nil && !IsNil(o.OriginNetwork) {
+// HasSourceNetwork returns a boolean if a field has been set.
+func (o *OracleStatusRequest200Response) HasSourceNetwork() bool {
+	if o != nil && !IsNil(o.SourceNetwork) {
 		return true
 	}
 
 	return false
 }
 
-// SetOriginNetwork gets a reference to the given Transact200ResponseStatusResponseOriginNetwork and assigns it to the OriginNetwork field.
-func (o *OracleStatusRequest200Response) SetOriginNetwork(v Transact200ResponseStatusResponseOriginNetwork) {
-	o.OriginNetwork = &v
+// SetSourceNetwork gets a reference to the given TransactRequestSourceAssetNetworkId and assigns it to the SourceNetwork field.
+func (o *OracleStatusRequest200Response) SetSourceNetwork(v TransactRequestSourceAssetNetworkId) {
+	o.SourceNetwork = &v
 }
 
 // GetDestinationNetwork returns the DestinationNetwork field value if set, zero value otherwise.
-func (o *OracleStatusRequest200Response) GetDestinationNetwork() Transact200ResponseStatusResponseDestinationNetwork {
+func (o *OracleStatusRequest200Response) GetDestinationNetwork() TransactRequestSourceAssetNetworkId {
 	if o == nil || IsNil(o.DestinationNetwork) {
-		var ret Transact200ResponseStatusResponseDestinationNetwork
+		var ret TransactRequestSourceAssetNetworkId
 		return ret
 	}
 	return *o.DestinationNetwork
@@ -124,7 +124,7 @@ func (o *OracleStatusRequest200Response) GetDestinationNetwork() Transact200Resp
 
 // GetDestinationNetworkOk returns a tuple with the DestinationNetwork field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *OracleStatusRequest200Response) GetDestinationNetworkOk() (*Transact200ResponseStatusResponseDestinationNetwork, bool) {
+func (o *OracleStatusRequest200Response) GetDestinationNetworkOk() (*TransactRequestSourceAssetNetworkId, bool) {
 	if o == nil || IsNil(o.DestinationNetwork) {
 		return nil, false
 	}
@@ -140,8 +140,8 @@ func (o *OracleStatusRequest200Response) HasDestinationNetwork() bool {
 	return false
 }
 
-// SetDestinationNetwork gets a reference to the given Transact200ResponseStatusResponseDestinationNetwork and assigns it to the DestinationNetwork field.
-func (o *OracleStatusRequest200Response) SetDestinationNetwork(v Transact200ResponseStatusResponseDestinationNetwork) {
+// SetDestinationNetwork gets a reference to the given TransactRequestSourceAssetNetworkId and assigns it to the DestinationNetwork field.
+func (o *OracleStatusRequest200Response) SetDestinationNetwork(v TransactRequestSourceAssetNetworkId) {
 	o.DestinationNetwork = &v
 }
 
@@ -350,8 +350,8 @@ func (o OracleStatusRequest200Response) ToMap() (map[string]interface{}, error) 
 	if !IsNil(o.TaskID) {
 		toSerialize["taskID"] = o.TaskID
 	}
-	if !IsNil(o.OriginNetwork) {
-		toSerialize["originNetwork"] = o.OriginNetwork
+	if !IsNil(o.SourceNetwork) {
+		toSerialize["sourceNetwork"] = o.SourceNetwork
 	}
 	if !IsNil(o.DestinationNetwork) {
 		toSerialize["destinationNetwork"] = o.DestinationNetwork

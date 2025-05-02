@@ -17,13 +17,10 @@ import (
 // checks if the OracleUnregisterResponse type satisfies the MappedNullable interface at compile time
 var _ MappedNullable = &OracleUnregisterResponse{}
 
-// OracleUnregisterResponse Response schema for unregistering a data transfer task.
+// OracleUnregisterResponse Response schema for unregistering a data transfer task. Includes the task ID and status of the unregistration.
 type OracleUnregisterResponse struct {
-	// The unique identifier for the context of the data transfer task.
 	TaskID *string `json:"taskID,omitempty"`
-	// The status of the unregistered data transfer task.
 	Status *string `json:"status,omitempty"`
-	Substatus *string `json:"substatus,omitempty"`
 }
 
 // NewOracleUnregisterResponse instantiates a new OracleUnregisterResponse object
@@ -107,38 +104,6 @@ func (o *OracleUnregisterResponse) SetStatus(v string) {
 	o.Status = &v
 }
 
-// GetSubstatus returns the Substatus field value if set, zero value otherwise.
-func (o *OracleUnregisterResponse) GetSubstatus() string {
-	if o == nil || IsNil(o.Substatus) {
-		var ret string
-		return ret
-	}
-	return *o.Substatus
-}
-
-// GetSubstatusOk returns a tuple with the Substatus field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *OracleUnregisterResponse) GetSubstatusOk() (*string, bool) {
-	if o == nil || IsNil(o.Substatus) {
-		return nil, false
-	}
-	return o.Substatus, true
-}
-
-// HasSubstatus returns a boolean if a field has been set.
-func (o *OracleUnregisterResponse) HasSubstatus() bool {
-	if o != nil && !IsNil(o.Substatus) {
-		return true
-	}
-
-	return false
-}
-
-// SetSubstatus gets a reference to the given string and assigns it to the Substatus field.
-func (o *OracleUnregisterResponse) SetSubstatus(v string) {
-	o.Substatus = &v
-}
-
 func (o OracleUnregisterResponse) MarshalJSON() ([]byte, error) {
 	toSerialize,err := o.ToMap()
 	if err != nil {
@@ -154,9 +119,6 @@ func (o OracleUnregisterResponse) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.Status) {
 		toSerialize["status"] = o.Status
-	}
-	if !IsNil(o.Substatus) {
-		toSerialize["substatus"] = o.Substatus
 	}
 	return toSerialize, nil
 }

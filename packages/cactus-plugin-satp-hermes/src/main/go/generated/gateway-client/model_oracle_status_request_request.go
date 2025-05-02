@@ -19,15 +19,16 @@ var _ MappedNullable = &OracleStatusRequestRequest{}
 
 // OracleStatusRequestRequest Request schema for checking the status of a data transfer task.
 type OracleStatusRequestRequest struct {
-	TaskID *string `json:"taskID,omitempty"`
+	TaskID string `json:"taskID"`
 }
 
 // NewOracleStatusRequestRequest instantiates a new OracleStatusRequestRequest object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewOracleStatusRequestRequest() *OracleStatusRequestRequest {
+func NewOracleStatusRequestRequest(taskID string) *OracleStatusRequestRequest {
 	this := OracleStatusRequestRequest{}
+	this.TaskID = taskID
 	return &this
 }
 
@@ -39,36 +40,28 @@ func NewOracleStatusRequestRequestWithDefaults() *OracleStatusRequestRequest {
 	return &this
 }
 
-// GetTaskID returns the TaskID field value if set, zero value otherwise.
+// GetTaskID returns the TaskID field value
 func (o *OracleStatusRequestRequest) GetTaskID() string {
-	if o == nil || IsNil(o.TaskID) {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.TaskID
+
+	return o.TaskID
 }
 
-// GetTaskIDOk returns a tuple with the TaskID field value if set, nil otherwise
+// GetTaskIDOk returns a tuple with the TaskID field value
 // and a boolean to check if the value has been set.
 func (o *OracleStatusRequestRequest) GetTaskIDOk() (*string, bool) {
-	if o == nil || IsNil(o.TaskID) {
+	if o == nil {
 		return nil, false
 	}
-	return o.TaskID, true
+	return &o.TaskID, true
 }
 
-// HasTaskID returns a boolean if a field has been set.
-func (o *OracleStatusRequestRequest) HasTaskID() bool {
-	if o != nil && !IsNil(o.TaskID) {
-		return true
-	}
-
-	return false
-}
-
-// SetTaskID gets a reference to the given string and assigns it to the TaskID field.
+// SetTaskID sets field value
 func (o *OracleStatusRequestRequest) SetTaskID(v string) {
-	o.TaskID = &v
+	o.TaskID = v
 }
 
 func (o OracleStatusRequestRequest) MarshalJSON() ([]byte, error) {
@@ -81,9 +74,7 @@ func (o OracleStatusRequestRequest) MarshalJSON() ([]byte, error) {
 
 func (o OracleStatusRequestRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.TaskID) {
-		toSerialize["taskID"] = o.TaskID
-	}
+	toSerialize["taskID"] = o.TaskID
 	return toSerialize, nil
 }
 

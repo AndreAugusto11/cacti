@@ -4,13 +4,13 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**TaskID** | Pointer to **string** |  | [optional] 
+**TaskID** | **string** |  | 
 
 ## Methods
 
 ### NewOracleStatusRequestRequest
 
-`func NewOracleStatusRequestRequest() *OracleStatusRequestRequest`
+`func NewOracleStatusRequestRequest(taskID string, ) *OracleStatusRequestRequest`
 
 NewOracleStatusRequestRequest instantiates a new OracleStatusRequestRequest object
 This constructor will assign default values to properties that have it defined,
@@ -44,11 +44,6 @@ and a boolean to check if the value has been set.
 
 SetTaskID sets TaskID field to given value.
 
-### HasTaskID
-
-`func (o *OracleStatusRequestRequest) HasTaskID() bool`
-
-HasTaskID returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

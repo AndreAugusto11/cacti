@@ -17,12 +17,22 @@ import (
 // checks if the OracleExecuteRequestRequestDestinationContract type satisfies the MappedNullable interface at compile time
 var _ MappedNullable = &OracleExecuteRequestRequestDestinationContract{}
 
-// OracleExecuteRequestRequestDestinationContract struct for OracleExecuteRequestRequestDestinationContract
+// OracleExecuteRequestRequestDestinationContract The contract data on the destination blockchain. Only if taskType is UPDATE or READ_AND_UPDATE.
 type OracleExecuteRequestRequestDestinationContract struct {
-	// The address of the contract on the destination network.
-	ContractAddress *string `json:"contractAddress,omitempty"`
-	// The name of the contract on the destination network.
+	// The name of the contract.
 	ContractName *string `json:"contractName,omitempty"`
+	// The address of the contract.
+	ContractAddress NullableString `json:"contractAddress,omitempty"`
+	// The ABI (Application Binary Interface) of the contract.
+	ContractAbi []map[string]interface{} `json:"contractAbi,omitempty"`
+	// The bytecode of the contract.
+	ContractBytecode NullableString `json:"contractBytecode,omitempty"`
+	// The name of the method to be invoked on the contract.
+	MethodName *string `json:"methodName,omitempty"`
+	// The parameters to be passed to the contract method.
+	Params []OracleRegisterRequestRequestSrcContractParamsInner `json:"params,omitempty"`
+	// The event signatures to listen for on the source network. To be defined if task mode is EVENT_LISTENING.
+	EventSignature *string `json:"eventSignature,omitempty"`
 }
 
 // NewOracleExecuteRequestRequestDestinationContract instantiates a new OracleExecuteRequestRequestDestinationContract object
@@ -40,38 +50,6 @@ func NewOracleExecuteRequestRequestDestinationContract() *OracleExecuteRequestRe
 func NewOracleExecuteRequestRequestDestinationContractWithDefaults() *OracleExecuteRequestRequestDestinationContract {
 	this := OracleExecuteRequestRequestDestinationContract{}
 	return &this
-}
-
-// GetContractAddress returns the ContractAddress field value if set, zero value otherwise.
-func (o *OracleExecuteRequestRequestDestinationContract) GetContractAddress() string {
-	if o == nil || IsNil(o.ContractAddress) {
-		var ret string
-		return ret
-	}
-	return *o.ContractAddress
-}
-
-// GetContractAddressOk returns a tuple with the ContractAddress field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *OracleExecuteRequestRequestDestinationContract) GetContractAddressOk() (*string, bool) {
-	if o == nil || IsNil(o.ContractAddress) {
-		return nil, false
-	}
-	return o.ContractAddress, true
-}
-
-// HasContractAddress returns a boolean if a field has been set.
-func (o *OracleExecuteRequestRequestDestinationContract) HasContractAddress() bool {
-	if o != nil && !IsNil(o.ContractAddress) {
-		return true
-	}
-
-	return false
-}
-
-// SetContractAddress gets a reference to the given string and assigns it to the ContractAddress field.
-func (o *OracleExecuteRequestRequestDestinationContract) SetContractAddress(v string) {
-	o.ContractAddress = &v
 }
 
 // GetContractName returns the ContractName field value if set, zero value otherwise.
@@ -106,6 +84,219 @@ func (o *OracleExecuteRequestRequestDestinationContract) SetContractName(v strin
 	o.ContractName = &v
 }
 
+// GetContractAddress returns the ContractAddress field value if set, zero value otherwise (both if not set or set to explicit null).
+func (o *OracleExecuteRequestRequestDestinationContract) GetContractAddress() string {
+	if o == nil || IsNil(o.ContractAddress.Get()) {
+		var ret string
+		return ret
+	}
+	return *o.ContractAddress.Get()
+}
+
+// GetContractAddressOk returns a tuple with the ContractAddress field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
+func (o *OracleExecuteRequestRequestDestinationContract) GetContractAddressOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return o.ContractAddress.Get(), o.ContractAddress.IsSet()
+}
+
+// HasContractAddress returns a boolean if a field has been set.
+func (o *OracleExecuteRequestRequestDestinationContract) HasContractAddress() bool {
+	if o != nil && o.ContractAddress.IsSet() {
+		return true
+	}
+
+	return false
+}
+
+// SetContractAddress gets a reference to the given NullableString and assigns it to the ContractAddress field.
+func (o *OracleExecuteRequestRequestDestinationContract) SetContractAddress(v string) {
+	o.ContractAddress.Set(&v)
+}
+// SetContractAddressNil sets the value for ContractAddress to be an explicit nil
+func (o *OracleExecuteRequestRequestDestinationContract) SetContractAddressNil() {
+	o.ContractAddress.Set(nil)
+}
+
+// UnsetContractAddress ensures that no value is present for ContractAddress, not even an explicit nil
+func (o *OracleExecuteRequestRequestDestinationContract) UnsetContractAddress() {
+	o.ContractAddress.Unset()
+}
+
+// GetContractAbi returns the ContractAbi field value if set, zero value otherwise (both if not set or set to explicit null).
+func (o *OracleExecuteRequestRequestDestinationContract) GetContractAbi() []map[string]interface{} {
+	if o == nil {
+		var ret []map[string]interface{}
+		return ret
+	}
+	return o.ContractAbi
+}
+
+// GetContractAbiOk returns a tuple with the ContractAbi field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
+func (o *OracleExecuteRequestRequestDestinationContract) GetContractAbiOk() ([]map[string]interface{}, bool) {
+	if o == nil || IsNil(o.ContractAbi) {
+		return nil, false
+	}
+	return o.ContractAbi, true
+}
+
+// HasContractAbi returns a boolean if a field has been set.
+func (o *OracleExecuteRequestRequestDestinationContract) HasContractAbi() bool {
+	if o != nil && IsNil(o.ContractAbi) {
+		return true
+	}
+
+	return false
+}
+
+// SetContractAbi gets a reference to the given []map[string]interface{} and assigns it to the ContractAbi field.
+func (o *OracleExecuteRequestRequestDestinationContract) SetContractAbi(v []map[string]interface{}) {
+	o.ContractAbi = v
+}
+
+// GetContractBytecode returns the ContractBytecode field value if set, zero value otherwise (both if not set or set to explicit null).
+func (o *OracleExecuteRequestRequestDestinationContract) GetContractBytecode() string {
+	if o == nil || IsNil(o.ContractBytecode.Get()) {
+		var ret string
+		return ret
+	}
+	return *o.ContractBytecode.Get()
+}
+
+// GetContractBytecodeOk returns a tuple with the ContractBytecode field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
+func (o *OracleExecuteRequestRequestDestinationContract) GetContractBytecodeOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return o.ContractBytecode.Get(), o.ContractBytecode.IsSet()
+}
+
+// HasContractBytecode returns a boolean if a field has been set.
+func (o *OracleExecuteRequestRequestDestinationContract) HasContractBytecode() bool {
+	if o != nil && o.ContractBytecode.IsSet() {
+		return true
+	}
+
+	return false
+}
+
+// SetContractBytecode gets a reference to the given NullableString and assigns it to the ContractBytecode field.
+func (o *OracleExecuteRequestRequestDestinationContract) SetContractBytecode(v string) {
+	o.ContractBytecode.Set(&v)
+}
+// SetContractBytecodeNil sets the value for ContractBytecode to be an explicit nil
+func (o *OracleExecuteRequestRequestDestinationContract) SetContractBytecodeNil() {
+	o.ContractBytecode.Set(nil)
+}
+
+// UnsetContractBytecode ensures that no value is present for ContractBytecode, not even an explicit nil
+func (o *OracleExecuteRequestRequestDestinationContract) UnsetContractBytecode() {
+	o.ContractBytecode.Unset()
+}
+
+// GetMethodName returns the MethodName field value if set, zero value otherwise.
+func (o *OracleExecuteRequestRequestDestinationContract) GetMethodName() string {
+	if o == nil || IsNil(o.MethodName) {
+		var ret string
+		return ret
+	}
+	return *o.MethodName
+}
+
+// GetMethodNameOk returns a tuple with the MethodName field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *OracleExecuteRequestRequestDestinationContract) GetMethodNameOk() (*string, bool) {
+	if o == nil || IsNil(o.MethodName) {
+		return nil, false
+	}
+	return o.MethodName, true
+}
+
+// HasMethodName returns a boolean if a field has been set.
+func (o *OracleExecuteRequestRequestDestinationContract) HasMethodName() bool {
+	if o != nil && !IsNil(o.MethodName) {
+		return true
+	}
+
+	return false
+}
+
+// SetMethodName gets a reference to the given string and assigns it to the MethodName field.
+func (o *OracleExecuteRequestRequestDestinationContract) SetMethodName(v string) {
+	o.MethodName = &v
+}
+
+// GetParams returns the Params field value if set, zero value otherwise.
+func (o *OracleExecuteRequestRequestDestinationContract) GetParams() []OracleRegisterRequestRequestSrcContractParamsInner {
+	if o == nil || IsNil(o.Params) {
+		var ret []OracleRegisterRequestRequestSrcContractParamsInner
+		return ret
+	}
+	return o.Params
+}
+
+// GetParamsOk returns a tuple with the Params field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *OracleExecuteRequestRequestDestinationContract) GetParamsOk() ([]OracleRegisterRequestRequestSrcContractParamsInner, bool) {
+	if o == nil || IsNil(o.Params) {
+		return nil, false
+	}
+	return o.Params, true
+}
+
+// HasParams returns a boolean if a field has been set.
+func (o *OracleExecuteRequestRequestDestinationContract) HasParams() bool {
+	if o != nil && !IsNil(o.Params) {
+		return true
+	}
+
+	return false
+}
+
+// SetParams gets a reference to the given []OracleRegisterRequestRequestSrcContractParamsInner and assigns it to the Params field.
+func (o *OracleExecuteRequestRequestDestinationContract) SetParams(v []OracleRegisterRequestRequestSrcContractParamsInner) {
+	o.Params = v
+}
+
+// GetEventSignature returns the EventSignature field value if set, zero value otherwise.
+func (o *OracleExecuteRequestRequestDestinationContract) GetEventSignature() string {
+	if o == nil || IsNil(o.EventSignature) {
+		var ret string
+		return ret
+	}
+	return *o.EventSignature
+}
+
+// GetEventSignatureOk returns a tuple with the EventSignature field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *OracleExecuteRequestRequestDestinationContract) GetEventSignatureOk() (*string, bool) {
+	if o == nil || IsNil(o.EventSignature) {
+		return nil, false
+	}
+	return o.EventSignature, true
+}
+
+// HasEventSignature returns a boolean if a field has been set.
+func (o *OracleExecuteRequestRequestDestinationContract) HasEventSignature() bool {
+	if o != nil && !IsNil(o.EventSignature) {
+		return true
+	}
+
+	return false
+}
+
+// SetEventSignature gets a reference to the given string and assigns it to the EventSignature field.
+func (o *OracleExecuteRequestRequestDestinationContract) SetEventSignature(v string) {
+	o.EventSignature = &v
+}
+
 func (o OracleExecuteRequestRequestDestinationContract) MarshalJSON() ([]byte, error) {
 	toSerialize,err := o.ToMap()
 	if err != nil {
@@ -116,11 +307,26 @@ func (o OracleExecuteRequestRequestDestinationContract) MarshalJSON() ([]byte, e
 
 func (o OracleExecuteRequestRequestDestinationContract) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.ContractAddress) {
-		toSerialize["contractAddress"] = o.ContractAddress
-	}
 	if !IsNil(o.ContractName) {
 		toSerialize["contractName"] = o.ContractName
+	}
+	if o.ContractAddress.IsSet() {
+		toSerialize["contractAddress"] = o.ContractAddress.Get()
+	}
+	if o.ContractAbi != nil {
+		toSerialize["contractAbi"] = o.ContractAbi
+	}
+	if o.ContractBytecode.IsSet() {
+		toSerialize["contractBytecode"] = o.ContractBytecode.Get()
+	}
+	if !IsNil(o.MethodName) {
+		toSerialize["methodName"] = o.MethodName
+	}
+	if !IsNil(o.Params) {
+		toSerialize["params"] = o.Params
+	}
+	if !IsNil(o.EventSignature) {
+		toSerialize["eventSignature"] = o.EventSignature
 	}
 	return toSerialize, nil
 }

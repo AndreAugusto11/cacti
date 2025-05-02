@@ -4,134 +4,419 @@ import {
   LoggerProvider,
   type LogLevelDesc,
 } from "@hyperledger/cactus-common";
-import { OracleNotificationDispatcher } from "./oracle-notification-dispatcher";
-import { OracleRelayer } from "./oracle-relayer";
+// import { OracleNotificationDispatcher } from "./oracle-notification-dispatcher";
 
+import { IOracleEntryBase, IOracleListenerBase } from "./oracle-types";
+import { IPluginBungeeHermesOptions } from "@hyperledger/cactus-plugin-bungee-hermes";
+import { INetworkOptions } from "../bridge/bridge-types";
+import { stringify as safeStableStringify } from "safe-stable-stringify";
 import {
-  IOracleManagerOptions,
-  IOracleRepeatableTask,
-  IOracleTask,
+  DeployOracleError,
+  OracleError,
+  UnsupportedNetworkError,
+} from "../common/errors";
+import { LedgerType } from "@hyperledger/cactus-core-api";
+import { v4 as uuidv4 } from "uuid";
+import { IOracleEVMOptions, OracleEVM } from "./implementations/oracle-evm";
+import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+import {
+  IOracleFabricOptions,
+  OracleFabric,
+} from "./implementations/oracle-fabric";
+import { OracleAbstract } from "./oracle-abstract";
+import { ClaimFormat } from "../../generated/proto/cacti/satp/v02/common/message_pb";
+import {
+  NetworkId,
+  OracleOperation,
+  OracleOperationStatusEnum,
+  OracleOperationTypeEnum,
+  OracleRegisterRequestTaskModeEnum,
+  OracleResponse,
+  OracleTask,
+  OracleTaskModeEnum,
   OracleTaskStatusEnum,
-} from "./oracle-types";
-// import { IPluginBungeeHermesOptions } from "@hyperledger/cactus-plugin-bungee-hermes";
-// import { Web3SigningCredential } from "@hyperledger/cactus-plugin-ledger-connector-besu";
-// import { FabricSigningCredential } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
-// import { OracleEVM } from "./leafs/oracle-evm";
-// import { OracleFabric } from "./leafs/oracle-fabric";
+  OracleTaskTypeEnum,
+} from "../../public-api";
+import { OracleExecutionLayer } from "./oracle-execution-layer";
+import { updateOracleOperation } from "./oracle-utils";
+import { IOracleBesuOptions, OracleBesu } from "./implementations/oracle-besu";
+import { OracleSchedulerManager } from "./oracle-scheduler-manager";
+
+export interface IOracleManagerOptions {
+  logLevel?: LogLevelDesc;
+  bungee: IPluginBungeeHermesOptions | undefined;
+  initialTasks?: OracleTask[];
+}
 
 export class OracleManager {
   public static readonly CLASS_NAME = "OracleManager";
   private readonly logger: Logger;
-  private readonly instanceId: string;
+  private readonly logLevel: LogLevelDesc = "INFO";
+
+  // Group oracle by the network, a network can have various oracles (bridges)
+  private readonly oracles: Map<string, Map<string, OracleAbstract>> =
+    new Map();
 
   // Map to store the status for a given task id.
-  private taskStatusMap: Map<string, IOracleTask> = new Map();
+  private taskStatusMap: Map<string, OracleTask> = new Map();
 
-  private readonly notificationDispatcher: OracleNotificationDispatcher;
-  private readonly relayer: OracleRelayer;
+  // private readonly notificationDispatcher: OracleNotificationDispatcher;
+  private readonly schedulerManager: OracleSchedulerManager;
 
   constructor(public readonly options: IOracleManagerOptions) {
     const fnTag = `${OracleManager.CLASS_NAME}#constructor()`;
     if (!options) {
       throw new Error(`${fnTag}: OracleManager options are required`);
     }
-    this.instanceId = options.instanceId;
-    const level = (options.logLevel || "INFO") as LogLevelDesc;
+    const logLevel = (options.logLevel || "INFO") as LogLevelDesc;
     const loggerOptions: ILoggerOptions = {
-      level,
+      level: logLevel,
       label: OracleManager.CLASS_NAME,
     };
     this.logger = LoggerProvider.getOrCreate(loggerOptions);
-    this.logger.info(
-      `${fnTag}: Initializing OracleManager with instanceId ${this.instanceId}`,
-    );
+    this.logger.info(`${fnTag}: Initializing OracleManager`);
 
-    this.notificationDispatcher = new OracleNotificationDispatcher({
-      logger: this.logger,
-    });
+    // this.notificationDispatcher = new OracleNotificationDispatcher({
+    //   logger: this.logger,
+    // });
 
-    // const oracleFabric = new OracleFabric(
-    //   {
-    //     contractName: "fabricContract",
-    //     channelName: "mychannel",
-    //     keychainId: "fabricKeychain",
-    //     signingCredential: {} as FabricSigningCredential, // todo fix
-    //     network: {
-    //       id: "fabric-network-id",
-    //       ledgerType: "fabric",
-    //     },
-    //     options: {}, // Provide valid connector options
-    //     bungeeOptions: {} as IPluginBungeeHermesOptions, // todo fix
-    //   },
-    //   this.fabricConnectorConfig,
-    //   // bungee: this.bungee,
-    // );
-
-    // const oracleEVM = new OracleEVM(
-    //   {
-    //     contractName: "evmContract",
-    //     keychainId: "evmKeychain",
-    //     signingCredential: {} as Web3SigningCredential, // todo fix
-    //     gas: 3000000,
-    //     network: {
-    //       id: "evm-network-id",
-    //       ledgerType: "evm",
-    //     },
-    //     options: {}, // Provide valid connector options
-    //     bungeeOptions: {} as IPluginBungeeHermesOptions, // todo fix
-    //   },
-    //   this.ethereumConnectorConfig,
-    //   // bungee: this.bungee,
-    // );
-
-    this.relayer = new OracleRelayer({
-      logger: this.logger,
-      oracleFabric: undefined,
-      oracleEVM: undefined,
+    this.schedulerManager = new OracleSchedulerManager({
+      logLevel: this.logLevel,
     });
   }
 
-  public getTasks(): IOracleTask[] {
+  /**
+   * Getter for the scheduler manager.
+   *
+   * @returns {OracleSchedulerManager} The scheduler manager instance.
+   */
+  public getSchedulerManager(): OracleSchedulerManager {
+    return this.schedulerManager;
+  }
+
+  /**
+   * Deploys a new oracle based on the provided options.
+   *
+   * @param oracleNetworkOptions - The configuration options for the oracle to be deployed.
+   * @throws {DeployOracleError} If the oracle is already deployed or if there is an error during deployment.
+   * @throws {UnsupportedNetworkError} If the network type specified in the options is not supported.
+   * @returns {Promise<void>} A promise that resolves when the oracle is successfully deployed.
+   */
+  public async deployOracle(
+    oracleNetworkOptions: INetworkOptions,
+  ): Promise<void> {
+    const fnTag = `${OracleManager.CLASS_NAME}#deployOracle()`;
+    this.logger.debug(`${fnTag}, Deploying Oracle...`);
+    this.logger.debug(
+      `${fnTag}, Oracle Network Options: ${JSON.stringify(oracleNetworkOptions)}`,
+    );
+
+    if (
+      this.oracles.has(
+        safeStableStringify(oracleNetworkOptions.networkIdentification),
+      )
+    ) {
+      throw new DeployOracleError(
+        `${fnTag}, Oracle already deployed: ${safeStableStringify(oracleNetworkOptions.networkIdentification)}`,
+      );
+    }
+
+    try {
+      let oracle: OracleAbstract;
+      switch (oracleNetworkOptions.networkIdentification.ledgerType) {
+        case LedgerType.Besu1X:
+        case LedgerType.Besu2X:
+          this.logger.debug(`${fnTag}, Deploying Besu Oracle...`);
+          this.logger.debug(
+            `${fnTag}, Besu Oracle Network Options: ${JSON.stringify(
+              oracleNetworkOptions,
+            )}`,
+          );
+          const besuNetworkOptions =
+            oracleNetworkOptions as unknown as IOracleBesuOptions;
+          oracle = new OracleBesu({
+            ...besuNetworkOptions,
+            connectorOptions: {
+              ...besuNetworkOptions.connectorOptions,
+              instanceId: uuidv4(),
+              pluginRegistry: new PluginRegistry({
+                plugins: [],
+              }),
+              logLevel: this.logLevel,
+            },
+            logLevel: this.logLevel,
+          });
+          break;
+        case LedgerType.Ethereum:
+          this.logger.debug(`${fnTag}, Deploying Ethereum Oracle...`);
+          this.logger.debug(
+            `${fnTag}, Ethereum Oracle Network Options: ${JSON.stringify(
+              oracleNetworkOptions,
+            )}`,
+          );
+          const ethereumNetworkOptions =
+            oracleNetworkOptions as unknown as IOracleEVMOptions;
+          oracle = new OracleEVM({
+            ...ethereumNetworkOptions,
+            connectorOptions: {
+              ...ethereumNetworkOptions.connectorOptions,
+              instanceId: uuidv4(),
+              pluginRegistry: new PluginRegistry({
+                plugins: [],
+              }),
+              logLevel: this.logLevel,
+            },
+            logLevel: this.logLevel,
+          });
+          break;
+        case LedgerType.Fabric2:
+          this.logger.debug(`${fnTag}, Deploying Fabric Oracle...`);
+          this.logger.debug(
+            `${fnTag}, Fabric Oracle Network Options: ${JSON.stringify(
+              oracleNetworkOptions,
+            )}`,
+          );
+          if (
+            !(oracleNetworkOptions as Partial<IOracleFabricOptions>)
+              .userIdentity
+          ) {
+            throw new DeployOracleError(
+              `${fnTag}, User Identity is required for Fabric network`,
+            );
+          }
+          const keychainEntryKeyBridge = "bridgeKey";
+          const fabricKeychain = new PluginKeychainMemory({
+            instanceId: uuidv4(),
+            keychainId: uuidv4(),
+            logLevel: this.logLevel,
+            backend: new Map([
+              [
+                keychainEntryKeyBridge,
+                JSON.stringify(
+                  (oracleNetworkOptions as Partial<IOracleFabricOptions>)
+                    .userIdentity,
+                ),
+              ],
+            ]),
+          });
+          const fabricNetworkOptions = {
+            ...oracleNetworkOptions,
+            connectorOptions: {
+              ...(oracleNetworkOptions as Partial<IOracleFabricOptions>)
+                .connectorOptions,
+              instanceId: uuidv4(),
+              pluginRegistry: new PluginRegistry({
+                plugins: [fabricKeychain],
+              }),
+              logLevel: this.logLevel,
+            },
+            signingCredential: {
+              keychainId: fabricKeychain.getKeychainId(),
+              keychainRef: keychainEntryKeyBridge,
+            },
+          } as unknown as IOracleFabricOptions;
+          oracle = new OracleFabric({
+            ...fabricNetworkOptions,
+            logLevel: this.logLevel,
+          });
+          break;
+        default:
+          throw new UnsupportedNetworkError(
+            `${fnTag}, ${oracleNetworkOptions.networkIdentification.ledgerType} is not supported`,
+          );
+      }
+      await oracle.deployContracts();
+
+      const networkKey = safeStableStringify(
+        oracleNetworkOptions.networkIdentification,
+      );
+      if (!this.oracles.has(networkKey)) {
+        this.oracles.set(networkKey, new Map());
+      }
+      this.oracles.get(networkKey)?.set(oracle.getId(), oracle);
+    } catch (error) {
+      this.logger.error(`${fnTag}, Error deploying oracle: ${error}`);
+      throw new DeployOracleError(error);
+    }
+  }
+
+  /**
+   * Retrieves the bridge endpoint (leaf) for the specified network ID.
+   *
+   * @param id - The network ID for which to retrieve the bridge endpoint.
+   * @throws {OracleError} If the bridge endpoint is not available for the specified network ID.
+   * @returns {OracleAbstract} The bridge endpoint associated with the specified network ID.
+   */
+  public getNetworkOracle(
+    id: NetworkId,
+    claimFormat: ClaimFormat = ClaimFormat.DEFAULT,
+  ): OracleAbstract {
+    const fnTag = `${OracleManager.CLASS_NAME}#getNetworkOracle()`;
+    this.logger.debug(
+      `${fnTag}, Getting Oracle for Network ID: ${safeStableStringify(id)}`,
+    );
+
+    const oracle = this.oracles.get(safeStableStringify(id));
+
+    if (!oracle) {
+      throw new OracleError(
+        `${fnTag}, Oracle not available for network: ${safeStableStringify(id)}`,
+      );
+    }
+
+    for (const leaf of oracle.values()) {
+      if (leaf.getSupportedClaimFormats().includes(claimFormat)) {
+        return leaf;
+      }
+    }
+
+    throw new OracleError(
+      `${fnTag}, Oracle not available: ${id}, with Claim Format: ${claimFormat}`,
+    );
+  }
+
+  /**
+   * Retrieves the SATP (Secure Asset Transfer Protocol) Execution Layer for a given network ID and claim type.
+   *
+   * @param id - The network ID for which the SATP Execution Layer is to be retrieved.
+   * @param claimType - The format of the claim. Defaults to `ClaimFormat.DEFAULT` if not provided.
+   * @returns An instance of `OracleExecutionLayer` configured with the specified network ID and claim type.
+   */
+  public getOracleExecutionLayer(
+    id: NetworkId,
+    claimType: ClaimFormat = ClaimFormat.DEFAULT,
+  ): OracleExecutionLayer {
+    const fnTag = `${OracleManager.CLASS_NAME}#getOracleExecutionLayer()`;
+    this.logger.debug(`${fnTag}, Getting SATP Execution Layer...`);
+
+    return new OracleExecutionLayer({
+      oracleImpl: this.getNetworkOracle(id, claimType),
+      claimType,
+      logLevel: this.logLevel,
+    });
+  }
+
+  public getTasks(): OracleTask[] {
     return Array.from(this.taskStatusMap.values());
   }
 
-  public async registerTask(task: IOracleRepeatableTask): Promise<boolean> {
+  public async registerTask(task: OracleTask): Promise<OracleTask> {
     const fnTag = `${OracleManager.CLASS_NAME}#registerTask()`;
     this.logger.info(`${fnTag}: Registering task`);
 
     try {
       this.taskStatusMap.set(task.id, task);
+      task.timestamp = Date.now();
+      task.status = OracleTaskStatusEnum.Active;
+
+      // set up polling or event listener
+      if (task.mode === OracleRegisterRequestTaskModeEnum.Polling) {
+        this.schedulerManager.addPoller(
+          task.id,
+          async () => {
+            this.logger.debug(
+              `${fnTag}: Create poller for task ${task.id} with interval ${task.pollingInterval}`,
+            );
+            await this.processTask(task as OracleTask);
+          },
+          task.pollingInterval!,
+        );
+      } else if (
+        task.mode === OracleRegisterRequestTaskModeEnum.EventListening
+      ) {
+        const oracle = this.getNetworkOracle(task.srcNetworkId!);
+
+        // this is implemented as follows: we set up a listener for the event
+        // on the source contract, and when the event is emitted, we call the
+        // process the relayOperation method with only the update operation
+
+        await this.schedulerManager.addEventListener(
+          oracle,
+          task.id,
+          {
+            contractName: task.srcContract.contractName,
+            contractAbi: task.srcContract.contractAbi,
+            contractAddress: task.srcContract.contractAddress,
+            eventSignature: task.srcContract.eventSignature,
+          } as IOracleListenerBase,
+          async (params: string[]) => {
+            const fnTag = `${OracleManager.CLASS_NAME}#addEventListener`;
+            this.logger.debug(
+              `${fnTag}: Captured event emitted for task ${task.id} -- listened to ${params} from event ${task.srcContract.eventSignature} in contract ${task.srcContract.contractAddress} on network ${task.srcNetworkId}`,
+            );
+
+            if (!task.dstContract.params) {
+              // if params are not defined, we assume the event listener is
+              // used as data source. Otherwise, we assume the event
+              // listener is only used as a trigger for the task
+              await this.processTask(task as OracleTask, params);
+            } else {
+              await this.processTask(task as OracleTask);
+            }
+          },
+        );
+      }
+
       this.logger.info(`${fnTag}: Task registered successfully`);
-      return true;
+      return task;
     } catch (error) {
       this.logger.error(`${fnTag}: Error registering task: ${error}`);
-      return false;
+      return task;
     }
   }
 
+  // Unregisters a task by its id.
+  public async unregisterTask(taskId: string): Promise<OracleTask> {
+    const fnTag = `${OracleManager.CLASS_NAME}#unregisterTask()`;
+    this.logger.info(`${fnTag}: Unregistering task with id ${taskId}`);
+
+    const task = this.taskStatusMap.get(taskId);
+    if (!task) {
+      throw new Error(`${fnTag}: Task with id ${taskId} not found`);
+    }
+
+    if (task.mode === OracleTaskModeEnum.Immediate) {
+      this.logger.info(`${fnTag}: Cannot unregister task with mode Immediate`);
+      return task;
+    } else if (task.mode === OracleTaskModeEnum.Polling) {
+      this.schedulerManager.removePoller(taskId);
+    } else if (task.mode === OracleTaskModeEnum.EventListening) {
+      this.schedulerManager.removeEventListener(taskId);
+    }
+
+    task.status = OracleTaskStatusEnum.Inactive;
+
+    this.logger.info(`${fnTag}: Task with id ${taskId} unregistered`);
+
+    return task;
+  }
+
   // Executes the task by its id.
-  // Note: Execution now calls OracleRelayer.relayTask, passing in the bungee instance.
-  public async executeTask(task: IOracleTask): Promise<IOracleTask> {
+  // Note: Execution now calls OracleManager.relayTask, passing in the bungee instance.
+  public async executeTask(task: OracleTask): Promise<OracleTask> {
     const fnTag = `${OracleManager.CLASS_NAME}#executeTask()`;
     this.logger.info(`${fnTag}: Executing task with id ${task.id}`);
 
     this.taskStatusMap.set(task.id, task);
+    task.timestamp = Date.now();
 
     try {
-      // Execute the task via the relayer.
-      await this.relayer.processTask(task);
+      task = await this.processTask(task);
+      this.logger.info(`${fnTag}: Task executed successfully`);
       // Dispatch a success notification.
     } catch (error) {
       // On error, update status to FAILED and update tasks mapping.
       // Dispatch a failure notification.
-      throw error;
     }
+
+    task.status = OracleTaskStatusEnum.Inactive;
 
     return task;
   }
 
   // Returns the status for a given task id.
-  public getTask(taskId: string): IOracleTask {
+  public getTask(taskId: string): OracleTask {
     const fnTag = `${OracleManager.CLASS_NAME}#getTask()`;
     const task = this.taskStatusMap.get(taskId);
 
@@ -147,9 +432,239 @@ export class OracleManager {
     return task.status;
   }
 
+  public async processTask(
+    task: OracleTask,
+    params?: string[],
+  ): Promise<OracleTask> {
+    const fnTag = `${OracleManager.CLASS_NAME}#relayTask`;
+    this.logger.debug(`${fnTag}: Processing task ${task.id}`);
+
+    // here, we decompose a task into multiple operations as needed and then call
+    // relayOperation for each operation. A READ or UPDATE task are decomposed into
+    // only one operation, but a READ_AND_UPDATE task is decomposed into two operations,
+    // one READ and one UPDATE with the data read from the first operation.
+
+    if (task.type === OracleTaskTypeEnum.Read) {
+      const operation = {
+        id: uuidv4(),
+        type: OracleOperationTypeEnum.Read,
+        networkId: task.srcNetworkId,
+        contract: task.srcContract,
+        status: OracleOperationStatusEnum.Pending,
+        timestamp: Date.now(),
+        output: undefined,
+      } as OracleOperation;
+
+      await this.relayOperation(task, operation);
+    } else if (task.type === OracleTaskTypeEnum.Update) {
+      if (params) {
+        task.dstContract.params = params;
+      }
+
+      const operation = {
+        id: uuidv4(),
+        type: OracleOperationTypeEnum.Update,
+        networkId: task.dstNetworkId,
+        contract: task.dstContract,
+        status: OracleOperationStatusEnum.Pending,
+        timestamp: Date.now(),
+        output: undefined,
+      } as OracleOperation;
+
+      await this.relayOperation(task, operation);
+    } else if (task.type === OracleTaskTypeEnum.ReadAndUpdate) {
+      let writeContent = params;
+
+      // if there are params provided, we do not need to read the data
+      // from the source contract, so we can skip the read operation
+      if (!params) {
+        const readOperation = {
+          id: uuidv4(),
+          type: OracleOperationTypeEnum.Read,
+          networkId: task.srcNetworkId,
+          contract: task.srcContract,
+          status: OracleOperationStatusEnum.Pending,
+          timestamp: Date.now(),
+          output: undefined,
+        } as OracleOperation;
+
+        const readResponse = await this.relayOperation(task, readOperation);
+
+        if (readResponse.output === undefined) {
+          throw new Error(
+            `${fnTag}: Read operation failed, no output received`,
+          );
+        }
+
+        writeContent = [readResponse.output];
+      }
+
+      const updateOperation = {
+        id: uuidv4(),
+        type: OracleOperationTypeEnum.Update,
+        networkId: task.dstNetworkId,
+        contract: {
+          ...task.dstContract,
+          params:
+            task.dstContract.params !== undefined &&
+            task.dstContract.params?.length !== 0 // if params are empty, use the read response
+              ? task.dstContract.params
+              : writeContent,
+        },
+        status: OracleOperationStatusEnum.Pending,
+        timestamp: Date.now(),
+        output: undefined,
+      } as OracleOperation;
+
+      await this.relayOperation(task, updateOperation);
+    }
+
+    this.logger.debug(`${fnTag}: Task ${task.id} processed.`);
+    return task;
+  }
+
+  // /**
+  //  * Builds an `OracleOperation` object for an update operation.
+  //  *
+  //  * This function is designed to provide flexibility in handling update operations.
+  //  * It can be invoked in various scenarios, such as:
+  //  * - When an event is emitted.
+  //  * - After reading data from the source contract.
+  //  * - Upon receiving an immediate update request.
+  //  *
+  //  * @param task - The `OracleTask` containing details about the destination network
+  //  *               and contract where the update operation will be performed.
+  //  * @param params - An array of string parameters to be passed to the destination contract.
+  //  *
+  //  * @returns An `OracleOperation` object representing the update operation, initialized
+  //  *          with a unique ID, type, network ID, contract details, pending status,
+  //  *          current timestamp, and undefined output.
+  //  */
+  // private buildUpdateOperation(
+  //   task: OracleTask,
+  //   params: string[],
+  // ): OracleOperation {
+  //   return {
+  //     id: uuidv4(),
+  //     type: OracleOperationTypeEnum.Update,
+  //     networkId: task.dstNetworkId,
+  //     contract: {
+  //       ...task.dstContract,
+  //       params,
+  //     },
+  //     status: OracleOperationStatusEnum.Pending,
+  //     timestamp: Date.now(),
+  //     output: undefined,
+  //   } as OracleOperation;
+  // }
+
+  /**
+   * Immediately dispatches an operation to the appropriate oracle.
+   */
+  public async relayOperation(
+    task: OracleTask,
+    operation: OracleOperation,
+  ): Promise<OracleResponse> {
+    const fnTag = `${OracleManager.CLASS_NAME}#relayTask`;
+    this.logger.debug(
+      `${fnTag}: Relaying operation ${operation.id} to network ${operation.networkId}`,
+    );
+
+    let response: OracleResponse;
+
+    try {
+      const oracle = this.getOracleExecutionLayer(operation.networkId);
+
+      const entry = oracle.convertOperationToEntry(operation);
+
+      if (operation.type === OracleOperationTypeEnum.Read) {
+        response = await oracle.readEntry(entry as IOracleEntryBase);
+      } else {
+        response = await oracle.updateEntry(entry as IOracleEntryBase);
+      }
+
+      updateOracleOperation(
+        operation,
+        OracleOperationStatusEnum.Success,
+        response,
+      );
+      task.operations.push(operation);
+    } catch (error) {
+      response = {
+        output: error.message,
+      } as OracleResponse;
+
+      this.logger.error(
+        `${fnTag}: Error relaying operation ${operation.id}: ${error}`,
+      );
+      updateOracleOperation(
+        operation,
+        OracleOperationStatusEnum.Failed,
+        response,
+      );
+      task.operations.push(operation);
+      throw error;
+    }
+
+    this.logger.debug(
+      `${fnTag}: Operation ${operation.id} relayed successfully`,
+    );
+    return response;
+  }
+
+  // protected isTriggered(condition?: OracleTaskTriggerCondition): boolean {
+  //   if (!condition) return false;
+  //   if (condition.scheduleTime && condition.scheduleTime <= new Date())
+  //     return true;
+  //   return false;
+  // }
+
+  // /**
+  //  * Starts a polling mechanism that checks all listeners at a regular interval.
+  //  */
+  // private pollAllTasks(intervalMs: number): void {
+  //   const fnTag = `${OracleRelayer.CLASS_NAME}#pollAllTasks`;
+  //   this.pollerId = setInterval(async () => {
+  //     for (const listener of this.listeners) {
+  //       const scheduledTask = this.scheduledTasks.find(
+  //         (t) => t.id === listener.taskId,
+  //       );
+  //       if (!scheduledTask) {
+  //         this.log.warn(
+  //           `${fnTag}: No scheduled task found for listener ${listener.taskId}`,
+  //         );
+  //         continue;
+  //       }
+  //       try {
+  //         this.relayOperation(scheduledTask);
+  //       } catch (err) {
+  //         this.log.error(
+  //           `${fnTag}: Error polling task ${listener.taskId}`,
+  //           err,
+  //         );
+  //       }
+  //     }
+  //   }, intervalMs);
+  // }
+
+  // public removeListener(taskId: string): void {
+  //   const fnTag = `${OracleRelayer.CLASS_NAME}#removeListener`;
+  //   const idx = this.listeners.findIndex((l) => l.taskId === taskId);
+  //   if (idx !== -1) {
+  //     this.listeners.splice(idx, 1);
+  //     this.log.debug(`${fnTag}: Removed listener for task ${taskId}`);
+  //     if (this.listeners.length === 0 && this.pollerId) {
+  //       clearInterval(this.pollerId);
+  //       this.pollerId = undefined;
+  //     }
+  //   } else {
+  //     this.log.debug(`${fnTag}: No active listener for task ${taskId}`);
+  //   }
+  // }
+
   public async shutdown(): Promise<void> {
-    const fnTag = `${OracleManager.CLASS_NAME}#shutdown()`;
-    this.logger.info(`${fnTag}: Shutting down OracleManager`);
-    // todo
+    const fnTag = `${OracleManager.CLASS_NAME}#shutdown`;
+    this.logger.debug(`${fnTag}: Shutting down all listeners.`);
+    await this.schedulerManager.clearAll();
   }
 }

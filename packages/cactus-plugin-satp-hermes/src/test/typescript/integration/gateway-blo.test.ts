@@ -14,8 +14,10 @@ import type { SATPGatewayConfig } from "../../../main/typescript/plugin-satp-her
 import { createClient } from "../test-utils";
 import {
   HealthCheckResponseStatusEnum,
-  OracleRegisterRequestRequestTaskModeEnum,
-  OracleRegisterRequestRequestTaskTypeEnum,
+  OracleRegisterRequestTaskModeEnum,
+  OracleRegisterRequestTaskTypeEnum,
+  TransactRequestSourceAssetNetworkId,
+  TransactRequestSourceAssetNetworkIdLedgerTypeEnum,
 } from "../../../main/typescript";
 import {
   knexClientConnection,
@@ -152,7 +154,7 @@ describe("GetStatus Endpoint and Functionality testing", () => {
 
       const oracleApiClient = createClient("OracleApi", address, port, logger);
 
-      const result = await oracleApiClient.oracleStatusRequest({
+      const result = await oracleApiClient.getOracleTaskStatus({
         taskID: "test-task-id",
       });
 
@@ -160,18 +162,28 @@ describe("GetStatus Endpoint and Functionality testing", () => {
       expect(result.status).toBe(200);
       expect(result.data.taskID).toBe("test-task-id");
 
-      const register = await oracleApiClient.oracleRegisterRequest({
-        sourceNetwork: "source-network-id",
-        targetNetwork: "target-network-id",
-        sourceContract: "source-contract-address",
-        destinationContract: "destination-contract-address",
-        sourceFunctionName: "source-function-name",
-        sourceFunctionParams: ["param1", "param2"],
-        destinationFunctionName: "destination-function-name",
-        destinationFunctionParams: ["paramA", "paramB"],
-        taskMode: OracleRegisterRequestRequestTaskModeEnum.EventListening,
-        taskInterval: 5000,
-        taskType: OracleRegisterRequestRequestTaskTypeEnum.Read,
+      const register = await oracleApiClient.registerOracleTask({
+        sourceNetworkId: {
+          id: "source-network-id",
+          ledgerType: TransactRequestSourceAssetNetworkIdLedgerTypeEnum.Besu2X,
+        } as TransactRequestSourceAssetNetworkId,
+        destinationNetworkId: {
+          id: "source-network-id",
+          ledgerType: TransactRequestSourceAssetNetworkIdLedgerTypeEnum.Besu2X,
+        } as TransactRequestSourceAssetNetworkId,
+        sourceContract: {
+          contractName: "source-contract-name",
+          methodName: "source-method-name",
+          params: ["param1", "param2"],
+        },
+        destinationContract: {
+          contractName: "source-contract-name",
+          methodName: "source-method-name",
+          params: ["param1", "param2"],
+        },
+        taskMode: OracleRegisterRequestTaskModeEnum.EventListening,
+        taskType: OracleRegisterRequestTaskTypeEnum.Read,
+        pollingInterval: 1000,
       });
 
       expect(register).toBeDefined();

@@ -4,14 +4,14 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**TaskID** | **string** | The unique identifier for the context of the repeatable task. | 
-**Status** | **string** | The status of the registered data transfer task. | 
+**TaskID** | Pointer to **string** |  | [optional] 
+**Status** | Pointer to **string** |  | [optional] 
 
 ## Methods
 
 ### NewOracleRegisterResponse
 
-`func NewOracleRegisterResponse(taskID string, status string, ) *OracleRegisterResponse`
+`func NewOracleRegisterResponse() *OracleRegisterResponse`
 
 NewOracleRegisterResponse instantiates a new OracleRegisterResponse object
 This constructor will assign default values to properties that have it defined,
@@ -45,6 +45,11 @@ and a boolean to check if the value has been set.
 
 SetTaskID sets TaskID field to given value.
 
+### HasTaskID
+
+`func (o *OracleRegisterResponse) HasTaskID() bool`
+
+HasTaskID returns a boolean if a field has been set.
 
 ### GetStatus
 
@@ -65,6 +70,11 @@ and a boolean to check if the value has been set.
 
 SetStatus sets Status field to given value.
 
+### HasStatus
+
+`func (o *OracleRegisterResponse) HasStatus() bool`
+
+HasStatus returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

@@ -4,19 +4,17 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**SourceNetwork** | Pointer to **string** | The source blockchain network identifier. Only if taskType is READ or READ_AND_UPDATE. | [optional] 
-**DestinationNetwork** | **string** | The target blockchain network identifier. Only if taskType is UPDATE or READ_AND_UPDATE. | 
-**SourceContract** | Pointer to **string** | The contract address on the source blockchain. Only if taskType is READ or READ_AND_UPDATE. | [optional] 
-**DestinationContract** | **string** | The contract address on the destination blockchain. Only if taskType is UPDATE or READ_AND_UPDATE. | 
-**ReadFunction** | Pointer to **string** | The function to be called on the source blockchain. Only if taskType is READ or READ_AND_UPDATE. | [optional] 
-**WriteFunction** | **string** | The function to be called on the destination blockchain. Only if taskType is UPDATE or READ_AND_UPDATE. | 
+**SourceNetworkId** | Pointer to [**TransactRequestSourceAssetNetworkId**](TransactRequestSourceAssetNetworkId.md) |  | [optional] 
+**DestinationNetworkId** | Pointer to [**TransactRequestSourceAssetNetworkId**](TransactRequestSourceAssetNetworkId.md) |  | [optional] 
+**SourceContract** | Pointer to [**ExecuteOracleTaskRequestSourceContract**](ExecuteOracleTaskRequestSourceContract.md) |  | [optional] 
+**DestinationContract** | Pointer to [**ExecuteOracleTaskRequestDestinationContract**](ExecuteOracleTaskRequestDestinationContract.md) |  | [optional] 
 **TaskType** | Pointer to **string** | The type of task to be registered. | [optional] 
 
 ## Methods
 
 ### NewOracleExecuteRequest
 
-`func NewOracleExecuteRequest(destinationNetwork string, destinationContract string, writeFunction string, ) *OracleExecuteRequest`
+`func NewOracleExecuteRequest() *OracleExecuteRequest`
 
 NewOracleExecuteRequest instantiates a new OracleExecuteRequest object
 This constructor will assign default values to properties that have it defined,
@@ -31,67 +29,72 @@ NewOracleExecuteRequestWithDefaults instantiates a new OracleExecuteRequest obje
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
-### GetSourceNetwork
+### GetSourceNetworkId
 
-`func (o *OracleExecuteRequest) GetSourceNetwork() string`
+`func (o *OracleExecuteRequest) GetSourceNetworkId() TransactRequestSourceAssetNetworkId`
 
-GetSourceNetwork returns the SourceNetwork field if non-nil, zero value otherwise.
+GetSourceNetworkId returns the SourceNetworkId field if non-nil, zero value otherwise.
 
-### GetSourceNetworkOk
+### GetSourceNetworkIdOk
 
-`func (o *OracleExecuteRequest) GetSourceNetworkOk() (*string, bool)`
+`func (o *OracleExecuteRequest) GetSourceNetworkIdOk() (*TransactRequestSourceAssetNetworkId, bool)`
 
-GetSourceNetworkOk returns a tuple with the SourceNetwork field if it's non-nil, zero value otherwise
+GetSourceNetworkIdOk returns a tuple with the SourceNetworkId field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetSourceNetwork
+### SetSourceNetworkId
 
-`func (o *OracleExecuteRequest) SetSourceNetwork(v string)`
+`func (o *OracleExecuteRequest) SetSourceNetworkId(v TransactRequestSourceAssetNetworkId)`
 
-SetSourceNetwork sets SourceNetwork field to given value.
+SetSourceNetworkId sets SourceNetworkId field to given value.
 
-### HasSourceNetwork
+### HasSourceNetworkId
 
-`func (o *OracleExecuteRequest) HasSourceNetwork() bool`
+`func (o *OracleExecuteRequest) HasSourceNetworkId() bool`
 
-HasSourceNetwork returns a boolean if a field has been set.
+HasSourceNetworkId returns a boolean if a field has been set.
 
-### GetDestinationNetwork
+### GetDestinationNetworkId
 
-`func (o *OracleExecuteRequest) GetDestinationNetwork() string`
+`func (o *OracleExecuteRequest) GetDestinationNetworkId() TransactRequestSourceAssetNetworkId`
 
-GetDestinationNetwork returns the DestinationNetwork field if non-nil, zero value otherwise.
+GetDestinationNetworkId returns the DestinationNetworkId field if non-nil, zero value otherwise.
 
-### GetDestinationNetworkOk
+### GetDestinationNetworkIdOk
 
-`func (o *OracleExecuteRequest) GetDestinationNetworkOk() (*string, bool)`
+`func (o *OracleExecuteRequest) GetDestinationNetworkIdOk() (*TransactRequestSourceAssetNetworkId, bool)`
 
-GetDestinationNetworkOk returns a tuple with the DestinationNetwork field if it's non-nil, zero value otherwise
+GetDestinationNetworkIdOk returns a tuple with the DestinationNetworkId field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetDestinationNetwork
+### SetDestinationNetworkId
 
-`func (o *OracleExecuteRequest) SetDestinationNetwork(v string)`
+`func (o *OracleExecuteRequest) SetDestinationNetworkId(v TransactRequestSourceAssetNetworkId)`
 
-SetDestinationNetwork sets DestinationNetwork field to given value.
+SetDestinationNetworkId sets DestinationNetworkId field to given value.
 
+### HasDestinationNetworkId
+
+`func (o *OracleExecuteRequest) HasDestinationNetworkId() bool`
+
+HasDestinationNetworkId returns a boolean if a field has been set.
 
 ### GetSourceContract
 
-`func (o *OracleExecuteRequest) GetSourceContract() string`
+`func (o *OracleExecuteRequest) GetSourceContract() ExecuteOracleTaskRequestSourceContract`
 
 GetSourceContract returns the SourceContract field if non-nil, zero value otherwise.
 
 ### GetSourceContractOk
 
-`func (o *OracleExecuteRequest) GetSourceContractOk() (*string, bool)`
+`func (o *OracleExecuteRequest) GetSourceContractOk() (*ExecuteOracleTaskRequestSourceContract, bool)`
 
 GetSourceContractOk returns a tuple with the SourceContract field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetSourceContract
 
-`func (o *OracleExecuteRequest) SetSourceContract(v string)`
+`func (o *OracleExecuteRequest) SetSourceContract(v ExecuteOracleTaskRequestSourceContract)`
 
 SetSourceContract sets SourceContract field to given value.
 
@@ -103,68 +106,28 @@ HasSourceContract returns a boolean if a field has been set.
 
 ### GetDestinationContract
 
-`func (o *OracleExecuteRequest) GetDestinationContract() string`
+`func (o *OracleExecuteRequest) GetDestinationContract() ExecuteOracleTaskRequestDestinationContract`
 
 GetDestinationContract returns the DestinationContract field if non-nil, zero value otherwise.
 
 ### GetDestinationContractOk
 
-`func (o *OracleExecuteRequest) GetDestinationContractOk() (*string, bool)`
+`func (o *OracleExecuteRequest) GetDestinationContractOk() (*ExecuteOracleTaskRequestDestinationContract, bool)`
 
 GetDestinationContractOk returns a tuple with the DestinationContract field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetDestinationContract
 
-`func (o *OracleExecuteRequest) SetDestinationContract(v string)`
+`func (o *OracleExecuteRequest) SetDestinationContract(v ExecuteOracleTaskRequestDestinationContract)`
 
 SetDestinationContract sets DestinationContract field to given value.
 
+### HasDestinationContract
 
-### GetReadFunction
+`func (o *OracleExecuteRequest) HasDestinationContract() bool`
 
-`func (o *OracleExecuteRequest) GetReadFunction() string`
-
-GetReadFunction returns the ReadFunction field if non-nil, zero value otherwise.
-
-### GetReadFunctionOk
-
-`func (o *OracleExecuteRequest) GetReadFunctionOk() (*string, bool)`
-
-GetReadFunctionOk returns a tuple with the ReadFunction field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetReadFunction
-
-`func (o *OracleExecuteRequest) SetReadFunction(v string)`
-
-SetReadFunction sets ReadFunction field to given value.
-
-### HasReadFunction
-
-`func (o *OracleExecuteRequest) HasReadFunction() bool`
-
-HasReadFunction returns a boolean if a field has been set.
-
-### GetWriteFunction
-
-`func (o *OracleExecuteRequest) GetWriteFunction() string`
-
-GetWriteFunction returns the WriteFunction field if non-nil, zero value otherwise.
-
-### GetWriteFunctionOk
-
-`func (o *OracleExecuteRequest) GetWriteFunctionOk() (*string, bool)`
-
-GetWriteFunctionOk returns a tuple with the WriteFunction field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetWriteFunction
-
-`func (o *OracleExecuteRequest) SetWriteFunction(v string)`
-
-SetWriteFunction sets WriteFunction field to given value.
-
+HasDestinationContract returns a boolean if a field has been set.
 
 ### GetTaskType
 

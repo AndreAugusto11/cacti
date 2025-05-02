@@ -4,17 +4,12 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**SourceNetwork** | Pointer to **string** | The source blockchain network identifier. Only if taskType is READ or READ_AND_UPDATE. | [optional] 
-**TargetNetwork** | Pointer to **string** | The target blockchain network identifier. Only if taskType is UPDATE or READ_AND_UPDATE. | [optional] 
-**SourceContract** | Pointer to **string** | The contract address on the source blockchain. Only if taskType is READ or READ_AND_UPDATE. | [optional] 
-**DestinationContract** | Pointer to **string** | The contract address on the destination blockchain. Only if taskType is UPDATE or READ_AND_UPDATE. | [optional] 
-**EventSignature** | Pointer to **string** | The signature of the event of interest on the source blockchain. Only if taskType is READ or READ_AND_UPDATE. | [optional] 
-**SourceFunctionName** | Pointer to **string** | The function to be called on the source blockchain. Only if taskType is READ or READ_AND_UPDATE. | [optional] 
-**SourceFunctionParams** | Pointer to **[]string** | The parameters for the function to be called on the source blockchain. Only if taskType is READ or READ_AND_UPDATE. | [optional] 
-**DestinationFunctionName** | Pointer to **string** | The function to be called on the destination blockchain. Only if taskType is UPDATE or READ_AND_UPDATE. | [optional] 
-**DestinationFunctionParams** | Pointer to **[]string** | The parameters for the function to be called on the destination blockchain. Only if taskType is UPDATE or READ_AND_UPDATE. | [optional] 
+**SourceNetworkId** | Pointer to [**TransactRequestSourceAssetNetworkId**](TransactRequestSourceAssetNetworkId.md) |  | [optional] 
+**DestinationNetworkId** | Pointer to [**TransactRequestSourceAssetNetworkId**](TransactRequestSourceAssetNetworkId.md) |  | [optional] 
+**SourceContract** | Pointer to [**RegisterOracleTaskRequestSourceContract**](RegisterOracleTaskRequestSourceContract.md) |  | [optional] 
+**DestinationContract** | Pointer to [**RegisterOracleTaskRequestDestinationContract**](RegisterOracleTaskRequestDestinationContract.md) |  | [optional] 
 **TaskMode** | **string** | The mode of operation for the repeatable task. | 
-**TaskInterval** | Pointer to **int32** | The interval for polling in milliseconds. Only if taskMode is POLLING. | [optional] 
+**PollingInterval** | Pointer to **int32** | The interval for polling in milliseconds. Only if taskMode is POLLING. | [optional] 
 **TaskType** | **string** | The type of task to be registered. | 
 
 ## Methods
@@ -36,72 +31,72 @@ NewOracleRegisterRequestWithDefaults instantiates a new OracleRegisterRequest ob
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
-### GetSourceNetwork
+### GetSourceNetworkId
 
-`func (o *OracleRegisterRequest) GetSourceNetwork() string`
+`func (o *OracleRegisterRequest) GetSourceNetworkId() TransactRequestSourceAssetNetworkId`
 
-GetSourceNetwork returns the SourceNetwork field if non-nil, zero value otherwise.
+GetSourceNetworkId returns the SourceNetworkId field if non-nil, zero value otherwise.
 
-### GetSourceNetworkOk
+### GetSourceNetworkIdOk
 
-`func (o *OracleRegisterRequest) GetSourceNetworkOk() (*string, bool)`
+`func (o *OracleRegisterRequest) GetSourceNetworkIdOk() (*TransactRequestSourceAssetNetworkId, bool)`
 
-GetSourceNetworkOk returns a tuple with the SourceNetwork field if it's non-nil, zero value otherwise
+GetSourceNetworkIdOk returns a tuple with the SourceNetworkId field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetSourceNetwork
+### SetSourceNetworkId
 
-`func (o *OracleRegisterRequest) SetSourceNetwork(v string)`
+`func (o *OracleRegisterRequest) SetSourceNetworkId(v TransactRequestSourceAssetNetworkId)`
 
-SetSourceNetwork sets SourceNetwork field to given value.
+SetSourceNetworkId sets SourceNetworkId field to given value.
 
-### HasSourceNetwork
+### HasSourceNetworkId
 
-`func (o *OracleRegisterRequest) HasSourceNetwork() bool`
+`func (o *OracleRegisterRequest) HasSourceNetworkId() bool`
 
-HasSourceNetwork returns a boolean if a field has been set.
+HasSourceNetworkId returns a boolean if a field has been set.
 
-### GetTargetNetwork
+### GetDestinationNetworkId
 
-`func (o *OracleRegisterRequest) GetTargetNetwork() string`
+`func (o *OracleRegisterRequest) GetDestinationNetworkId() TransactRequestSourceAssetNetworkId`
 
-GetTargetNetwork returns the TargetNetwork field if non-nil, zero value otherwise.
+GetDestinationNetworkId returns the DestinationNetworkId field if non-nil, zero value otherwise.
 
-### GetTargetNetworkOk
+### GetDestinationNetworkIdOk
 
-`func (o *OracleRegisterRequest) GetTargetNetworkOk() (*string, bool)`
+`func (o *OracleRegisterRequest) GetDestinationNetworkIdOk() (*TransactRequestSourceAssetNetworkId, bool)`
 
-GetTargetNetworkOk returns a tuple with the TargetNetwork field if it's non-nil, zero value otherwise
+GetDestinationNetworkIdOk returns a tuple with the DestinationNetworkId field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetTargetNetwork
+### SetDestinationNetworkId
 
-`func (o *OracleRegisterRequest) SetTargetNetwork(v string)`
+`func (o *OracleRegisterRequest) SetDestinationNetworkId(v TransactRequestSourceAssetNetworkId)`
 
-SetTargetNetwork sets TargetNetwork field to given value.
+SetDestinationNetworkId sets DestinationNetworkId field to given value.
 
-### HasTargetNetwork
+### HasDestinationNetworkId
 
-`func (o *OracleRegisterRequest) HasTargetNetwork() bool`
+`func (o *OracleRegisterRequest) HasDestinationNetworkId() bool`
 
-HasTargetNetwork returns a boolean if a field has been set.
+HasDestinationNetworkId returns a boolean if a field has been set.
 
 ### GetSourceContract
 
-`func (o *OracleRegisterRequest) GetSourceContract() string`
+`func (o *OracleRegisterRequest) GetSourceContract() RegisterOracleTaskRequestSourceContract`
 
 GetSourceContract returns the SourceContract field if non-nil, zero value otherwise.
 
 ### GetSourceContractOk
 
-`func (o *OracleRegisterRequest) GetSourceContractOk() (*string, bool)`
+`func (o *OracleRegisterRequest) GetSourceContractOk() (*RegisterOracleTaskRequestSourceContract, bool)`
 
 GetSourceContractOk returns a tuple with the SourceContract field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetSourceContract
 
-`func (o *OracleRegisterRequest) SetSourceContract(v string)`
+`func (o *OracleRegisterRequest) SetSourceContract(v RegisterOracleTaskRequestSourceContract)`
 
 SetSourceContract sets SourceContract field to given value.
 
@@ -113,20 +108,20 @@ HasSourceContract returns a boolean if a field has been set.
 
 ### GetDestinationContract
 
-`func (o *OracleRegisterRequest) GetDestinationContract() string`
+`func (o *OracleRegisterRequest) GetDestinationContract() RegisterOracleTaskRequestDestinationContract`
 
 GetDestinationContract returns the DestinationContract field if non-nil, zero value otherwise.
 
 ### GetDestinationContractOk
 
-`func (o *OracleRegisterRequest) GetDestinationContractOk() (*string, bool)`
+`func (o *OracleRegisterRequest) GetDestinationContractOk() (*RegisterOracleTaskRequestDestinationContract, bool)`
 
 GetDestinationContractOk returns a tuple with the DestinationContract field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetDestinationContract
 
-`func (o *OracleRegisterRequest) SetDestinationContract(v string)`
+`func (o *OracleRegisterRequest) SetDestinationContract(v RegisterOracleTaskRequestDestinationContract)`
 
 SetDestinationContract sets DestinationContract field to given value.
 
@@ -135,131 +130,6 @@ SetDestinationContract sets DestinationContract field to given value.
 `func (o *OracleRegisterRequest) HasDestinationContract() bool`
 
 HasDestinationContract returns a boolean if a field has been set.
-
-### GetEventSignature
-
-`func (o *OracleRegisterRequest) GetEventSignature() string`
-
-GetEventSignature returns the EventSignature field if non-nil, zero value otherwise.
-
-### GetEventSignatureOk
-
-`func (o *OracleRegisterRequest) GetEventSignatureOk() (*string, bool)`
-
-GetEventSignatureOk returns a tuple with the EventSignature field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetEventSignature
-
-`func (o *OracleRegisterRequest) SetEventSignature(v string)`
-
-SetEventSignature sets EventSignature field to given value.
-
-### HasEventSignature
-
-`func (o *OracleRegisterRequest) HasEventSignature() bool`
-
-HasEventSignature returns a boolean if a field has been set.
-
-### GetSourceFunctionName
-
-`func (o *OracleRegisterRequest) GetSourceFunctionName() string`
-
-GetSourceFunctionName returns the SourceFunctionName field if non-nil, zero value otherwise.
-
-### GetSourceFunctionNameOk
-
-`func (o *OracleRegisterRequest) GetSourceFunctionNameOk() (*string, bool)`
-
-GetSourceFunctionNameOk returns a tuple with the SourceFunctionName field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetSourceFunctionName
-
-`func (o *OracleRegisterRequest) SetSourceFunctionName(v string)`
-
-SetSourceFunctionName sets SourceFunctionName field to given value.
-
-### HasSourceFunctionName
-
-`func (o *OracleRegisterRequest) HasSourceFunctionName() bool`
-
-HasSourceFunctionName returns a boolean if a field has been set.
-
-### GetSourceFunctionParams
-
-`func (o *OracleRegisterRequest) GetSourceFunctionParams() []string`
-
-GetSourceFunctionParams returns the SourceFunctionParams field if non-nil, zero value otherwise.
-
-### GetSourceFunctionParamsOk
-
-`func (o *OracleRegisterRequest) GetSourceFunctionParamsOk() (*[]string, bool)`
-
-GetSourceFunctionParamsOk returns a tuple with the SourceFunctionParams field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetSourceFunctionParams
-
-`func (o *OracleRegisterRequest) SetSourceFunctionParams(v []string)`
-
-SetSourceFunctionParams sets SourceFunctionParams field to given value.
-
-### HasSourceFunctionParams
-
-`func (o *OracleRegisterRequest) HasSourceFunctionParams() bool`
-
-HasSourceFunctionParams returns a boolean if a field has been set.
-
-### GetDestinationFunctionName
-
-`func (o *OracleRegisterRequest) GetDestinationFunctionName() string`
-
-GetDestinationFunctionName returns the DestinationFunctionName field if non-nil, zero value otherwise.
-
-### GetDestinationFunctionNameOk
-
-`func (o *OracleRegisterRequest) GetDestinationFunctionNameOk() (*string, bool)`
-
-GetDestinationFunctionNameOk returns a tuple with the DestinationFunctionName field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetDestinationFunctionName
-
-`func (o *OracleRegisterRequest) SetDestinationFunctionName(v string)`
-
-SetDestinationFunctionName sets DestinationFunctionName field to given value.
-
-### HasDestinationFunctionName
-
-`func (o *OracleRegisterRequest) HasDestinationFunctionName() bool`
-
-HasDestinationFunctionName returns a boolean if a field has been set.
-
-### GetDestinationFunctionParams
-
-`func (o *OracleRegisterRequest) GetDestinationFunctionParams() []string`
-
-GetDestinationFunctionParams returns the DestinationFunctionParams field if non-nil, zero value otherwise.
-
-### GetDestinationFunctionParamsOk
-
-`func (o *OracleRegisterRequest) GetDestinationFunctionParamsOk() (*[]string, bool)`
-
-GetDestinationFunctionParamsOk returns a tuple with the DestinationFunctionParams field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetDestinationFunctionParams
-
-`func (o *OracleRegisterRequest) SetDestinationFunctionParams(v []string)`
-
-SetDestinationFunctionParams sets DestinationFunctionParams field to given value.
-
-### HasDestinationFunctionParams
-
-`func (o *OracleRegisterRequest) HasDestinationFunctionParams() bool`
-
-HasDestinationFunctionParams returns a boolean if a field has been set.
 
 ### GetTaskMode
 
@@ -281,30 +151,30 @@ and a boolean to check if the value has been set.
 SetTaskMode sets TaskMode field to given value.
 
 
-### GetTaskInterval
+### GetPollingInterval
 
-`func (o *OracleRegisterRequest) GetTaskInterval() int32`
+`func (o *OracleRegisterRequest) GetPollingInterval() int32`
 
-GetTaskInterval returns the TaskInterval field if non-nil, zero value otherwise.
+GetPollingInterval returns the PollingInterval field if non-nil, zero value otherwise.
 
-### GetTaskIntervalOk
+### GetPollingIntervalOk
 
-`func (o *OracleRegisterRequest) GetTaskIntervalOk() (*int32, bool)`
+`func (o *OracleRegisterRequest) GetPollingIntervalOk() (*int32, bool)`
 
-GetTaskIntervalOk returns a tuple with the TaskInterval field if it's non-nil, zero value otherwise
+GetPollingIntervalOk returns a tuple with the PollingInterval field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetTaskInterval
+### SetPollingInterval
 
-`func (o *OracleRegisterRequest) SetTaskInterval(v int32)`
+`func (o *OracleRegisterRequest) SetPollingInterval(v int32)`
 
-SetTaskInterval sets TaskInterval field to given value.
+SetPollingInterval sets PollingInterval field to given value.
 
-### HasTaskInterval
+### HasPollingInterval
 
-`func (o *OracleRegisterRequest) HasTaskInterval() bool`
+`func (o *OracleRegisterRequest) HasPollingInterval() bool`
 
-HasTaskInterval returns a boolean if a field has been set.
+HasPollingInterval returns a boolean if a field has been set.
 
 ### GetTaskType
 

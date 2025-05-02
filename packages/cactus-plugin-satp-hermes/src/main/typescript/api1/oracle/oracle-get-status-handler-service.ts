@@ -8,13 +8,13 @@ returns a status and useful data to confirm such status (eg bungee notarizations
 
 import { LoggerProvider, LogLevelDesc } from "@hyperledger/cactus-common";
 import { OracleManager } from "../../cross-chain-mechanisms/oracle/oracle-manager";
-import { OracleStatusRequest, OracleStatusResponse } from "../../public-api";
+import { OracleStatusRequest, OracleTask } from "../../public-api";
 
 export async function getTaskStatus(
   logLevel: LogLevelDesc,
   req: OracleStatusRequest,
   manager: OracleManager,
-): Promise<OracleStatusResponse> {
+): Promise<OracleTask> {
   const fnTag = `executeTask()`;
   const logger = LoggerProvider.getOrCreate({
     label: fnTag,
@@ -27,9 +27,5 @@ export async function getTaskStatus(
     throw new Error(`${fnTag} - missing required parameters for task status`);
   }
 
-  const result = await manager.getTask(req.taskID);
-
-  return {
-    taskID: result.id,
-  };
+  return manager.getTask(req.taskID);
 }

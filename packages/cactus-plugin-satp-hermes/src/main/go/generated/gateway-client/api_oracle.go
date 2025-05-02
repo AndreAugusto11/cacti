@@ -22,106 +22,106 @@ import (
 type OracleApi interface {
 
 	/*
-	OracleExecuteRequest Execute data transfer task
+	ExecuteOracleTask Execute data transfer task
 
 	Execute a registered data transfer task from source to target blockchain
 
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiOracleExecuteRequestRequest
+	@return ApiExecuteOracleTaskRequest
 	*/
-	OracleExecuteRequest(ctx context.Context) ApiOracleExecuteRequestRequest
+	ExecuteOracleTask(ctx context.Context) ApiExecuteOracleTaskRequest
 
-	// OracleExecuteRequestExecute executes the request
-	//  @return OracleExecuteRequest200Response
-	OracleExecuteRequestExecute(r ApiOracleExecuteRequestRequest) (*OracleExecuteRequest200Response, *http.Response, error)
+	// ExecuteOracleTaskExecute executes the request
+	//  @return ExecuteOracleTask200Response
+	ExecuteOracleTaskExecute(r ApiExecuteOracleTaskRequest) (*ExecuteOracleTask200Response, *http.Response, error)
 
 	/*
-	OracleRegisterRequest Register data transfer task
+	GetOracleTaskStatus Get oracle task status
+
+	Get oracle task status.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiGetOracleTaskStatusRequest
+	*/
+	GetOracleTaskStatus(ctx context.Context) ApiGetOracleTaskStatusRequest
+
+	// GetOracleTaskStatusExecute executes the request
+	//  @return GetOracleTaskStatus200Response
+	GetOracleTaskStatusExecute(r ApiGetOracleTaskStatusRequest) (*GetOracleTaskStatus200Response, *http.Response, error)
+
+	/*
+	RegisterOracleTask Register data transfer task
 
 	Register data transfer from source to target blockchain
 
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiOracleRegisterRequestRequest
+	@return ApiRegisterOracleTaskRequest
 	*/
-	OracleRegisterRequest(ctx context.Context) ApiOracleRegisterRequestRequest
+	RegisterOracleTask(ctx context.Context) ApiRegisterOracleTaskRequest
 
-	// OracleRegisterRequestExecute executes the request
-	//  @return OracleRegisterRequest200Response
-	OracleRegisterRequestExecute(r ApiOracleRegisterRequestRequest) (*OracleRegisterRequest200Response, *http.Response, error)
+	// RegisterOracleTaskExecute executes the request
+	//  @return RegisterOracleTask200Response
+	RegisterOracleTaskExecute(r ApiRegisterOracleTaskRequest) (*RegisterOracleTask200Response, *http.Response, error)
 
 	/*
-	OracleStatusRequest Get oracle task status
-
-	Get oracle task status
-
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiOracleStatusRequestRequest
-	*/
-	OracleStatusRequest(ctx context.Context) ApiOracleStatusRequestRequest
-
-	// OracleStatusRequestExecute executes the request
-	//  @return OracleStatusRequest200Response
-	OracleStatusRequestExecute(r ApiOracleStatusRequestRequest) (*OracleStatusRequest200Response, *http.Response, error)
-
-	/*
-	OracleUnregisterRequest Unregister data transfer task
+	UnregisterOracleTask Unregister data transfer task
 
 	Unregister data transfer task from source to target blockchain
 
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiOracleUnregisterRequestRequest
+	@return ApiUnregisterOracleTaskRequest
 	*/
-	OracleUnregisterRequest(ctx context.Context) ApiOracleUnregisterRequestRequest
+	UnregisterOracleTask(ctx context.Context) ApiUnregisterOracleTaskRequest
 
-	// OracleUnregisterRequestExecute executes the request
-	//  @return OracleUnregisterRequest200Response
-	OracleUnregisterRequestExecute(r ApiOracleUnregisterRequestRequest) (*OracleUnregisterRequest200Response, *http.Response, error)
+	// UnregisterOracleTaskExecute executes the request
+	//  @return UnregisterOracleTask200Response
+	UnregisterOracleTaskExecute(r ApiUnregisterOracleTaskRequest) (*UnregisterOracleTask200Response, *http.Response, error)
 }
 
 // OracleApiService OracleApi service
 type OracleApiService service
 
-type ApiOracleExecuteRequestRequest struct {
+type ApiExecuteOracleTaskRequest struct {
 	ctx context.Context
 	ApiService OracleApi
-	oracleExecuteRequestRequest *OracleExecuteRequestRequest
+	executeOracleTaskRequest *ExecuteOracleTaskRequest
 }
 
-func (r ApiOracleExecuteRequestRequest) OracleExecuteRequestRequest(oracleExecuteRequestRequest OracleExecuteRequestRequest) ApiOracleExecuteRequestRequest {
-	r.oracleExecuteRequestRequest = &oracleExecuteRequestRequest
+func (r ApiExecuteOracleTaskRequest) ExecuteOracleTaskRequest(executeOracleTaskRequest ExecuteOracleTaskRequest) ApiExecuteOracleTaskRequest {
+	r.executeOracleTaskRequest = &executeOracleTaskRequest
 	return r
 }
 
-func (r ApiOracleExecuteRequestRequest) Execute() (*OracleExecuteRequest200Response, *http.Response, error) {
-	return r.ApiService.OracleExecuteRequestExecute(r)
+func (r ApiExecuteOracleTaskRequest) Execute() (*ExecuteOracleTask200Response, *http.Response, error) {
+	return r.ApiService.ExecuteOracleTaskExecute(r)
 }
 
 /*
-OracleExecuteRequest Execute data transfer task
+ExecuteOracleTask Execute data transfer task
 
 Execute a registered data transfer task from source to target blockchain
 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiOracleExecuteRequestRequest
+ @return ApiExecuteOracleTaskRequest
 */
-func (a *OracleApiService) OracleExecuteRequest(ctx context.Context) ApiOracleExecuteRequestRequest {
-	return ApiOracleExecuteRequestRequest{
+func (a *OracleApiService) ExecuteOracleTask(ctx context.Context) ApiExecuteOracleTaskRequest {
+	return ApiExecuteOracleTaskRequest{
 		ApiService: a,
 		ctx: ctx,
 	}
 }
 
 // Execute executes the request
-//  @return OracleExecuteRequest200Response
-func (a *OracleApiService) OracleExecuteRequestExecute(r ApiOracleExecuteRequestRequest) (*OracleExecuteRequest200Response, *http.Response, error) {
+//  @return ExecuteOracleTask200Response
+func (a *OracleApiService) ExecuteOracleTaskExecute(r ApiExecuteOracleTaskRequest) (*ExecuteOracleTask200Response, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
 		formFiles            []formFile
-		localVarReturnValue  *OracleExecuteRequest200Response
+		localVarReturnValue  *ExecuteOracleTask200Response
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OracleApiService.OracleExecuteRequest")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OracleApiService.ExecuteOracleTask")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -131,8 +131,8 @@ func (a *OracleApiService) OracleExecuteRequestExecute(r ApiOracleExecuteRequest
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
-	if r.oracleExecuteRequestRequest == nil {
-		return localVarReturnValue, nil, reportError("oracleExecuteRequestRequest is required and must be specified")
+	if r.executeOracleTaskRequest == nil {
+		return localVarReturnValue, nil, reportError("executeOracleTaskRequest is required and must be specified")
 	}
 
 	// to determine the Content-Type header
@@ -153,7 +153,7 @@ func (a *OracleApiService) OracleExecuteRequestExecute(r ApiOracleExecuteRequest
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	// body params
-	localVarPostBody = r.oracleExecuteRequestRequest
+	localVarPostBody = r.executeOracleTaskRequest
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -191,157 +191,47 @@ func (a *OracleApiService) OracleExecuteRequestExecute(r ApiOracleExecuteRequest
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
-type ApiOracleRegisterRequestRequest struct {
+type ApiGetOracleTaskStatusRequest struct {
 	ctx context.Context
 	ApiService OracleApi
-	oracleRegisterRequestRequest *OracleRegisterRequestRequest
+	getOracleTaskStatusRequest *GetOracleTaskStatusRequest
 }
 
-func (r ApiOracleRegisterRequestRequest) OracleRegisterRequestRequest(oracleRegisterRequestRequest OracleRegisterRequestRequest) ApiOracleRegisterRequestRequest {
-	r.oracleRegisterRequestRequest = &oracleRegisterRequestRequest
+func (r ApiGetOracleTaskStatusRequest) GetOracleTaskStatusRequest(getOracleTaskStatusRequest GetOracleTaskStatusRequest) ApiGetOracleTaskStatusRequest {
+	r.getOracleTaskStatusRequest = &getOracleTaskStatusRequest
 	return r
 }
 
-func (r ApiOracleRegisterRequestRequest) Execute() (*OracleRegisterRequest200Response, *http.Response, error) {
-	return r.ApiService.OracleRegisterRequestExecute(r)
+func (r ApiGetOracleTaskStatusRequest) Execute() (*GetOracleTaskStatus200Response, *http.Response, error) {
+	return r.ApiService.GetOracleTaskStatusExecute(r)
 }
 
 /*
-OracleRegisterRequest Register data transfer task
+GetOracleTaskStatus Get oracle task status
 
-Register data transfer from source to target blockchain
+Get oracle task status.
 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiOracleRegisterRequestRequest
+ @return ApiGetOracleTaskStatusRequest
 */
-func (a *OracleApiService) OracleRegisterRequest(ctx context.Context) ApiOracleRegisterRequestRequest {
-	return ApiOracleRegisterRequestRequest{
+func (a *OracleApiService) GetOracleTaskStatus(ctx context.Context) ApiGetOracleTaskStatusRequest {
+	return ApiGetOracleTaskStatusRequest{
 		ApiService: a,
 		ctx: ctx,
 	}
 }
 
 // Execute executes the request
-//  @return OracleRegisterRequest200Response
-func (a *OracleApiService) OracleRegisterRequestExecute(r ApiOracleRegisterRequestRequest) (*OracleRegisterRequest200Response, *http.Response, error) {
-	var (
-		localVarHTTPMethod   = http.MethodPost
-		localVarPostBody     interface{}
-		formFiles            []formFile
-		localVarReturnValue  *OracleRegisterRequest200Response
-	)
-
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OracleApiService.OracleRegisterRequest")
-	if err != nil {
-		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
-	}
-
-	localVarPath := localBasePath + "/api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/register"
-
-	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := url.Values{}
-	localVarFormParams := url.Values{}
-	if r.oracleRegisterRequestRequest == nil {
-		return localVarReturnValue, nil, reportError("oracleRegisterRequestRequest is required and must be specified")
-	}
-
-	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{"application/json"}
-
-	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
-	}
-
-	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"application/json"}
-
-	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
-	}
-	// body params
-	localVarPostBody = r.oracleRegisterRequestRequest
-	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
-	if err != nil {
-		return localVarReturnValue, nil, err
-	}
-
-	localVarHTTPResponse, err := a.client.callAPI(req)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarReturnValue, localVarHTTPResponse, err
-	}
-
-	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
-	if err != nil {
-		return localVarReturnValue, localVarHTTPResponse, err
-	}
-
-	if localVarHTTPResponse.StatusCode >= 300 {
-		newErr := &GenericOpenAPIError{
-			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
-		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
-	}
-
-	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-	if err != nil {
-		newErr := &GenericOpenAPIError{
-			body:  localVarBody,
-			error: err.Error(),
-		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
-	}
-
-	return localVarReturnValue, localVarHTTPResponse, nil
-}
-
-type ApiOracleStatusRequestRequest struct {
-	ctx context.Context
-	ApiService OracleApi
-	oracleStatusRequestRequest *OracleStatusRequestRequest
-}
-
-func (r ApiOracleStatusRequestRequest) OracleStatusRequestRequest(oracleStatusRequestRequest OracleStatusRequestRequest) ApiOracleStatusRequestRequest {
-	r.oracleStatusRequestRequest = &oracleStatusRequestRequest
-	return r
-}
-
-func (r ApiOracleStatusRequestRequest) Execute() (*OracleStatusRequest200Response, *http.Response, error) {
-	return r.ApiService.OracleStatusRequestExecute(r)
-}
-
-/*
-OracleStatusRequest Get oracle task status
-
-Get oracle task status
-
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiOracleStatusRequestRequest
-*/
-func (a *OracleApiService) OracleStatusRequest(ctx context.Context) ApiOracleStatusRequestRequest {
-	return ApiOracleStatusRequestRequest{
-		ApiService: a,
-		ctx: ctx,
-	}
-}
-
-// Execute executes the request
-//  @return OracleStatusRequest200Response
-func (a *OracleApiService) OracleStatusRequestExecute(r ApiOracleStatusRequestRequest) (*OracleStatusRequest200Response, *http.Response, error) {
+//  @return GetOracleTaskStatus200Response
+func (a *OracleApiService) GetOracleTaskStatusExecute(r ApiGetOracleTaskStatusRequest) (*GetOracleTaskStatus200Response, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodGet
 		localVarPostBody     interface{}
 		formFiles            []formFile
-		localVarReturnValue  *OracleStatusRequest200Response
+		localVarReturnValue  *GetOracleTaskStatus200Response
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OracleApiService.OracleStatusRequest")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OracleApiService.GetOracleTaskStatus")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -351,8 +241,8 @@ func (a *OracleApiService) OracleStatusRequestExecute(r ApiOracleStatusRequestRe
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
-	if r.oracleStatusRequestRequest == nil {
-		return localVarReturnValue, nil, reportError("oracleStatusRequestRequest is required and must be specified")
+	if r.getOracleTaskStatusRequest == nil {
+		return localVarReturnValue, nil, reportError("getOracleTaskStatusRequest is required and must be specified")
 	}
 
 	// to determine the Content-Type header
@@ -373,7 +263,7 @@ func (a *OracleApiService) OracleStatusRequestExecute(r ApiOracleStatusRequestRe
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	// body params
-	localVarPostBody = r.oracleStatusRequestRequest
+	localVarPostBody = r.getOracleTaskStatusRequest
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -411,58 +301,58 @@ func (a *OracleApiService) OracleStatusRequestExecute(r ApiOracleStatusRequestRe
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
-type ApiOracleUnregisterRequestRequest struct {
+type ApiRegisterOracleTaskRequest struct {
 	ctx context.Context
 	ApiService OracleApi
-	oracleUnregisterRequestRequest *OracleUnregisterRequestRequest
+	registerOracleTaskRequest *RegisterOracleTaskRequest
 }
 
-func (r ApiOracleUnregisterRequestRequest) OracleUnregisterRequestRequest(oracleUnregisterRequestRequest OracleUnregisterRequestRequest) ApiOracleUnregisterRequestRequest {
-	r.oracleUnregisterRequestRequest = &oracleUnregisterRequestRequest
+func (r ApiRegisterOracleTaskRequest) RegisterOracleTaskRequest(registerOracleTaskRequest RegisterOracleTaskRequest) ApiRegisterOracleTaskRequest {
+	r.registerOracleTaskRequest = &registerOracleTaskRequest
 	return r
 }
 
-func (r ApiOracleUnregisterRequestRequest) Execute() (*OracleUnregisterRequest200Response, *http.Response, error) {
-	return r.ApiService.OracleUnregisterRequestExecute(r)
+func (r ApiRegisterOracleTaskRequest) Execute() (*RegisterOracleTask200Response, *http.Response, error) {
+	return r.ApiService.RegisterOracleTaskExecute(r)
 }
 
 /*
-OracleUnregisterRequest Unregister data transfer task
+RegisterOracleTask Register data transfer task
 
-Unregister data transfer task from source to target blockchain
+Register data transfer from source to target blockchain
 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiOracleUnregisterRequestRequest
+ @return ApiRegisterOracleTaskRequest
 */
-func (a *OracleApiService) OracleUnregisterRequest(ctx context.Context) ApiOracleUnregisterRequestRequest {
-	return ApiOracleUnregisterRequestRequest{
+func (a *OracleApiService) RegisterOracleTask(ctx context.Context) ApiRegisterOracleTaskRequest {
+	return ApiRegisterOracleTaskRequest{
 		ApiService: a,
 		ctx: ctx,
 	}
 }
 
 // Execute executes the request
-//  @return OracleUnregisterRequest200Response
-func (a *OracleApiService) OracleUnregisterRequestExecute(r ApiOracleUnregisterRequestRequest) (*OracleUnregisterRequest200Response, *http.Response, error) {
+//  @return RegisterOracleTask200Response
+func (a *OracleApiService) RegisterOracleTaskExecute(r ApiRegisterOracleTaskRequest) (*RegisterOracleTask200Response, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
 		formFiles            []formFile
-		localVarReturnValue  *OracleUnregisterRequest200Response
+		localVarReturnValue  *RegisterOracleTask200Response
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OracleApiService.OracleUnregisterRequest")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OracleApiService.RegisterOracleTask")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/unregister"
+	localVarPath := localBasePath + "/api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/register"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
-	if r.oracleUnregisterRequestRequest == nil {
-		return localVarReturnValue, nil, reportError("oracleUnregisterRequestRequest is required and must be specified")
+	if r.registerOracleTaskRequest == nil {
+		return localVarReturnValue, nil, reportError("registerOracleTaskRequest is required and must be specified")
 	}
 
 	// to determine the Content-Type header
@@ -483,7 +373,117 @@ func (a *OracleApiService) OracleUnregisterRequestExecute(r ApiOracleUnregisterR
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	// body params
-	localVarPostBody = r.oracleUnregisterRequestRequest
+	localVarPostBody = r.registerOracleTaskRequest
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiUnregisterOracleTaskRequest struct {
+	ctx context.Context
+	ApiService OracleApi
+	unregisterOracleTaskRequest *UnregisterOracleTaskRequest
+}
+
+func (r ApiUnregisterOracleTaskRequest) UnregisterOracleTaskRequest(unregisterOracleTaskRequest UnregisterOracleTaskRequest) ApiUnregisterOracleTaskRequest {
+	r.unregisterOracleTaskRequest = &unregisterOracleTaskRequest
+	return r
+}
+
+func (r ApiUnregisterOracleTaskRequest) Execute() (*UnregisterOracleTask200Response, *http.Response, error) {
+	return r.ApiService.UnregisterOracleTaskExecute(r)
+}
+
+/*
+UnregisterOracleTask Unregister data transfer task
+
+Unregister data transfer task from source to target blockchain
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiUnregisterOracleTaskRequest
+*/
+func (a *OracleApiService) UnregisterOracleTask(ctx context.Context) ApiUnregisterOracleTaskRequest {
+	return ApiUnregisterOracleTaskRequest{
+		ApiService: a,
+		ctx: ctx,
+	}
+}
+
+// Execute executes the request
+//  @return UnregisterOracleTask200Response
+func (a *OracleApiService) UnregisterOracleTaskExecute(r ApiUnregisterOracleTaskRequest) (*UnregisterOracleTask200Response, *http.Response, error) {
+	var (
+		localVarHTTPMethod   = http.MethodPost
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *UnregisterOracleTask200Response
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OracleApiService.UnregisterOracleTask")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/unregister"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+	if r.unregisterOracleTaskRequest == nil {
+		return localVarReturnValue, nil, reportError("unregisterOracleTaskRequest is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.unregisterOracleTaskRequest
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return localVarReturnValue, nil, err

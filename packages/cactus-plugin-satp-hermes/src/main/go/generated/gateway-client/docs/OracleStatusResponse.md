@@ -4,21 +4,23 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**TaskID** | Pointer to **string** | The unique identifier for the context of the data transfer task. | [optional] 
-**OriginNetwork** | Pointer to [**Transact200ResponseStatusResponseOriginNetwork**](Transact200ResponseStatusResponseOriginNetwork.md) |  | [optional] 
-**DestinationNetwork** | Pointer to [**Transact200ResponseStatusResponseDestinationNetwork**](Transact200ResponseStatusResponseDestinationNetwork.md) |  | [optional] 
-**OriginContract** | Pointer to [**OracleStatusRequest200ResponseOriginContract**](OracleStatusRequest200ResponseOriginContract.md) |  | [optional] 
-**DestinationContract** | Pointer to [**OracleStatusRequest200ResponseDestinationContract**](OracleStatusRequest200ResponseDestinationContract.md) |  | [optional] 
-**EventOfInterest** | Pointer to [**OracleStatusRequest200ResponseEventOfInterest**](OracleStatusRequest200ResponseEventOfInterest.md) |  | [optional] 
-**WriteFunction** | Pointer to [**OracleStatusRequest200ResponseWriteFunction**](OracleStatusRequest200ResponseWriteFunction.md) |  | [optional] 
-**Tasks** | Pointer to [**[]OracleStatusRequest200ResponseTasksInner**](OracleStatusRequest200ResponseTasksInner.md) |  | [optional] 
-**Status** | Pointer to **string** | The status of the data transfer task. | [optional] 
+**TaskID** | Pointer to **string** |  | [optional] 
+**Type** | [**Enum**](enum.md) | The type of the Oracle task. | 
+**SrcNetworkId** | Pointer to [**TransactRequestSourceAssetNetworkId**](TransactRequestSourceAssetNetworkId.md) |  | [optional] 
+**SrcContract** | [**ExecuteOracleTask200ResponseSrcContract**](ExecuteOracleTask200ResponseSrcContract.md) |  | 
+**DstNetworkId** | Pointer to [**TransactRequestSourceAssetNetworkId**](TransactRequestSourceAssetNetworkId.md) |  | [optional] 
+**DstContract** | [**ExecuteOracleTask200ResponseDstContract**](ExecuteOracleTask200ResponseDstContract.md) |  | 
+**Timestamp** | **int64** | The timestamp when the Oracle task was created or last updated. | 
+**Operations** | [**[]ExecuteOracleTask200ResponseOperationsInner**](ExecuteOracleTask200ResponseOperationsInner.md) | The list of operations performed by the Oracle task. | 
+**Status** | [**Enum**](enum.md) | The current status of the Oracle task. | 
+**Mode** | **string** | The mode of operation for registered tasks. | 
+**PollingInterval** | Pointer to **int32** | The interval for polling in milliseconds. Only if taskMode is POLLING. | [optional] 
 
 ## Methods
 
 ### NewOracleStatusResponse
 
-`func NewOracleStatusResponse() *OracleStatusResponse`
+`func NewOracleStatusResponse(type_ Enum, srcContract ExecuteOracleTask200ResponseSrcContract, dstContract ExecuteOracleTask200ResponseDstContract, timestamp int64, operations []ExecuteOracleTask200ResponseOperationsInner, status Enum, mode string, ) *OracleStatusResponse`
 
 NewOracleStatusResponse instantiates a new OracleStatusResponse object
 This constructor will assign default values to properties that have it defined,
@@ -58,205 +60,220 @@ SetTaskID sets TaskID field to given value.
 
 HasTaskID returns a boolean if a field has been set.
 
-### GetOriginNetwork
+### GetType
 
-`func (o *OracleStatusResponse) GetOriginNetwork() Transact200ResponseStatusResponseOriginNetwork`
+`func (o *OracleStatusResponse) GetType() Enum`
 
-GetOriginNetwork returns the OriginNetwork field if non-nil, zero value otherwise.
+GetType returns the Type field if non-nil, zero value otherwise.
 
-### GetOriginNetworkOk
+### GetTypeOk
 
-`func (o *OracleStatusResponse) GetOriginNetworkOk() (*Transact200ResponseStatusResponseOriginNetwork, bool)`
+`func (o *OracleStatusResponse) GetTypeOk() (*Enum, bool)`
 
-GetOriginNetworkOk returns a tuple with the OriginNetwork field if it's non-nil, zero value otherwise
+GetTypeOk returns a tuple with the Type field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetOriginNetwork
+### SetType
 
-`func (o *OracleStatusResponse) SetOriginNetwork(v Transact200ResponseStatusResponseOriginNetwork)`
+`func (o *OracleStatusResponse) SetType(v Enum)`
 
-SetOriginNetwork sets OriginNetwork field to given value.
+SetType sets Type field to given value.
 
-### HasOriginNetwork
 
-`func (o *OracleStatusResponse) HasOriginNetwork() bool`
+### GetSrcNetworkId
 
-HasOriginNetwork returns a boolean if a field has been set.
+`func (o *OracleStatusResponse) GetSrcNetworkId() TransactRequestSourceAssetNetworkId`
 
-### GetDestinationNetwork
+GetSrcNetworkId returns the SrcNetworkId field if non-nil, zero value otherwise.
 
-`func (o *OracleStatusResponse) GetDestinationNetwork() Transact200ResponseStatusResponseDestinationNetwork`
+### GetSrcNetworkIdOk
 
-GetDestinationNetwork returns the DestinationNetwork field if non-nil, zero value otherwise.
+`func (o *OracleStatusResponse) GetSrcNetworkIdOk() (*TransactRequestSourceAssetNetworkId, bool)`
 
-### GetDestinationNetworkOk
-
-`func (o *OracleStatusResponse) GetDestinationNetworkOk() (*Transact200ResponseStatusResponseDestinationNetwork, bool)`
-
-GetDestinationNetworkOk returns a tuple with the DestinationNetwork field if it's non-nil, zero value otherwise
+GetSrcNetworkIdOk returns a tuple with the SrcNetworkId field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetDestinationNetwork
+### SetSrcNetworkId
 
-`func (o *OracleStatusResponse) SetDestinationNetwork(v Transact200ResponseStatusResponseDestinationNetwork)`
+`func (o *OracleStatusResponse) SetSrcNetworkId(v TransactRequestSourceAssetNetworkId)`
 
-SetDestinationNetwork sets DestinationNetwork field to given value.
+SetSrcNetworkId sets SrcNetworkId field to given value.
 
-### HasDestinationNetwork
+### HasSrcNetworkId
 
-`func (o *OracleStatusResponse) HasDestinationNetwork() bool`
+`func (o *OracleStatusResponse) HasSrcNetworkId() bool`
 
-HasDestinationNetwork returns a boolean if a field has been set.
+HasSrcNetworkId returns a boolean if a field has been set.
 
-### GetOriginContract
+### GetSrcContract
 
-`func (o *OracleStatusResponse) GetOriginContract() OracleStatusRequest200ResponseOriginContract`
+`func (o *OracleStatusResponse) GetSrcContract() ExecuteOracleTask200ResponseSrcContract`
 
-GetOriginContract returns the OriginContract field if non-nil, zero value otherwise.
+GetSrcContract returns the SrcContract field if non-nil, zero value otherwise.
 
-### GetOriginContractOk
+### GetSrcContractOk
 
-`func (o *OracleStatusResponse) GetOriginContractOk() (*OracleStatusRequest200ResponseOriginContract, bool)`
+`func (o *OracleStatusResponse) GetSrcContractOk() (*ExecuteOracleTask200ResponseSrcContract, bool)`
 
-GetOriginContractOk returns a tuple with the OriginContract field if it's non-nil, zero value otherwise
+GetSrcContractOk returns a tuple with the SrcContract field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetOriginContract
+### SetSrcContract
 
-`func (o *OracleStatusResponse) SetOriginContract(v OracleStatusRequest200ResponseOriginContract)`
+`func (o *OracleStatusResponse) SetSrcContract(v ExecuteOracleTask200ResponseSrcContract)`
 
-SetOriginContract sets OriginContract field to given value.
+SetSrcContract sets SrcContract field to given value.
 
-### HasOriginContract
 
-`func (o *OracleStatusResponse) HasOriginContract() bool`
+### GetDstNetworkId
 
-HasOriginContract returns a boolean if a field has been set.
+`func (o *OracleStatusResponse) GetDstNetworkId() TransactRequestSourceAssetNetworkId`
 
-### GetDestinationContract
+GetDstNetworkId returns the DstNetworkId field if non-nil, zero value otherwise.
 
-`func (o *OracleStatusResponse) GetDestinationContract() OracleStatusRequest200ResponseDestinationContract`
+### GetDstNetworkIdOk
 
-GetDestinationContract returns the DestinationContract field if non-nil, zero value otherwise.
+`func (o *OracleStatusResponse) GetDstNetworkIdOk() (*TransactRequestSourceAssetNetworkId, bool)`
 
-### GetDestinationContractOk
-
-`func (o *OracleStatusResponse) GetDestinationContractOk() (*OracleStatusRequest200ResponseDestinationContract, bool)`
-
-GetDestinationContractOk returns a tuple with the DestinationContract field if it's non-nil, zero value otherwise
+GetDstNetworkIdOk returns a tuple with the DstNetworkId field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetDestinationContract
+### SetDstNetworkId
 
-`func (o *OracleStatusResponse) SetDestinationContract(v OracleStatusRequest200ResponseDestinationContract)`
+`func (o *OracleStatusResponse) SetDstNetworkId(v TransactRequestSourceAssetNetworkId)`
 
-SetDestinationContract sets DestinationContract field to given value.
+SetDstNetworkId sets DstNetworkId field to given value.
 
-### HasDestinationContract
+### HasDstNetworkId
 
-`func (o *OracleStatusResponse) HasDestinationContract() bool`
+`func (o *OracleStatusResponse) HasDstNetworkId() bool`
 
-HasDestinationContract returns a boolean if a field has been set.
+HasDstNetworkId returns a boolean if a field has been set.
 
-### GetEventOfInterest
+### GetDstContract
 
-`func (o *OracleStatusResponse) GetEventOfInterest() OracleStatusRequest200ResponseEventOfInterest`
+`func (o *OracleStatusResponse) GetDstContract() ExecuteOracleTask200ResponseDstContract`
 
-GetEventOfInterest returns the EventOfInterest field if non-nil, zero value otherwise.
+GetDstContract returns the DstContract field if non-nil, zero value otherwise.
 
-### GetEventOfInterestOk
+### GetDstContractOk
 
-`func (o *OracleStatusResponse) GetEventOfInterestOk() (*OracleStatusRequest200ResponseEventOfInterest, bool)`
+`func (o *OracleStatusResponse) GetDstContractOk() (*ExecuteOracleTask200ResponseDstContract, bool)`
 
-GetEventOfInterestOk returns a tuple with the EventOfInterest field if it's non-nil, zero value otherwise
+GetDstContractOk returns a tuple with the DstContract field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetEventOfInterest
+### SetDstContract
 
-`func (o *OracleStatusResponse) SetEventOfInterest(v OracleStatusRequest200ResponseEventOfInterest)`
+`func (o *OracleStatusResponse) SetDstContract(v ExecuteOracleTask200ResponseDstContract)`
 
-SetEventOfInterest sets EventOfInterest field to given value.
+SetDstContract sets DstContract field to given value.
 
-### HasEventOfInterest
 
-`func (o *OracleStatusResponse) HasEventOfInterest() bool`
+### GetTimestamp
 
-HasEventOfInterest returns a boolean if a field has been set.
+`func (o *OracleStatusResponse) GetTimestamp() int64`
 
-### GetWriteFunction
+GetTimestamp returns the Timestamp field if non-nil, zero value otherwise.
 
-`func (o *OracleStatusResponse) GetWriteFunction() OracleStatusRequest200ResponseWriteFunction`
+### GetTimestampOk
 
-GetWriteFunction returns the WriteFunction field if non-nil, zero value otherwise.
+`func (o *OracleStatusResponse) GetTimestampOk() (*int64, bool)`
 
-### GetWriteFunctionOk
-
-`func (o *OracleStatusResponse) GetWriteFunctionOk() (*OracleStatusRequest200ResponseWriteFunction, bool)`
-
-GetWriteFunctionOk returns a tuple with the WriteFunction field if it's non-nil, zero value otherwise
+GetTimestampOk returns a tuple with the Timestamp field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetWriteFunction
+### SetTimestamp
 
-`func (o *OracleStatusResponse) SetWriteFunction(v OracleStatusRequest200ResponseWriteFunction)`
+`func (o *OracleStatusResponse) SetTimestamp(v int64)`
 
-SetWriteFunction sets WriteFunction field to given value.
+SetTimestamp sets Timestamp field to given value.
 
-### HasWriteFunction
 
-`func (o *OracleStatusResponse) HasWriteFunction() bool`
+### GetOperations
 
-HasWriteFunction returns a boolean if a field has been set.
+`func (o *OracleStatusResponse) GetOperations() []ExecuteOracleTask200ResponseOperationsInner`
 
-### GetTasks
+GetOperations returns the Operations field if non-nil, zero value otherwise.
 
-`func (o *OracleStatusResponse) GetTasks() []OracleStatusRequest200ResponseTasksInner`
+### GetOperationsOk
 
-GetTasks returns the Tasks field if non-nil, zero value otherwise.
+`func (o *OracleStatusResponse) GetOperationsOk() (*[]ExecuteOracleTask200ResponseOperationsInner, bool)`
 
-### GetTasksOk
-
-`func (o *OracleStatusResponse) GetTasksOk() (*[]OracleStatusRequest200ResponseTasksInner, bool)`
-
-GetTasksOk returns a tuple with the Tasks field if it's non-nil, zero value otherwise
+GetOperationsOk returns a tuple with the Operations field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetTasks
+### SetOperations
 
-`func (o *OracleStatusResponse) SetTasks(v []OracleStatusRequest200ResponseTasksInner)`
+`func (o *OracleStatusResponse) SetOperations(v []ExecuteOracleTask200ResponseOperationsInner)`
 
-SetTasks sets Tasks field to given value.
+SetOperations sets Operations field to given value.
 
-### HasTasks
-
-`func (o *OracleStatusResponse) HasTasks() bool`
-
-HasTasks returns a boolean if a field has been set.
 
 ### GetStatus
 
-`func (o *OracleStatusResponse) GetStatus() string`
+`func (o *OracleStatusResponse) GetStatus() Enum`
 
 GetStatus returns the Status field if non-nil, zero value otherwise.
 
 ### GetStatusOk
 
-`func (o *OracleStatusResponse) GetStatusOk() (*string, bool)`
+`func (o *OracleStatusResponse) GetStatusOk() (*Enum, bool)`
 
 GetStatusOk returns a tuple with the Status field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetStatus
 
-`func (o *OracleStatusResponse) SetStatus(v string)`
+`func (o *OracleStatusResponse) SetStatus(v Enum)`
 
 SetStatus sets Status field to given value.
 
-### HasStatus
 
-`func (o *OracleStatusResponse) HasStatus() bool`
+### GetMode
 
-HasStatus returns a boolean if a field has been set.
+`func (o *OracleStatusResponse) GetMode() string`
+
+GetMode returns the Mode field if non-nil, zero value otherwise.
+
+### GetModeOk
+
+`func (o *OracleStatusResponse) GetModeOk() (*string, bool)`
+
+GetModeOk returns a tuple with the Mode field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetMode
+
+`func (o *OracleStatusResponse) SetMode(v string)`
+
+SetMode sets Mode field to given value.
+
+
+### GetPollingInterval
+
+`func (o *OracleStatusResponse) GetPollingInterval() int32`
+
+GetPollingInterval returns the PollingInterval field if non-nil, zero value otherwise.
+
+### GetPollingIntervalOk
+
+`func (o *OracleStatusResponse) GetPollingIntervalOk() (*int32, bool)`
+
+GetPollingIntervalOk returns a tuple with the PollingInterval field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetPollingInterval
+
+`func (o *OracleStatusResponse) SetPollingInterval(v int32)`
+
+SetPollingInterval sets PollingInterval field to given value.
+
+### HasPollingInterval
+
+`func (o *OracleStatusResponse) HasPollingInterval() bool`
+
+HasPollingInterval returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

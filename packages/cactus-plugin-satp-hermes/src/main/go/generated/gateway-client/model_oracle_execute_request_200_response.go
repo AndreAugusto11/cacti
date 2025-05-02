@@ -19,19 +19,28 @@ var _ MappedNullable = &OracleExecuteRequest200Response{}
 
 // OracleExecuteRequest200Response Response schema for an immediate transfer task execution. Includes the task ID, status, and substatus.
 type OracleExecuteRequest200Response struct {
-	// The unique identifier for the transfer task.
-	TaskID string `json:"taskID"`
-	// The output of the transfer task execution.
-	Outputs []string `json:"outputs,omitempty"`
+	// The unique identifier for the task.
+	Id *string `json:"id,omitempty"`
+	// The type of the Oracle task.
+	Type *string `json:"type,omitempty"`
+	SrcNetworkId *TransactRequestSourceAssetNetworkId `json:"srcNetworkId,omitempty"`
+	SrcContract *OracleExecuteRequest200ResponseSrcContract `json:"srcContract,omitempty"`
+	DstNetworkId *TransactRequestSourceAssetNetworkId `json:"dstNetworkId,omitempty"`
+	DstContract *OracleExecuteRequest200ResponseDstContract `json:"dstContract,omitempty"`
+	// The timestamp when the Oracle task was created or last updated.
+	Timestamp *int64 `json:"timestamp,omitempty"`
+	// The list of operations performed by the Oracle task.
+	Operations []OracleExecuteRequest200ResponseOperationsInner `json:"operations,omitempty"`
+	// The current status of the Oracle task.
+	Status *string `json:"status,omitempty"`
 }
 
 // NewOracleExecuteRequest200Response instantiates a new OracleExecuteRequest200Response object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewOracleExecuteRequest200Response(taskID string) *OracleExecuteRequest200Response {
+func NewOracleExecuteRequest200Response() *OracleExecuteRequest200Response {
 	this := OracleExecuteRequest200Response{}
-	this.TaskID = taskID
 	return &this
 }
 
@@ -43,60 +52,292 @@ func NewOracleExecuteRequest200ResponseWithDefaults() *OracleExecuteRequest200Re
 	return &this
 }
 
-// GetTaskID returns the TaskID field value
-func (o *OracleExecuteRequest200Response) GetTaskID() string {
-	if o == nil {
+// GetId returns the Id field value if set, zero value otherwise.
+func (o *OracleExecuteRequest200Response) GetId() string {
+	if o == nil || IsNil(o.Id) {
 		var ret string
 		return ret
 	}
-
-	return o.TaskID
+	return *o.Id
 }
 
-// GetTaskIDOk returns a tuple with the TaskID field value
+// GetIdOk returns a tuple with the Id field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *OracleExecuteRequest200Response) GetTaskIDOk() (*string, bool) {
-	if o == nil {
+func (o *OracleExecuteRequest200Response) GetIdOk() (*string, bool) {
+	if o == nil || IsNil(o.Id) {
 		return nil, false
 	}
-	return &o.TaskID, true
+	return o.Id, true
 }
 
-// SetTaskID sets field value
-func (o *OracleExecuteRequest200Response) SetTaskID(v string) {
-	o.TaskID = v
-}
-
-// GetOutputs returns the Outputs field value if set, zero value otherwise.
-func (o *OracleExecuteRequest200Response) GetOutputs() []string {
-	if o == nil || IsNil(o.Outputs) {
-		var ret []string
-		return ret
-	}
-	return o.Outputs
-}
-
-// GetOutputsOk returns a tuple with the Outputs field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *OracleExecuteRequest200Response) GetOutputsOk() ([]string, bool) {
-	if o == nil || IsNil(o.Outputs) {
-		return nil, false
-	}
-	return o.Outputs, true
-}
-
-// HasOutputs returns a boolean if a field has been set.
-func (o *OracleExecuteRequest200Response) HasOutputs() bool {
-	if o != nil && !IsNil(o.Outputs) {
+// HasId returns a boolean if a field has been set.
+func (o *OracleExecuteRequest200Response) HasId() bool {
+	if o != nil && !IsNil(o.Id) {
 		return true
 	}
 
 	return false
 }
 
-// SetOutputs gets a reference to the given []string and assigns it to the Outputs field.
-func (o *OracleExecuteRequest200Response) SetOutputs(v []string) {
-	o.Outputs = v
+// SetId gets a reference to the given string and assigns it to the Id field.
+func (o *OracleExecuteRequest200Response) SetId(v string) {
+	o.Id = &v
+}
+
+// GetType returns the Type field value if set, zero value otherwise.
+func (o *OracleExecuteRequest200Response) GetType() string {
+	if o == nil || IsNil(o.Type) {
+		var ret string
+		return ret
+	}
+	return *o.Type
+}
+
+// GetTypeOk returns a tuple with the Type field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *OracleExecuteRequest200Response) GetTypeOk() (*string, bool) {
+	if o == nil || IsNil(o.Type) {
+		return nil, false
+	}
+	return o.Type, true
+}
+
+// HasType returns a boolean if a field has been set.
+func (o *OracleExecuteRequest200Response) HasType() bool {
+	if o != nil && !IsNil(o.Type) {
+		return true
+	}
+
+	return false
+}
+
+// SetType gets a reference to the given string and assigns it to the Type field.
+func (o *OracleExecuteRequest200Response) SetType(v string) {
+	o.Type = &v
+}
+
+// GetSrcNetworkId returns the SrcNetworkId field value if set, zero value otherwise.
+func (o *OracleExecuteRequest200Response) GetSrcNetworkId() TransactRequestSourceAssetNetworkId {
+	if o == nil || IsNil(o.SrcNetworkId) {
+		var ret TransactRequestSourceAssetNetworkId
+		return ret
+	}
+	return *o.SrcNetworkId
+}
+
+// GetSrcNetworkIdOk returns a tuple with the SrcNetworkId field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *OracleExecuteRequest200Response) GetSrcNetworkIdOk() (*TransactRequestSourceAssetNetworkId, bool) {
+	if o == nil || IsNil(o.SrcNetworkId) {
+		return nil, false
+	}
+	return o.SrcNetworkId, true
+}
+
+// HasSrcNetworkId returns a boolean if a field has been set.
+func (o *OracleExecuteRequest200Response) HasSrcNetworkId() bool {
+	if o != nil && !IsNil(o.SrcNetworkId) {
+		return true
+	}
+
+	return false
+}
+
+// SetSrcNetworkId gets a reference to the given TransactRequestSourceAssetNetworkId and assigns it to the SrcNetworkId field.
+func (o *OracleExecuteRequest200Response) SetSrcNetworkId(v TransactRequestSourceAssetNetworkId) {
+	o.SrcNetworkId = &v
+}
+
+// GetSrcContract returns the SrcContract field value if set, zero value otherwise.
+func (o *OracleExecuteRequest200Response) GetSrcContract() OracleExecuteRequest200ResponseSrcContract {
+	if o == nil || IsNil(o.SrcContract) {
+		var ret OracleExecuteRequest200ResponseSrcContract
+		return ret
+	}
+	return *o.SrcContract
+}
+
+// GetSrcContractOk returns a tuple with the SrcContract field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *OracleExecuteRequest200Response) GetSrcContractOk() (*OracleExecuteRequest200ResponseSrcContract, bool) {
+	if o == nil || IsNil(o.SrcContract) {
+		return nil, false
+	}
+	return o.SrcContract, true
+}
+
+// HasSrcContract returns a boolean if a field has been set.
+func (o *OracleExecuteRequest200Response) HasSrcContract() bool {
+	if o != nil && !IsNil(o.SrcContract) {
+		return true
+	}
+
+	return false
+}
+
+// SetSrcContract gets a reference to the given OracleExecuteRequest200ResponseSrcContract and assigns it to the SrcContract field.
+func (o *OracleExecuteRequest200Response) SetSrcContract(v OracleExecuteRequest200ResponseSrcContract) {
+	o.SrcContract = &v
+}
+
+// GetDstNetworkId returns the DstNetworkId field value if set, zero value otherwise.
+func (o *OracleExecuteRequest200Response) GetDstNetworkId() TransactRequestSourceAssetNetworkId {
+	if o == nil || IsNil(o.DstNetworkId) {
+		var ret TransactRequestSourceAssetNetworkId
+		return ret
+	}
+	return *o.DstNetworkId
+}
+
+// GetDstNetworkIdOk returns a tuple with the DstNetworkId field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *OracleExecuteRequest200Response) GetDstNetworkIdOk() (*TransactRequestSourceAssetNetworkId, bool) {
+	if o == nil || IsNil(o.DstNetworkId) {
+		return nil, false
+	}
+	return o.DstNetworkId, true
+}
+
+// HasDstNetworkId returns a boolean if a field has been set.
+func (o *OracleExecuteRequest200Response) HasDstNetworkId() bool {
+	if o != nil && !IsNil(o.DstNetworkId) {
+		return true
+	}
+
+	return false
+}
+
+// SetDstNetworkId gets a reference to the given TransactRequestSourceAssetNetworkId and assigns it to the DstNetworkId field.
+func (o *OracleExecuteRequest200Response) SetDstNetworkId(v TransactRequestSourceAssetNetworkId) {
+	o.DstNetworkId = &v
+}
+
+// GetDstContract returns the DstContract field value if set, zero value otherwise.
+func (o *OracleExecuteRequest200Response) GetDstContract() OracleExecuteRequest200ResponseDstContract {
+	if o == nil || IsNil(o.DstContract) {
+		var ret OracleExecuteRequest200ResponseDstContract
+		return ret
+	}
+	return *o.DstContract
+}
+
+// GetDstContractOk returns a tuple with the DstContract field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *OracleExecuteRequest200Response) GetDstContractOk() (*OracleExecuteRequest200ResponseDstContract, bool) {
+	if o == nil || IsNil(o.DstContract) {
+		return nil, false
+	}
+	return o.DstContract, true
+}
+
+// HasDstContract returns a boolean if a field has been set.
+func (o *OracleExecuteRequest200Response) HasDstContract() bool {
+	if o != nil && !IsNil(o.DstContract) {
+		return true
+	}
+
+	return false
+}
+
+// SetDstContract gets a reference to the given OracleExecuteRequest200ResponseDstContract and assigns it to the DstContract field.
+func (o *OracleExecuteRequest200Response) SetDstContract(v OracleExecuteRequest200ResponseDstContract) {
+	o.DstContract = &v
+}
+
+// GetTimestamp returns the Timestamp field value if set, zero value otherwise.
+func (o *OracleExecuteRequest200Response) GetTimestamp() int64 {
+	if o == nil || IsNil(o.Timestamp) {
+		var ret int64
+		return ret
+	}
+	return *o.Timestamp
+}
+
+// GetTimestampOk returns a tuple with the Timestamp field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *OracleExecuteRequest200Response) GetTimestampOk() (*int64, bool) {
+	if o == nil || IsNil(o.Timestamp) {
+		return nil, false
+	}
+	return o.Timestamp, true
+}
+
+// HasTimestamp returns a boolean if a field has been set.
+func (o *OracleExecuteRequest200Response) HasTimestamp() bool {
+	if o != nil && !IsNil(o.Timestamp) {
+		return true
+	}
+
+	return false
+}
+
+// SetTimestamp gets a reference to the given int64 and assigns it to the Timestamp field.
+func (o *OracleExecuteRequest200Response) SetTimestamp(v int64) {
+	o.Timestamp = &v
+}
+
+// GetOperations returns the Operations field value if set, zero value otherwise.
+func (o *OracleExecuteRequest200Response) GetOperations() []OracleExecuteRequest200ResponseOperationsInner {
+	if o == nil || IsNil(o.Operations) {
+		var ret []OracleExecuteRequest200ResponseOperationsInner
+		return ret
+	}
+	return o.Operations
+}
+
+// GetOperationsOk returns a tuple with the Operations field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *OracleExecuteRequest200Response) GetOperationsOk() ([]OracleExecuteRequest200ResponseOperationsInner, bool) {
+	if o == nil || IsNil(o.Operations) {
+		return nil, false
+	}
+	return o.Operations, true
+}
+
+// HasOperations returns a boolean if a field has been set.
+func (o *OracleExecuteRequest200Response) HasOperations() bool {
+	if o != nil && !IsNil(o.Operations) {
+		return true
+	}
+
+	return false
+}
+
+// SetOperations gets a reference to the given []OracleExecuteRequest200ResponseOperationsInner and assigns it to the Operations field.
+func (o *OracleExecuteRequest200Response) SetOperations(v []OracleExecuteRequest200ResponseOperationsInner) {
+	o.Operations = v
+}
+
+// GetStatus returns the Status field value if set, zero value otherwise.
+func (o *OracleExecuteRequest200Response) GetStatus() string {
+	if o == nil || IsNil(o.Status) {
+		var ret string
+		return ret
+	}
+	return *o.Status
+}
+
+// GetStatusOk returns a tuple with the Status field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *OracleExecuteRequest200Response) GetStatusOk() (*string, bool) {
+	if o == nil || IsNil(o.Status) {
+		return nil, false
+	}
+	return o.Status, true
+}
+
+// HasStatus returns a boolean if a field has been set.
+func (o *OracleExecuteRequest200Response) HasStatus() bool {
+	if o != nil && !IsNil(o.Status) {
+		return true
+	}
+
+	return false
+}
+
+// SetStatus gets a reference to the given string and assigns it to the Status field.
+func (o *OracleExecuteRequest200Response) SetStatus(v string) {
+	o.Status = &v
 }
 
 func (o OracleExecuteRequest200Response) MarshalJSON() ([]byte, error) {
@@ -109,9 +350,32 @@ func (o OracleExecuteRequest200Response) MarshalJSON() ([]byte, error) {
 
 func (o OracleExecuteRequest200Response) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	toSerialize["taskID"] = o.TaskID
-	if !IsNil(o.Outputs) {
-		toSerialize["outputs"] = o.Outputs
+	if !IsNil(o.Id) {
+		toSerialize["id"] = o.Id
+	}
+	if !IsNil(o.Type) {
+		toSerialize["type"] = o.Type
+	}
+	if !IsNil(o.SrcNetworkId) {
+		toSerialize["srcNetworkId"] = o.SrcNetworkId
+	}
+	if !IsNil(o.SrcContract) {
+		toSerialize["srcContract"] = o.SrcContract
+	}
+	if !IsNil(o.DstNetworkId) {
+		toSerialize["dstNetworkId"] = o.DstNetworkId
+	}
+	if !IsNil(o.DstContract) {
+		toSerialize["dstContract"] = o.DstContract
+	}
+	if !IsNil(o.Timestamp) {
+		toSerialize["timestamp"] = o.Timestamp
+	}
+	if !IsNil(o.Operations) {
+		toSerialize["operations"] = o.Operations
+	}
+	if !IsNil(o.Status) {
+		toSerialize["status"] = o.Status
 	}
 	return toSerialize, nil
 }

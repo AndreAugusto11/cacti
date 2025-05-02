@@ -5,8 +5,8 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **TaskID** | Pointer to **string** | The unique identifier for the context of the data transfer task. | [optional] 
-**OriginNetwork** | Pointer to [**Transact200ResponseStatusResponseOriginNetwork**](Transact200ResponseStatusResponseOriginNetwork.md) |  | [optional] 
-**DestinationNetwork** | Pointer to [**Transact200ResponseStatusResponseDestinationNetwork**](Transact200ResponseStatusResponseDestinationNetwork.md) |  | [optional] 
+**SourceNetwork** | Pointer to [**TransactRequestSourceAssetNetworkId**](TransactRequestSourceAssetNetworkId.md) |  | [optional] 
+**DestinationNetwork** | Pointer to [**TransactRequestSourceAssetNetworkId**](TransactRequestSourceAssetNetworkId.md) |  | [optional] 
 **OriginContract** | Pointer to [**OracleStatusRequest200ResponseOriginContract**](OracleStatusRequest200ResponseOriginContract.md) |  | [optional] 
 **DestinationContract** | Pointer to [**OracleStatusRequest200ResponseDestinationContract**](OracleStatusRequest200ResponseDestinationContract.md) |  | [optional] 
 **EventOfInterest** | Pointer to [**OracleStatusRequest200ResponseEventOfInterest**](OracleStatusRequest200ResponseEventOfInterest.md) |  | [optional] 
@@ -58,47 +58,47 @@ SetTaskID sets TaskID field to given value.
 
 HasTaskID returns a boolean if a field has been set.
 
-### GetOriginNetwork
+### GetSourceNetwork
 
-`func (o *OracleStatusRequest200Response) GetOriginNetwork() Transact200ResponseStatusResponseOriginNetwork`
+`func (o *OracleStatusRequest200Response) GetSourceNetwork() TransactRequestSourceAssetNetworkId`
 
-GetOriginNetwork returns the OriginNetwork field if non-nil, zero value otherwise.
+GetSourceNetwork returns the SourceNetwork field if non-nil, zero value otherwise.
 
-### GetOriginNetworkOk
+### GetSourceNetworkOk
 
-`func (o *OracleStatusRequest200Response) GetOriginNetworkOk() (*Transact200ResponseStatusResponseOriginNetwork, bool)`
+`func (o *OracleStatusRequest200Response) GetSourceNetworkOk() (*TransactRequestSourceAssetNetworkId, bool)`
 
-GetOriginNetworkOk returns a tuple with the OriginNetwork field if it's non-nil, zero value otherwise
+GetSourceNetworkOk returns a tuple with the SourceNetwork field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetOriginNetwork
+### SetSourceNetwork
 
-`func (o *OracleStatusRequest200Response) SetOriginNetwork(v Transact200ResponseStatusResponseOriginNetwork)`
+`func (o *OracleStatusRequest200Response) SetSourceNetwork(v TransactRequestSourceAssetNetworkId)`
 
-SetOriginNetwork sets OriginNetwork field to given value.
+SetSourceNetwork sets SourceNetwork field to given value.
 
-### HasOriginNetwork
+### HasSourceNetwork
 
-`func (o *OracleStatusRequest200Response) HasOriginNetwork() bool`
+`func (o *OracleStatusRequest200Response) HasSourceNetwork() bool`
 
-HasOriginNetwork returns a boolean if a field has been set.
+HasSourceNetwork returns a boolean if a field has been set.
 
 ### GetDestinationNetwork
 
-`func (o *OracleStatusRequest200Response) GetDestinationNetwork() Transact200ResponseStatusResponseDestinationNetwork`
+`func (o *OracleStatusRequest200Response) GetDestinationNetwork() TransactRequestSourceAssetNetworkId`
 
 GetDestinationNetwork returns the DestinationNetwork field if non-nil, zero value otherwise.
 
 ### GetDestinationNetworkOk
 
-`func (o *OracleStatusRequest200Response) GetDestinationNetworkOk() (*Transact200ResponseStatusResponseDestinationNetwork, bool)`
+`func (o *OracleStatusRequest200Response) GetDestinationNetworkOk() (*TransactRequestSourceAssetNetworkId, bool)`
 
 GetDestinationNetworkOk returns a tuple with the DestinationNetwork field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetDestinationNetwork
 
-`func (o *OracleStatusRequest200Response) SetDestinationNetwork(v Transact200ResponseStatusResponseDestinationNetwork)`
+`func (o *OracleStatusRequest200Response) SetDestinationNetwork(v TransactRequestSourceAssetNetworkId)`
 
 SetDestinationNetwork sets DestinationNetwork field to given value.
 

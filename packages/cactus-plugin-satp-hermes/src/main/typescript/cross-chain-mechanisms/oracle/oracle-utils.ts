@@ -1,32 +1,23 @@
-import { OracleRegisterRequestTaskModeEnum } from "../../public-api";
 import {
-  IOracleOperation,
-  IOracleResponse,
+  OracleOperation,
   OracleOperationStatusEnum,
-  OracleRepeatableTaskMode,
-} from "./oracle-types";
-
-export function convertToDomainOracleRepeatableTaskMode(
-  mode: OracleRegisterRequestTaskModeEnum,
-): OracleRepeatableTaskMode {
-  switch (mode) {
-    case OracleRegisterRequestTaskModeEnum.EventListening:
-      return OracleRepeatableTaskMode.EVENT_LISTENING;
-    case OracleRegisterRequestTaskModeEnum.Polling:
-      return OracleRepeatableTaskMode.POLLING;
-    default:
-      throw new Error(`Unsupported mode: ${mode}`);
-  }
-}
+  OracleResponse,
+} from "../../public-api";
 
 export function updateOracleOperation(
-  task: IOracleOperation,
+  operation: OracleOperation,
   newStatus: OracleOperationStatusEnum,
-  output: IOracleResponse,
-): IOracleOperation {
-  return {
-    ...task,
-    status: newStatus,
-    output: output,
-  };
+  output: OracleResponse,
+): void {
+  operation.status = newStatus;
+  operation.output = output;
 }
+
+/**
+ * Represents a Solidity event log.
+ */
+export type SolidityEventLog = {
+  address: string;
+  data: string;
+  topics: string[];
+};

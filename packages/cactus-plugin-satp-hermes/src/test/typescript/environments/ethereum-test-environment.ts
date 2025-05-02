@@ -10,6 +10,7 @@ import { PluginRegistry } from "@hyperledger/cactus-core";
 import { randomUUID as uuidv4 } from "node:crypto";
 import {
   EthContractInvocationType,
+  InvokeContractV1Response,
   IPluginLedgerConnectorEthereumOptions,
   PluginLedgerConnectorEthereum,
   Web3SigningCredential,
@@ -107,7 +108,7 @@ export class EthereumTestEnvironment {
       bytecode: SATPWrapperContract.bytecode.object,
     };
 
-    const rpcApiHttpHost = await this.ledger.getRpcApiHttpHost();
+    const rpcApiWsHost = await this.ledger.getRpcApiWebSocketHost();
     this.bridgeEthAccount = await this.ledger.newEthPersonalAccount();
     this.keychainEntryValue = "test";
     this.keychainEntryKey = this.bridgeEthAccount;
@@ -141,7 +142,7 @@ export class EthereumTestEnvironment {
 
     this.connectorOptions = {
       instanceId: uuidv4(),
-      rpcApiHttpHost,
+      rpcApiWsHost,
       pluginRegistry,
       logLevel,
     };
@@ -178,6 +179,14 @@ export class EthereumTestEnvironment {
   }
 
   public getTestBridgeSigningCredential(): Web3SigningCredential {
+    return {
+      ethAccount: this.bridgeEthAccount,
+      secret: "test",
+      type: Web3SigningCredentialType.GethKeychainPassword,
+    };
+  }
+
+  public getTestOracleSigningCredential(): Web3SigningCredential {
     return {
       ethAccount: this.bridgeEthAccount,
       secret: "test",
@@ -300,6 +309,44 @@ export class EthereumTestEnvironment {
     this.log.info("BRIDGE_ROLE given to SATPWrapperContract successfully");
   }
 
+  // Deploys smart contracts and sets up configurations for testing
+  public async deployAndSetupOracleContracts(
+    claimFormat: ClaimFormat,
+    contract_name: string,
+    contract: { abi: any; bytecode: { object: string } },
+  ): Promise<string> {
+    const blOracleContract = await this.connector.deployContract({
+      contract: {
+        contractJSON: {
+          contractName: contract_name,
+          abi: contract.abi,
+          bytecode: contract.bytecode.object,
+        },
+        keychainId: this.keychainPlugin1.getKeychainId(),
+      },
+      constructorArgs: [],
+      web3SigningCredential: this.getTestOracleSigningCredential(),
+    });
+    expect(blOracleContract).toBeTruthy();
+    expect(blOracleContract.transactionReceipt).toBeTruthy();
+    expect(blOracleContract.transactionReceipt.contractAddress).toBeTruthy();
+
+    this.assetContractAddress =
+      blOracleContract.transactionReceipt.contractAddress ?? "";
+
+    this.log.info("Oracle Business Logic Contract Deployed successfully");
+
+    this.ethereumConfig = {
+      networkIdentification: this.network,
+      signingCredential: this.getTestOracleSigningCredential(),
+      connectorOptions: this.connectorOptions,
+      claimFormats: [claimFormat],
+      gas: 5000000,
+    };
+
+    return blOracleContract.transactionReceipt.contractAddress!;
+  }
+
   public async mintTokens(amount: string): Promise<void> {
     const responseMint = await this.connector.invokeContract({
       contract: {
@@ -413,5 +460,51 @@ export class EthereumTestEnvironment {
   public async tearDown(): Promise<void> {
     await this.ledger.stop();
     await this.ledger.destroy();
+  }
+
+  public async writeData(
+    contractName: string,
+    contractAddress: string,
+    contractAbi: any,
+    methodName: string,
+    params: string[],
+  ): Promise<InvokeContractV1Response> {
+    return await this.connector.invokeContract({
+      contract: {
+        contractJSON: {
+          contractName: contractName,
+          abi: contractAbi,
+          bytecode: contractAbi.object,
+        },
+        contractAddress: contractAddress,
+      },
+      invocationType: EthContractInvocationType.Send,
+      methodName: methodName,
+      params: params,
+      web3SigningCredential: this.getTestOracleSigningCredential(),
+    });
+  }
+
+  public readData(
+    contractName: string,
+    contractAddress: string,
+    contractAbi: any,
+    methodName: string,
+    params: string[],
+  ): Promise<InvokeContractV1Response> {
+    return this.connector.invokeContract({
+      contract: {
+        contractJSON: {
+          contractName: contractName,
+          abi: contractAbi,
+          bytecode: contractAbi.object,
+        },
+        contractAddress: contractAddress,
+      },
+      invocationType: EthContractInvocationType.Call,
+      methodName: methodName,
+      params: params,
+      web3SigningCredential: this.getTestOracleSigningCredential(),
+    });
   }
 }

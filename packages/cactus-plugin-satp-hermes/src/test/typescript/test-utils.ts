@@ -379,3 +379,10 @@ export async function setupDBTable(config: Knex.Config): Promise<void> {
   const knexInstanceClient = knex(config);
   await knexInstanceClient.migrate.latest();
 }
+
+export interface IContractJson {
+  abi: any;
+  bytecode: {
+    object: string;
+  };
+}

@@ -17,22 +17,18 @@ import (
 // checks if the OracleRegisterResponse type satisfies the MappedNullable interface at compile time
 var _ MappedNullable = &OracleRegisterResponse{}
 
-// OracleRegisterResponse Response schema for registering a repeatable task.
+// OracleRegisterResponse Response schema for registering a repeatable task. Includes the task ID and status of the registration.
 type OracleRegisterResponse struct {
-	// The unique identifier for the context of the repeatable task.
-	TaskID string `json:"taskID"`
-	// The status of the registered data transfer task.
-	Status string `json:"status"`
+	TaskID *string `json:"taskID,omitempty"`
+	Status *string `json:"status,omitempty"`
 }
 
 // NewOracleRegisterResponse instantiates a new OracleRegisterResponse object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewOracleRegisterResponse(taskID string, status string) *OracleRegisterResponse {
+func NewOracleRegisterResponse() *OracleRegisterResponse {
 	this := OracleRegisterResponse{}
-	this.TaskID = taskID
-	this.Status = status
 	return &this
 }
 
@@ -44,52 +40,68 @@ func NewOracleRegisterResponseWithDefaults() *OracleRegisterResponse {
 	return &this
 }
 
-// GetTaskID returns the TaskID field value
+// GetTaskID returns the TaskID field value if set, zero value otherwise.
 func (o *OracleRegisterResponse) GetTaskID() string {
-	if o == nil {
+	if o == nil || IsNil(o.TaskID) {
 		var ret string
 		return ret
 	}
-
-	return o.TaskID
+	return *o.TaskID
 }
 
-// GetTaskIDOk returns a tuple with the TaskID field value
+// GetTaskIDOk returns a tuple with the TaskID field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OracleRegisterResponse) GetTaskIDOk() (*string, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.TaskID) {
 		return nil, false
 	}
-	return &o.TaskID, true
+	return o.TaskID, true
 }
 
-// SetTaskID sets field value
+// HasTaskID returns a boolean if a field has been set.
+func (o *OracleRegisterResponse) HasTaskID() bool {
+	if o != nil && !IsNil(o.TaskID) {
+		return true
+	}
+
+	return false
+}
+
+// SetTaskID gets a reference to the given string and assigns it to the TaskID field.
 func (o *OracleRegisterResponse) SetTaskID(v string) {
-	o.TaskID = v
+	o.TaskID = &v
 }
 
-// GetStatus returns the Status field value
+// GetStatus returns the Status field value if set, zero value otherwise.
 func (o *OracleRegisterResponse) GetStatus() string {
-	if o == nil {
+	if o == nil || IsNil(o.Status) {
 		var ret string
 		return ret
 	}
-
-	return o.Status
+	return *o.Status
 }
 
-// GetStatusOk returns a tuple with the Status field value
+// GetStatusOk returns a tuple with the Status field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OracleRegisterResponse) GetStatusOk() (*string, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.Status) {
 		return nil, false
 	}
-	return &o.Status, true
+	return o.Status, true
 }
 
-// SetStatus sets field value
+// HasStatus returns a boolean if a field has been set.
+func (o *OracleRegisterResponse) HasStatus() bool {
+	if o != nil && !IsNil(o.Status) {
+		return true
+	}
+
+	return false
+}
+
+// SetStatus gets a reference to the given string and assigns it to the Status field.
 func (o *OracleRegisterResponse) SetStatus(v string) {
-	o.Status = v
+	o.Status = &v
 }
 
 func (o OracleRegisterResponse) MarshalJSON() ([]byte, error) {
@@ -102,8 +114,12 @@ func (o OracleRegisterResponse) MarshalJSON() ([]byte, error) {
 
 func (o OracleRegisterResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	toSerialize["taskID"] = o.TaskID
-	toSerialize["status"] = o.Status
+	if !IsNil(o.TaskID) {
+		toSerialize["taskID"] = o.TaskID
+	}
+	if !IsNil(o.Status) {
+		toSerialize["status"] = o.Status
+	}
 	return toSerialize, nil
 }
 

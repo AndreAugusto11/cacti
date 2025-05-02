@@ -4,9 +4,8 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**TaskID** | Pointer to **string** | The unique identifier for the context of the data transfer task. | [optional] 
-**Status** | Pointer to **string** | The status of the unregistered data transfer task. | [optional] 
-**Substatus** | Pointer to **string** |  | [optional] 
+**TaskID** | Pointer to **string** |  | [optional] 
+**Status** | Pointer to **string** |  | [optional] 
 
 ## Methods
 
@@ -76,31 +75,6 @@ SetStatus sets Status field to given value.
 `func (o *OracleUnregisterResponse) HasStatus() bool`
 
 HasStatus returns a boolean if a field has been set.
-
-### GetSubstatus
-
-`func (o *OracleUnregisterResponse) GetSubstatus() string`
-
-GetSubstatus returns the Substatus field if non-nil, zero value otherwise.
-
-### GetSubstatusOk
-
-`func (o *OracleUnregisterResponse) GetSubstatusOk() (*string, bool)`
-
-GetSubstatusOk returns a tuple with the Substatus field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetSubstatus
-
-`func (o *OracleUnregisterResponse) SetSubstatus(v string)`
-
-SetSubstatus sets Substatus field to given value.
-
-### HasSubstatus
-
-`func (o *OracleUnregisterResponse) HasSubstatus() bool`
-
-HasSubstatus returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

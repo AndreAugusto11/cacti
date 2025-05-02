@@ -25,21 +25,18 @@ import { LoggerProvider, LogLevelDesc } from "@hyperledger/cactus-common";
 import { OracleManager } from "../../cross-chain-mechanisms/oracle/oracle-manager";
 import {
   OracleRegisterRequest,
-  OracleRegisterResponse,
-} from "../../public-api";
-import {
-  IOracleRepeatableTask,
+  OracleTask,
+  OracleTaskModeEnum,
   OracleTaskStatusEnum,
-  OracleTaskType,
-} from "../../cross-chain-mechanisms/oracle/oracle-types";
-import { convertToDomainOracleRepeatableTaskMode } from "../../cross-chain-mechanisms/oracle/oracle-utils";
+  OracleTaskTypeEnum,
+} from "../../public-api";
 import { v4 as uuidv4 } from "uuid";
 
 export async function registerTask(
   logLevel: LogLevelDesc,
   req: OracleRegisterRequest,
   manager: OracleManager,
-): Promise<OracleRegisterResponse> {
+): Promise<OracleTask> {
   const fnTag = `registerTask()`;
   const logger = LoggerProvider.getOrCreate({
     label: fnTag,
@@ -48,88 +45,161 @@ export async function registerTask(
 
   logger.info(`${fnTag}, executing task registration endpoint`);
 
-  let type: OracleTaskType;
+  let type: OracleTaskTypeEnum;
 
-  // we need to create a IOracleTask based on the parameters of the request and based on the type of task and mode of task
+  if (req.taskMode === OracleTaskModeEnum.Polling) {
+    if (!req.pollingInterval) {
+      throw new Error(
+        `${fnTag}, Invalid register of READ task with POLLING mode: pollingInterval must be defined for POLLING mode.`,
+      );
+    }
+  }
+
   switch (req.taskType) {
     case "READ": {
+      if (req.destinationContract || req.destinationNetworkId) {
+        logger.info(
+          `${fnTag} - parameters of destination network will be ignored for a READ task`,
+        );
+      }
+
       if (
-        !req.sourceNetwork ||
+        !req.sourceNetworkId ||
         !req.sourceContract ||
-        (!req.sourceFunctionName && !req.eventSignature)
+        !req.sourceContract.contractName
       ) {
         throw new Error(
-          `${fnTag}, Invalid READ task request: sourceNetwork, sourceContract, and either readFunction or eventSignature must be defined.`,
+          `${fnTag} - missing required parameters for executing READ task. Requirements: sourceNetworkId, sourceContract, sourceContract.contractName`,
         );
       }
 
-      if (!req.sourceFunctionName && !req.sourceFunctionParams) {
-        throw new Error(
-          `${fnTag}, Invalid READ task request: sourceFunctionParams must be defined when sourceFunctionName is defined.`,
-        );
+      if (req.taskMode === OracleTaskModeEnum.Polling) {
+        if (!req.sourceContract.methodName || !req.sourceContract.params) {
+          throw new Error(
+            `${fnTag}, Invalid register of READ task with POLLING mode: methodName and params must be defined for POLLING mode.`,
+          );
+        }
+
+        if (req.sourceContract.eventSignature) {
+          logger.info(
+            `${fnTag} - sourceContract.eventSignature will be ignored for POLLING mode`,
+          );
+        }
+      } else if (req.taskMode === OracleTaskModeEnum.EventListening) {
+        if (req.sourceContract.methodName || req.sourceContract.params) {
+          logger.info(
+            `${fnTag} - sourceContract.methodName and sourceContract.params will be ignored for EVENT_LISTENING mode`,
+          );
+        }
+
+        if (req.pollingInterval) {
+          throw new Error(
+            `${fnTag}, Invalid register of READ task with EVENT_LISTENING mode: pollingInterval must not be defined for EVENT_LISTENING mode.`,
+          );
+        }
+
+        if (!req.sourceContract.eventSignature) {
+          throw new Error(
+            `${fnTag}, Invalid register of READ task with EVENT_LISTENING mode: sourceContract.eventSignature must be defined for EVENT_LISTENING mode.`,
+          );
+        }
       }
 
-      if (req.taskMode === "POLLING" && !req.taskInterval) {
-        throw new Error(
-          `${fnTag}, Invalid READ task request: taskInterval must be defined for POLLING mode.`,
-        );
-      }
-      type = OracleTaskType.READ;
+      type = OracleTaskTypeEnum.Read;
       break;
     }
     case "UPDATE": {
+      if (req.sourceContract || req.sourceNetworkId) {
+        logger.info(
+          `${fnTag} - parameters of source network will be ignored for an UPDATE task`,
+        );
+      }
+
       if (
-        !req.targetNetwork ||
+        !req.destinationNetworkId ||
         !req.destinationContract ||
-        !req.destinationFunctionName
+        !req.destinationContract?.methodName
       ) {
         throw new Error(
-          `${fnTag}, Invalid UPDATE task request: targetNetwork, destinationContract, and writeFunction must be defined.`,
+          `${fnTag}, Invalid UPDATE task request: destinationNetworkId, destinationContract, and writeFunction must be defined.`,
         );
       }
 
-      if (!req.destinationFunctionName && !req.destinationFunctionParams) {
+      if (
+        !req.destinationContract?.methodName &&
+        !req.destinationContract.params
+      ) {
         throw new Error(
-          `${fnTag}, Invalid UPDATE task request: destinationFunctionParams must be defined when destinationFunctionName is defined.`,
+          `${fnTag}, Invalid UPDATE task request: destinationFunctionParams must be defined when destinationContract?.methodName is defined.`,
         );
       }
 
-      if (req.taskMode === "POLLING" && !req.taskInterval) {
-        throw new Error(
-          `${fnTag}, Invalid UPDATE task request: taskInterval must be defined for POLLING mode.`,
-        );
-      }
+      if (req.taskMode === OracleTaskModeEnum.Polling) {
+        if (
+          !req.destinationContract.methodName ||
+          !req.destinationContract.params
+        ) {
+          throw new Error(
+            `${fnTag}, Invalid register of UPDATE task with POLLING mode: methodName and params must be defined for POLLING mode.`,
+          );
+        }
+      } else if (req.taskMode === OracleTaskModeEnum.EventListening) {
+        if (
+          req.destinationContract.methodName ||
+          req.destinationContract.params
+        ) {
+          logger.info(
+            `${fnTag} - destinationContract.methodName and destinationContract.params will be ignored for EVENT_LISTENING mode`,
+          );
+        }
 
-      type = OracleTaskType.UPDATE;
+        if (req.pollingInterval) {
+          throw new Error(
+            `${fnTag}, Invalid register of UPDATE task with EVENT_LISTENING mode: pollingInterval must not be defined for EVENT_LISTENING mode.`,
+          );
+        }
+      }
+      type = OracleTaskTypeEnum.Update;
       break;
     }
     case "READ_AND_UPDATE": {
       if (
-        !req.sourceNetwork ||
+        !req.sourceNetworkId ||
         !req.sourceContract ||
-        !req.sourceFunctionName ||
-        !req.targetNetwork ||
-        !req.destinationContract ||
-        !req.destinationFunctionName
+        !req.destinationNetworkId ||
+        !req.destinationContract
       ) {
         throw new Error(
-          `${fnTag}, Invalid READ_AND_UPDATE task request: sourceNetwork, sourceContract, readFunction, targetNetwork, destinationContract, and writeFunction must be defined.`,
+          `${fnTag}, Invalid READ_AND_UPDATE task request: sourceNetworkId, sourceContract, readFunction, destinationNetworkId, destinationContract, and writeFunction must be defined.`,
         );
       }
 
-      if (!req.sourceFunctionName && !req.sourceFunctionParams) {
+      if (
+        !req.sourceContract.methodName &&
+        !req.sourceContract.params &&
+        !req.sourceContract.eventSignature
+      ) {
         throw new Error(
-          `${fnTag}, Invalid READ task request: sourceFunctionParams must be defined when sourceFunctionName is defined.`,
+          `${fnTag}, Invalid READ_AND_UPDATE task request: methodName and params or eventSignature must be defined.`,
         );
       }
 
-      if (req.taskMode === "POLLING" && !req.taskInterval) {
+      if (req.taskMode === "POLLING" && !req.pollingInterval) {
         throw new Error(
-          `${fnTag}, Invalid READ_AND_UPDATE task request: taskInterval must be defined for POLLING mode.`,
+          `${fnTag}, Invalid READ_AND_UPDATE task request: pollingInterval must be defined for POLLING mode.`,
         );
       }
 
-      type = OracleTaskType.READ_AND_UPDATE;
+      if (
+        req.taskMode === "EVENT_LISTENING" &&
+        !req.sourceContract.eventSignature
+      ) {
+        throw new Error(
+          `${fnTag}, Invalid READ_AND_UPDATE task request: sourceContract.eventSignature must be defined for EVENT_LISTENING mode.`,
+        );
+      }
+
+      type = OracleTaskTypeEnum.ReadAndUpdate;
       break;
     }
     default: {
@@ -142,25 +212,17 @@ export async function registerTask(
     id: uuidv4(),
     type: type,
     outputs: [],
-    srcNetworkId: req.sourceNetwork,
-    srcContractAddress: req.sourceContract,
-    srcFunctionName: req.sourceFunctionName,
-    srcFunctionParams: req.sourceFunctionParams,
-    dstNetworkId: req.targetNetwork,
-    dstContractAddress: req.destinationContract,
-    dstFunctionName: req.destinationFunctionName,
-    dstFunctionParams: req.destinationFunctionParams,
-    mode: convertToDomainOracleRepeatableTaskMode(req.taskMode),
-    status: OracleTaskStatusEnum.ACTIVE,
+    srcNetworkId: req.sourceNetworkId,
+    dstNetworkId: req.destinationNetworkId,
+    srcContract: req.sourceContract,
+    dstContract: req.destinationContract,
+    mode: req.taskMode,
+    status: OracleTaskStatusEnum.Active,
     timestamp: Date.now(),
-    taskInterval: req.taskMode === "POLLING" ? req.taskInterval : undefined,
+    pollingInterval:
+      req.taskMode === "POLLING" ? req.pollingInterval : undefined,
     operations: [],
-  } as IOracleRepeatableTask;
+  } as OracleTask;
 
-  const success = await manager.registerTask(task);
-
-  return {
-    taskID: task.id,
-    status: success ? "SUCCESS" : "FAILURE",
-  } as OracleRegisterResponse;
+  return await manager.registerTask(task);
 }
