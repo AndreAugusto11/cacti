@@ -12,7 +12,13 @@ import {
 
 import type { SATPGatewayConfig } from "../../../main/typescript/plugin-satp-hermes-gateway";
 import { createClient } from "../test-utils";
-import { HealthCheckResponseStatusEnum } from "../../../main/typescript";
+import {
+  HealthCheckResponseStatusEnum,
+  OracleRegisterRequestTaskModeEnum,
+  OracleRegisterRequestTaskTypeEnum,
+  TransactRequestSourceAssetNetworkId,
+  TransactRequestSourceAssetNetworkIdLedgerTypeEnum,
+} from "../../../main/typescript";
 import {
   knexClientConnection,
   knexSourceRemoteConnection,
@@ -131,6 +137,59 @@ describe("GetStatus Endpoint and Functionality testing", () => {
       expect(result.status).toBe(200);
       expect(result.data.integrations).toBeDefined();
       expect(result.data.integrations.length).toBe(0); // No integrations yet
+    } finally {
+      await gateway.shutdown();
+    }
+  });
+
+  test("Oracle endpoints work", async () => {
+    const gateway = await factory.create(options);
+
+    try {
+      await gateway.startup();
+      const address = options.gid!.address!;
+      const port = options.gid!.gatewayOapiPort!;
+
+      await gateway.getOrCreateHttpServer();
+
+      const oracleApiClient = createClient("OracleApi", address, port, logger);
+
+      const result = await oracleApiClient.getOracleTaskStatus({
+        taskID: "test-task-id",
+      });
+
+      expect(result).toBeDefined();
+      expect(result.status).toBe(200);
+      expect(result.data.taskID).toBe("test-task-id");
+
+      const register = await oracleApiClient.registerOracleTask({
+        sourceNetworkId: {
+          id: "source-network-id",
+          ledgerType: TransactRequestSourceAssetNetworkIdLedgerTypeEnum.Besu2X,
+        } as TransactRequestSourceAssetNetworkId,
+        destinationNetworkId: {
+          id: "source-network-id",
+          ledgerType: TransactRequestSourceAssetNetworkIdLedgerTypeEnum.Besu2X,
+        } as TransactRequestSourceAssetNetworkId,
+        sourceContract: {
+          contractName: "source-contract-name",
+          methodName: "source-method-name",
+          params: ["param1", "param2"],
+        },
+        destinationContract: {
+          contractName: "source-contract-name",
+          methodName: "source-method-name",
+          params: ["param1", "param2"],
+        },
+        taskMode: OracleRegisterRequestTaskModeEnum.EventListening,
+        taskType: OracleRegisterRequestTaskTypeEnum.Read,
+        pollingInterval: 1000,
+      });
+
+      expect(register).toBeDefined();
+      expect(register.status).toBe(200);
+      expect(register.data.taskID).toBeDefined();
+      expect(register.data.status).toBe("SUCCESS");
     } finally {
       await gateway.shutdown();
     }

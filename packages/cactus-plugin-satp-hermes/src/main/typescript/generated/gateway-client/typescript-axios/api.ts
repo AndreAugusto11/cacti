@@ -231,6 +231,55 @@ export interface BridgeInfo {
     'tokenAddress'?: string;
 }
 /**
+ * Represents a business logic contract with its associated metadata and method details.
+ * @export
+ * @interface BusinessLogicContract
+ */
+export interface BusinessLogicContract {
+    /**
+     * The name of the contract.
+     * @type {string}
+     * @memberof BusinessLogicContract
+     */
+    'contractName'?: string;
+    /**
+     * The address of the contract.
+     * @type {string}
+     * @memberof BusinessLogicContract
+     */
+    'contractAddress'?: string | null;
+    /**
+     * The ABI (Application Binary Interface) of the contract.
+     * @type {Array<object>}
+     * @memberof BusinessLogicContract
+     */
+    'contractAbi'?: Array<object> | null;
+    /**
+     * The bytecode of the contract.
+     * @type {string}
+     * @memberof BusinessLogicContract
+     */
+    'contractBytecode'?: string | null;
+    /**
+     * The name of the method to be invoked on the contract.
+     * @type {string}
+     * @memberof BusinessLogicContract
+     */
+    'methodName'?: string;
+    /**
+     * The parameters to be passed to the contract method.
+     * @type {Array<ExecuteOracleTaskRequestSourceContractParamsInner>}
+     * @memberof BusinessLogicContract
+     */
+    'params'?: Array<ExecuteOracleTaskRequestSourceContractParamsInner>;
+    /**
+     * The event signatures to listen for on the source network. To be defined if task mode is EVENT_LISTENING.
+     * @type {string}
+     * @memberof BusinessLogicContract
+     */
+    'eventSignature'?: string;
+}
+/**
  * Response for a cancel transaction request. Indicates whether the cancel action was successful and includes the current session status.
  * @export
  * @interface Cancel200Response
@@ -422,6 +471,493 @@ export interface Estimate {
      */
     'tool'?: string;
 }
+/**
+ * Response schema for executing a data transfer task. Includes the task ID and status of the execution.
+ * @export
+ * @interface ExecuteOracleTask200Response
+ */
+export interface ExecuteOracleTask200Response {
+    /**
+     * 
+     * @type {string}
+     * @memberof ExecuteOracleTask200Response
+     */
+    'taskID'?: string;
+    /**
+     * The type of the Oracle task.
+     * @type {Enum}
+     * @memberof ExecuteOracleTask200Response
+     */
+    'type': ExecuteOracleTask200ResponseTypeEnum;
+    /**
+     * 
+     * @type {TransactRequestSourceAssetNetworkId}
+     * @memberof ExecuteOracleTask200Response
+     */
+    'srcNetworkId'?: TransactRequestSourceAssetNetworkId;
+    /**
+     * 
+     * @type {ExecuteOracleTask200ResponseSrcContract}
+     * @memberof ExecuteOracleTask200Response
+     */
+    'srcContract': ExecuteOracleTask200ResponseSrcContract;
+    /**
+     * 
+     * @type {TransactRequestSourceAssetNetworkId}
+     * @memberof ExecuteOracleTask200Response
+     */
+    'dstNetworkId'?: TransactRequestSourceAssetNetworkId;
+    /**
+     * 
+     * @type {ExecuteOracleTask200ResponseDstContract}
+     * @memberof ExecuteOracleTask200Response
+     */
+    'dstContract': ExecuteOracleTask200ResponseDstContract;
+    /**
+     * The timestamp when the Oracle task was created or last updated.
+     * @type {number}
+     * @memberof ExecuteOracleTask200Response
+     */
+    'timestamp': number;
+    /**
+     * The list of operations performed by the Oracle task.
+     * @type {Array<ExecuteOracleTask200ResponseOperationsInner>}
+     * @memberof ExecuteOracleTask200Response
+     */
+    'operations': Array<ExecuteOracleTask200ResponseOperationsInner>;
+    /**
+     * The current status of the Oracle task.
+     * @type {Enum}
+     * @memberof ExecuteOracleTask200Response
+     */
+    'status': ExecuteOracleTask200ResponseStatusEnum;
+    /**
+     * The mode of operation for registered tasks.
+     * @type {string}
+     * @memberof ExecuteOracleTask200Response
+     */
+    'mode': ExecuteOracleTask200ResponseModeEnum;
+    /**
+     * The interval for polling in milliseconds. Only if taskMode is POLLING.
+     * @type {number}
+     * @memberof ExecuteOracleTask200Response
+     */
+    'pollingInterval'?: number;
+}
+
+export const ExecuteOracleTask200ResponseTypeEnum = {
+    Read: 'READ',
+    Update: 'UPDATE',
+    ReadAndUpdate: 'READ_AND_UPDATE'
+} as const;
+
+export type ExecuteOracleTask200ResponseTypeEnum = typeof ExecuteOracleTask200ResponseTypeEnum[keyof typeof ExecuteOracleTask200ResponseTypeEnum];
+export const ExecuteOracleTask200ResponseStatusEnum = {
+    Active: 'ACTIVE',
+    Inactive: 'INACTIVE'
+} as const;
+
+export type ExecuteOracleTask200ResponseStatusEnum = typeof ExecuteOracleTask200ResponseStatusEnum[keyof typeof ExecuteOracleTask200ResponseStatusEnum];
+export const ExecuteOracleTask200ResponseModeEnum = {
+    Polling: 'POLLING',
+    EventListening: 'EVENT_LISTENING',
+    Immediate: 'IMMEDIATE'
+} as const;
+
+export type ExecuteOracleTask200ResponseModeEnum = typeof ExecuteOracleTask200ResponseModeEnum[keyof typeof ExecuteOracleTask200ResponseModeEnum];
+
+/**
+ * The destination contract details for the Oracle task.
+ * @export
+ * @interface ExecuteOracleTask200ResponseDstContract
+ */
+export interface ExecuteOracleTask200ResponseDstContract {
+    /**
+     * The name of the contract.
+     * @type {string}
+     * @memberof ExecuteOracleTask200ResponseDstContract
+     */
+    'contractName'?: string;
+    /**
+     * The address of the contract.
+     * @type {string}
+     * @memberof ExecuteOracleTask200ResponseDstContract
+     */
+    'contractAddress'?: string | null;
+    /**
+     * The ABI (Application Binary Interface) of the contract.
+     * @type {Array<object>}
+     * @memberof ExecuteOracleTask200ResponseDstContract
+     */
+    'contractAbi'?: Array<object> | null;
+    /**
+     * The bytecode of the contract.
+     * @type {string}
+     * @memberof ExecuteOracleTask200ResponseDstContract
+     */
+    'contractBytecode'?: string | null;
+    /**
+     * The name of the method to be invoked on the contract.
+     * @type {string}
+     * @memberof ExecuteOracleTask200ResponseDstContract
+     */
+    'methodName'?: string;
+    /**
+     * The parameters to be passed to the contract method.
+     * @type {Array<ExecuteOracleTaskRequestSourceContractParamsInner>}
+     * @memberof ExecuteOracleTask200ResponseDstContract
+     */
+    'params'?: Array<ExecuteOracleTaskRequestSourceContractParamsInner>;
+    /**
+     * The event signatures to listen for on the source network. To be defined if task mode is EVENT_LISTENING.
+     * @type {string}
+     * @memberof ExecuteOracleTask200ResponseDstContract
+     */
+    'eventSignature'?: string;
+}
+/**
+ * Represents an operation performed by the Oracle, including its type, network, contract, status, and optional output.
+ * @export
+ * @interface ExecuteOracleTask200ResponseOperationsInner
+ */
+export interface ExecuteOracleTask200ResponseOperationsInner {
+    /**
+     * A unique identifier for the Oracle operation.
+     * @type {string}
+     * @memberof ExecuteOracleTask200ResponseOperationsInner
+     */
+    'id': string;
+    /**
+     * The type of the Oracle operation.
+     * @type {string}
+     * @memberof ExecuteOracleTask200ResponseOperationsInner
+     */
+    'type': ExecuteOracleTask200ResponseOperationsInnerTypeEnum;
+    /**
+     * 
+     * @type {TransactRequestSourceAssetNetworkId}
+     * @memberof ExecuteOracleTask200ResponseOperationsInner
+     */
+    'networkId': TransactRequestSourceAssetNetworkId;
+    /**
+     * 
+     * @type {ExecuteOracleTask200ResponseOperationsInnerContract}
+     * @memberof ExecuteOracleTask200ResponseOperationsInner
+     */
+    'contract': ExecuteOracleTask200ResponseOperationsInnerContract;
+    /**
+     * The current status of the Oracle operation.
+     * @type {string}
+     * @memberof ExecuteOracleTask200ResponseOperationsInner
+     */
+    'status': ExecuteOracleTask200ResponseOperationsInnerStatusEnum;
+    /**
+     * 
+     * @type {ExecuteOracleTask200ResponseOperationsInnerOutput}
+     * @memberof ExecuteOracleTask200ResponseOperationsInner
+     */
+    'output'?: ExecuteOracleTask200ResponseOperationsInnerOutput;
+    /**
+     * The timestamp when the Oracle operation was created or last updated.
+     * @type {number}
+     * @memberof ExecuteOracleTask200ResponseOperationsInner
+     */
+    'timestamp': number;
+}
+
+export const ExecuteOracleTask200ResponseOperationsInnerTypeEnum = {
+    Read: 'READ',
+    Update: 'UPDATE'
+} as const;
+
+export type ExecuteOracleTask200ResponseOperationsInnerTypeEnum = typeof ExecuteOracleTask200ResponseOperationsInnerTypeEnum[keyof typeof ExecuteOracleTask200ResponseOperationsInnerTypeEnum];
+export const ExecuteOracleTask200ResponseOperationsInnerStatusEnum = {
+    Pending: 'PENDING',
+    Success: 'SUCCESS',
+    Failed: 'FAILED'
+} as const;
+
+export type ExecuteOracleTask200ResponseOperationsInnerStatusEnum = typeof ExecuteOracleTask200ResponseOperationsInnerStatusEnum[keyof typeof ExecuteOracleTask200ResponseOperationsInnerStatusEnum];
+
+/**
+ * The contract associated with the Oracle operation.
+ * @export
+ * @interface ExecuteOracleTask200ResponseOperationsInnerContract
+ */
+export interface ExecuteOracleTask200ResponseOperationsInnerContract {
+    /**
+     * The name of the contract.
+     * @type {string}
+     * @memberof ExecuteOracleTask200ResponseOperationsInnerContract
+     */
+    'contractName'?: string;
+    /**
+     * The address of the contract.
+     * @type {string}
+     * @memberof ExecuteOracleTask200ResponseOperationsInnerContract
+     */
+    'contractAddress'?: string | null;
+    /**
+     * The ABI (Application Binary Interface) of the contract.
+     * @type {Array<object>}
+     * @memberof ExecuteOracleTask200ResponseOperationsInnerContract
+     */
+    'contractAbi'?: Array<object> | null;
+    /**
+     * The bytecode of the contract.
+     * @type {string}
+     * @memberof ExecuteOracleTask200ResponseOperationsInnerContract
+     */
+    'contractBytecode'?: string | null;
+    /**
+     * The name of the method to be invoked on the contract.
+     * @type {string}
+     * @memberof ExecuteOracleTask200ResponseOperationsInnerContract
+     */
+    'methodName'?: string;
+    /**
+     * The parameters to be passed to the contract method.
+     * @type {Array<ExecuteOracleTaskRequestSourceContractParamsInner>}
+     * @memberof ExecuteOracleTask200ResponseOperationsInnerContract
+     */
+    'params'?: Array<ExecuteOracleTaskRequestSourceContractParamsInner>;
+    /**
+     * The event signatures to listen for on the source network. To be defined if task mode is EVENT_LISTENING.
+     * @type {string}
+     * @memberof ExecuteOracleTask200ResponseOperationsInnerContract
+     */
+    'eventSignature'?: string;
+}
+/**
+ * Optional output generated by the Oracle operation.
+ * @export
+ * @interface ExecuteOracleTask200ResponseOperationsInnerOutput
+ */
+export interface ExecuteOracleTask200ResponseOperationsInnerOutput {
+    /**
+     * The unique identifier for the transaction.
+     * @type {string}
+     * @memberof ExecuteOracleTask200ResponseOperationsInnerOutput
+     */
+    'transactionId'?: string;
+    /**
+     * The receipt of the transaction, providing proof of execution.
+     * @type {object}
+     * @memberof ExecuteOracleTask200ResponseOperationsInnerOutput
+     */
+    'transactionReceipt'?: object;
+    /**
+     * The output of the Oracle operation execution.
+     * @type {string}
+     * @memberof ExecuteOracleTask200ResponseOperationsInnerOutput
+     */
+    'output'?: string;
+    /**
+     * Proof of the Oracle operation execution.
+     * @type {object}
+     * @memberof ExecuteOracleTask200ResponseOperationsInnerOutput
+     */
+    'proof'?: object;
+}
+/**
+ * The source contract details for the Oracle task.
+ * @export
+ * @interface ExecuteOracleTask200ResponseSrcContract
+ */
+export interface ExecuteOracleTask200ResponseSrcContract {
+    /**
+     * The name of the contract.
+     * @type {string}
+     * @memberof ExecuteOracleTask200ResponseSrcContract
+     */
+    'contractName'?: string;
+    /**
+     * The address of the contract.
+     * @type {string}
+     * @memberof ExecuteOracleTask200ResponseSrcContract
+     */
+    'contractAddress'?: string | null;
+    /**
+     * The ABI (Application Binary Interface) of the contract.
+     * @type {Array<object>}
+     * @memberof ExecuteOracleTask200ResponseSrcContract
+     */
+    'contractAbi'?: Array<object> | null;
+    /**
+     * The bytecode of the contract.
+     * @type {string}
+     * @memberof ExecuteOracleTask200ResponseSrcContract
+     */
+    'contractBytecode'?: string | null;
+    /**
+     * The name of the method to be invoked on the contract.
+     * @type {string}
+     * @memberof ExecuteOracleTask200ResponseSrcContract
+     */
+    'methodName'?: string;
+    /**
+     * The parameters to be passed to the contract method.
+     * @type {Array<ExecuteOracleTaskRequestSourceContractParamsInner>}
+     * @memberof ExecuteOracleTask200ResponseSrcContract
+     */
+    'params'?: Array<ExecuteOracleTaskRequestSourceContractParamsInner>;
+    /**
+     * The event signatures to listen for on the source network. To be defined if task mode is EVENT_LISTENING.
+     * @type {string}
+     * @memberof ExecuteOracleTask200ResponseSrcContract
+     */
+    'eventSignature'?: string;
+}
+/**
+ * Request schema for triggering an immediate transfer task. Includes the task ID, payload, and destination network and contract details.
+ * @export
+ * @interface ExecuteOracleTaskRequest
+ */
+export interface ExecuteOracleTaskRequest {
+    /**
+     * 
+     * @type {TransactRequestSourceAssetNetworkId}
+     * @memberof ExecuteOracleTaskRequest
+     */
+    'sourceNetworkId'?: TransactRequestSourceAssetNetworkId;
+    /**
+     * 
+     * @type {TransactRequestSourceAssetNetworkId}
+     * @memberof ExecuteOracleTaskRequest
+     */
+    'destinationNetworkId'?: TransactRequestSourceAssetNetworkId;
+    /**
+     * 
+     * @type {ExecuteOracleTaskRequestSourceContract}
+     * @memberof ExecuteOracleTaskRequest
+     */
+    'sourceContract'?: ExecuteOracleTaskRequestSourceContract;
+    /**
+     * 
+     * @type {ExecuteOracleTaskRequestDestinationContract}
+     * @memberof ExecuteOracleTaskRequest
+     */
+    'destinationContract'?: ExecuteOracleTaskRequestDestinationContract;
+    /**
+     * The type of task to be registered.
+     * @type {string}
+     * @memberof ExecuteOracleTaskRequest
+     */
+    'taskType'?: ExecuteOracleTaskRequestTaskTypeEnum;
+}
+
+export const ExecuteOracleTaskRequestTaskTypeEnum = {
+    Read: 'READ',
+    Update: 'UPDATE',
+    ReadAndUpdate: 'READ_AND_UPDATE'
+} as const;
+
+export type ExecuteOracleTaskRequestTaskTypeEnum = typeof ExecuteOracleTaskRequestTaskTypeEnum[keyof typeof ExecuteOracleTaskRequestTaskTypeEnum];
+
+/**
+ * The contract data on the destination blockchain. Only if taskType is UPDATE or READ_AND_UPDATE.
+ * @export
+ * @interface ExecuteOracleTaskRequestDestinationContract
+ */
+export interface ExecuteOracleTaskRequestDestinationContract {
+    /**
+     * The name of the contract.
+     * @type {string}
+     * @memberof ExecuteOracleTaskRequestDestinationContract
+     */
+    'contractName'?: string;
+    /**
+     * The address of the contract.
+     * @type {string}
+     * @memberof ExecuteOracleTaskRequestDestinationContract
+     */
+    'contractAddress'?: string | null;
+    /**
+     * The ABI (Application Binary Interface) of the contract.
+     * @type {Array<object>}
+     * @memberof ExecuteOracleTaskRequestDestinationContract
+     */
+    'contractAbi'?: Array<object> | null;
+    /**
+     * The bytecode of the contract.
+     * @type {string}
+     * @memberof ExecuteOracleTaskRequestDestinationContract
+     */
+    'contractBytecode'?: string | null;
+    /**
+     * The name of the method to be invoked on the contract.
+     * @type {string}
+     * @memberof ExecuteOracleTaskRequestDestinationContract
+     */
+    'methodName'?: string;
+    /**
+     * The parameters to be passed to the contract method.
+     * @type {Array<ExecuteOracleTaskRequestSourceContractParamsInner>}
+     * @memberof ExecuteOracleTaskRequestDestinationContract
+     */
+    'params'?: Array<ExecuteOracleTaskRequestSourceContractParamsInner>;
+    /**
+     * The event signatures to listen for on the source network. To be defined if task mode is EVENT_LISTENING.
+     * @type {string}
+     * @memberof ExecuteOracleTaskRequestDestinationContract
+     */
+    'eventSignature'?: string;
+}
+/**
+ * The contract data on the source blockchain. Only if taskType is READ or READ_AND_UPDATE.
+ * @export
+ * @interface ExecuteOracleTaskRequestSourceContract
+ */
+export interface ExecuteOracleTaskRequestSourceContract {
+    /**
+     * The name of the contract.
+     * @type {string}
+     * @memberof ExecuteOracleTaskRequestSourceContract
+     */
+    'contractName'?: string;
+    /**
+     * The address of the contract.
+     * @type {string}
+     * @memberof ExecuteOracleTaskRequestSourceContract
+     */
+    'contractAddress'?: string | null;
+    /**
+     * The ABI (Application Binary Interface) of the contract.
+     * @type {Array<object>}
+     * @memberof ExecuteOracleTaskRequestSourceContract
+     */
+    'contractAbi'?: Array<object> | null;
+    /**
+     * The bytecode of the contract.
+     * @type {string}
+     * @memberof ExecuteOracleTaskRequestSourceContract
+     */
+    'contractBytecode'?: string | null;
+    /**
+     * The name of the method to be invoked on the contract.
+     * @type {string}
+     * @memberof ExecuteOracleTaskRequestSourceContract
+     */
+    'methodName'?: string;
+    /**
+     * The parameters to be passed to the contract method.
+     * @type {Array<ExecuteOracleTaskRequestSourceContractParamsInner>}
+     * @memberof ExecuteOracleTaskRequestSourceContract
+     */
+    'params'?: Array<ExecuteOracleTaskRequestSourceContractParamsInner>;
+    /**
+     * The event signatures to listen for on the source network. To be defined if task mode is EVENT_LISTENING.
+     * @type {string}
+     * @memberof ExecuteOracleTaskRequestSourceContract
+     */
+    'eventSignature'?: string;
+}
+/**
+ * @type ExecuteOracleTaskRequestSourceContractParamsInner
+ * @export
+ */
+export type ExecuteOracleTaskRequestSourceContractParamsInner = number | string;
+
 /**
  * Details about a specific fee cost associated with the transaction.
  * @export
@@ -733,6 +1269,114 @@ export interface GetIntegrations200ResponseIntegrationsInner {
      * @memberof GetIntegrations200ResponseIntegrationsInner
      */
     'environment'?: string;
+}
+/**
+ * Response schema for checking the status of a data transfer task. Includes the task ID and status of the task.
+ * @export
+ * @interface GetOracleTaskStatus200Response
+ */
+export interface GetOracleTaskStatus200Response {
+    /**
+     * 
+     * @type {string}
+     * @memberof GetOracleTaskStatus200Response
+     */
+    'taskID'?: string;
+    /**
+     * The type of the Oracle task.
+     * @type {Enum}
+     * @memberof GetOracleTaskStatus200Response
+     */
+    'type': GetOracleTaskStatus200ResponseTypeEnum;
+    /**
+     * 
+     * @type {TransactRequestSourceAssetNetworkId}
+     * @memberof GetOracleTaskStatus200Response
+     */
+    'srcNetworkId'?: TransactRequestSourceAssetNetworkId;
+    /**
+     * 
+     * @type {ExecuteOracleTask200ResponseSrcContract}
+     * @memberof GetOracleTaskStatus200Response
+     */
+    'srcContract': ExecuteOracleTask200ResponseSrcContract;
+    /**
+     * 
+     * @type {TransactRequestSourceAssetNetworkId}
+     * @memberof GetOracleTaskStatus200Response
+     */
+    'dstNetworkId'?: TransactRequestSourceAssetNetworkId;
+    /**
+     * 
+     * @type {ExecuteOracleTask200ResponseDstContract}
+     * @memberof GetOracleTaskStatus200Response
+     */
+    'dstContract': ExecuteOracleTask200ResponseDstContract;
+    /**
+     * The timestamp when the Oracle task was created or last updated.
+     * @type {number}
+     * @memberof GetOracleTaskStatus200Response
+     */
+    'timestamp': number;
+    /**
+     * The list of operations performed by the Oracle task.
+     * @type {Array<ExecuteOracleTask200ResponseOperationsInner>}
+     * @memberof GetOracleTaskStatus200Response
+     */
+    'operations': Array<ExecuteOracleTask200ResponseOperationsInner>;
+    /**
+     * The current status of the Oracle task.
+     * @type {Enum}
+     * @memberof GetOracleTaskStatus200Response
+     */
+    'status': GetOracleTaskStatus200ResponseStatusEnum;
+    /**
+     * The mode of operation for registered tasks.
+     * @type {string}
+     * @memberof GetOracleTaskStatus200Response
+     */
+    'mode': GetOracleTaskStatus200ResponseModeEnum;
+    /**
+     * The interval for polling in milliseconds. Only if taskMode is POLLING.
+     * @type {number}
+     * @memberof GetOracleTaskStatus200Response
+     */
+    'pollingInterval'?: number;
+}
+
+export const GetOracleTaskStatus200ResponseTypeEnum = {
+    Read: 'READ',
+    Update: 'UPDATE',
+    ReadAndUpdate: 'READ_AND_UPDATE'
+} as const;
+
+export type GetOracleTaskStatus200ResponseTypeEnum = typeof GetOracleTaskStatus200ResponseTypeEnum[keyof typeof GetOracleTaskStatus200ResponseTypeEnum];
+export const GetOracleTaskStatus200ResponseStatusEnum = {
+    Active: 'ACTIVE',
+    Inactive: 'INACTIVE'
+} as const;
+
+export type GetOracleTaskStatus200ResponseStatusEnum = typeof GetOracleTaskStatus200ResponseStatusEnum[keyof typeof GetOracleTaskStatus200ResponseStatusEnum];
+export const GetOracleTaskStatus200ResponseModeEnum = {
+    Polling: 'POLLING',
+    EventListening: 'EVENT_LISTENING',
+    Immediate: 'IMMEDIATE'
+} as const;
+
+export type GetOracleTaskStatus200ResponseModeEnum = typeof GetOracleTaskStatus200ResponseModeEnum[keyof typeof GetOracleTaskStatus200ResponseModeEnum];
+
+/**
+ * Request schema for checking the status of a data transfer task.
+ * @export
+ * @interface GetOracleTaskStatusRequest
+ */
+export interface GetOracleTaskStatusRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof GetOracleTaskStatusRequest
+     */
+    'taskID': string;
 }
 /**
  * A collection of available and unavailable routes
@@ -1481,6 +2125,576 @@ export const NetworkIdLedgerTypeEnum = {
 export type NetworkIdLedgerTypeEnum = typeof NetworkIdLedgerTypeEnum[keyof typeof NetworkIdLedgerTypeEnum];
 
 /**
+ * Request schema for triggering an immediate transfer task. Includes the task ID, payload, and destination network and contract details.
+ * @export
+ * @interface OracleExecuteRequest
+ */
+export interface OracleExecuteRequest {
+    /**
+     * 
+     * @type {TransactRequestSourceAssetNetworkId}
+     * @memberof OracleExecuteRequest
+     */
+    'sourceNetworkId'?: TransactRequestSourceAssetNetworkId;
+    /**
+     * 
+     * @type {TransactRequestSourceAssetNetworkId}
+     * @memberof OracleExecuteRequest
+     */
+    'destinationNetworkId'?: TransactRequestSourceAssetNetworkId;
+    /**
+     * 
+     * @type {ExecuteOracleTaskRequestSourceContract}
+     * @memberof OracleExecuteRequest
+     */
+    'sourceContract'?: ExecuteOracleTaskRequestSourceContract;
+    /**
+     * 
+     * @type {ExecuteOracleTaskRequestDestinationContract}
+     * @memberof OracleExecuteRequest
+     */
+    'destinationContract'?: ExecuteOracleTaskRequestDestinationContract;
+    /**
+     * The type of task to be registered.
+     * @type {string}
+     * @memberof OracleExecuteRequest
+     */
+    'taskType'?: OracleExecuteRequestTaskTypeEnum;
+}
+
+export const OracleExecuteRequestTaskTypeEnum = {
+    Read: 'READ',
+    Update: 'UPDATE',
+    ReadAndUpdate: 'READ_AND_UPDATE'
+} as const;
+
+export type OracleExecuteRequestTaskTypeEnum = typeof OracleExecuteRequestTaskTypeEnum[keyof typeof OracleExecuteRequestTaskTypeEnum];
+
+/**
+ * Response schema for executing a data transfer task. Includes the task ID and status of the execution.
+ * @export
+ * @interface OracleExecuteResponse
+ */
+export interface OracleExecuteResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof OracleExecuteResponse
+     */
+    'taskID'?: string;
+    /**
+     * The type of the Oracle task.
+     * @type {Enum}
+     * @memberof OracleExecuteResponse
+     */
+    'type': OracleExecuteResponseTypeEnum;
+    /**
+     * 
+     * @type {TransactRequestSourceAssetNetworkId}
+     * @memberof OracleExecuteResponse
+     */
+    'srcNetworkId'?: TransactRequestSourceAssetNetworkId;
+    /**
+     * 
+     * @type {ExecuteOracleTask200ResponseSrcContract}
+     * @memberof OracleExecuteResponse
+     */
+    'srcContract': ExecuteOracleTask200ResponseSrcContract;
+    /**
+     * 
+     * @type {TransactRequestSourceAssetNetworkId}
+     * @memberof OracleExecuteResponse
+     */
+    'dstNetworkId'?: TransactRequestSourceAssetNetworkId;
+    /**
+     * 
+     * @type {ExecuteOracleTask200ResponseDstContract}
+     * @memberof OracleExecuteResponse
+     */
+    'dstContract': ExecuteOracleTask200ResponseDstContract;
+    /**
+     * The timestamp when the Oracle task was created or last updated.
+     * @type {number}
+     * @memberof OracleExecuteResponse
+     */
+    'timestamp': number;
+    /**
+     * The list of operations performed by the Oracle task.
+     * @type {Array<ExecuteOracleTask200ResponseOperationsInner>}
+     * @memberof OracleExecuteResponse
+     */
+    'operations': Array<ExecuteOracleTask200ResponseOperationsInner>;
+    /**
+     * The current status of the Oracle task.
+     * @type {Enum}
+     * @memberof OracleExecuteResponse
+     */
+    'status': OracleExecuteResponseStatusEnum;
+    /**
+     * The mode of operation for registered tasks.
+     * @type {string}
+     * @memberof OracleExecuteResponse
+     */
+    'mode': OracleExecuteResponseModeEnum;
+    /**
+     * The interval for polling in milliseconds. Only if taskMode is POLLING.
+     * @type {number}
+     * @memberof OracleExecuteResponse
+     */
+    'pollingInterval'?: number;
+}
+
+export const OracleExecuteResponseTypeEnum = {
+    Read: 'READ',
+    Update: 'UPDATE',
+    ReadAndUpdate: 'READ_AND_UPDATE'
+} as const;
+
+export type OracleExecuteResponseTypeEnum = typeof OracleExecuteResponseTypeEnum[keyof typeof OracleExecuteResponseTypeEnum];
+export const OracleExecuteResponseStatusEnum = {
+    Active: 'ACTIVE',
+    Inactive: 'INACTIVE'
+} as const;
+
+export type OracleExecuteResponseStatusEnum = typeof OracleExecuteResponseStatusEnum[keyof typeof OracleExecuteResponseStatusEnum];
+export const OracleExecuteResponseModeEnum = {
+    Polling: 'POLLING',
+    EventListening: 'EVENT_LISTENING',
+    Immediate: 'IMMEDIATE'
+} as const;
+
+export type OracleExecuteResponseModeEnum = typeof OracleExecuteResponseModeEnum[keyof typeof OracleExecuteResponseModeEnum];
+
+/**
+ * Represents an operation performed by the Oracle, including its type, network, contract, status, and optional output.
+ * @export
+ * @interface OracleOperation
+ */
+export interface OracleOperation {
+    /**
+     * A unique identifier for the Oracle operation.
+     * @type {string}
+     * @memberof OracleOperation
+     */
+    'id': string;
+    /**
+     * The type of the Oracle operation.
+     * @type {string}
+     * @memberof OracleOperation
+     */
+    'type': OracleOperationTypeEnum;
+    /**
+     * 
+     * @type {TransactRequestSourceAssetNetworkId}
+     * @memberof OracleOperation
+     */
+    'networkId': TransactRequestSourceAssetNetworkId;
+    /**
+     * 
+     * @type {ExecuteOracleTask200ResponseOperationsInnerContract}
+     * @memberof OracleOperation
+     */
+    'contract': ExecuteOracleTask200ResponseOperationsInnerContract;
+    /**
+     * The current status of the Oracle operation.
+     * @type {string}
+     * @memberof OracleOperation
+     */
+    'status': OracleOperationStatusEnum;
+    /**
+     * 
+     * @type {ExecuteOracleTask200ResponseOperationsInnerOutput}
+     * @memberof OracleOperation
+     */
+    'output'?: ExecuteOracleTask200ResponseOperationsInnerOutput;
+    /**
+     * The timestamp when the Oracle operation was created or last updated.
+     * @type {number}
+     * @memberof OracleOperation
+     */
+    'timestamp': number;
+}
+
+export const OracleOperationTypeEnum = {
+    Read: 'READ',
+    Update: 'UPDATE'
+} as const;
+
+export type OracleOperationTypeEnum = typeof OracleOperationTypeEnum[keyof typeof OracleOperationTypeEnum];
+export const OracleOperationStatusEnum = {
+    Pending: 'PENDING',
+    Success: 'SUCCESS',
+    Failed: 'FAILED'
+} as const;
+
+export type OracleOperationStatusEnum = typeof OracleOperationStatusEnum[keyof typeof OracleOperationStatusEnum];
+
+/**
+ * Request schema for registering a repeatable task.
+ * @export
+ * @interface OracleRegisterRequest
+ */
+export interface OracleRegisterRequest {
+    /**
+     * 
+     * @type {TransactRequestSourceAssetNetworkId}
+     * @memberof OracleRegisterRequest
+     */
+    'sourceNetworkId'?: TransactRequestSourceAssetNetworkId;
+    /**
+     * 
+     * @type {TransactRequestSourceAssetNetworkId}
+     * @memberof OracleRegisterRequest
+     */
+    'destinationNetworkId'?: TransactRequestSourceAssetNetworkId;
+    /**
+     * 
+     * @type {RegisterOracleTaskRequestSourceContract}
+     * @memberof OracleRegisterRequest
+     */
+    'sourceContract'?: RegisterOracleTaskRequestSourceContract;
+    /**
+     * 
+     * @type {RegisterOracleTaskRequestDestinationContract}
+     * @memberof OracleRegisterRequest
+     */
+    'destinationContract'?: RegisterOracleTaskRequestDestinationContract;
+    /**
+     * The mode of operation for the repeatable task.
+     * @type {string}
+     * @memberof OracleRegisterRequest
+     */
+    'taskMode': OracleRegisterRequestTaskModeEnum;
+    /**
+     * The interval for polling in milliseconds. Only if taskMode is POLLING.
+     * @type {number}
+     * @memberof OracleRegisterRequest
+     */
+    'pollingInterval'?: number;
+    /**
+     * The type of task to be registered.
+     * @type {string}
+     * @memberof OracleRegisterRequest
+     */
+    'taskType': OracleRegisterRequestTaskTypeEnum;
+}
+
+export const OracleRegisterRequestTaskModeEnum = {
+    Polling: 'POLLING',
+    EventListening: 'EVENT_LISTENING'
+} as const;
+
+export type OracleRegisterRequestTaskModeEnum = typeof OracleRegisterRequestTaskModeEnum[keyof typeof OracleRegisterRequestTaskModeEnum];
+export const OracleRegisterRequestTaskTypeEnum = {
+    Read: 'READ',
+    Update: 'UPDATE',
+    ReadAndUpdate: 'READ_AND_UPDATE'
+} as const;
+
+export type OracleRegisterRequestTaskTypeEnum = typeof OracleRegisterRequestTaskTypeEnum[keyof typeof OracleRegisterRequestTaskTypeEnum];
+
+/**
+ * Response schema for registering a repeatable task. Includes the task ID and status of the registration.
+ * @export
+ * @interface OracleRegisterResponse
+ */
+export interface OracleRegisterResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof OracleRegisterResponse
+     */
+    'taskID'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof OracleRegisterResponse
+     */
+    'status'?: OracleRegisterResponseStatusEnum;
+}
+
+export const OracleRegisterResponseStatusEnum = {
+    Success: 'SUCCESS',
+    Failed: 'FAILED'
+} as const;
+
+export type OracleRegisterResponseStatusEnum = typeof OracleRegisterResponseStatusEnum[keyof typeof OracleRegisterResponseStatusEnum];
+
+/**
+ * Represents the response from an Oracle task execution, including transaction details and outputs.
+ * @export
+ * @interface OracleResponse
+ */
+export interface OracleResponse {
+    /**
+     * The unique identifier for the transaction.
+     * @type {string}
+     * @memberof OracleResponse
+     */
+    'transactionId'?: string;
+    /**
+     * The receipt of the transaction, providing proof of execution.
+     * @type {object}
+     * @memberof OracleResponse
+     */
+    'transactionReceipt'?: object;
+    /**
+     * The output of the Oracle operation execution.
+     * @type {string}
+     * @memberof OracleResponse
+     */
+    'output'?: string;
+    /**
+     * Proof of the Oracle operation execution.
+     * @type {object}
+     * @memberof OracleResponse
+     */
+    'proof'?: object;
+}
+/**
+ * Request schema for checking the status of a data transfer task.
+ * @export
+ * @interface OracleStatusRequest
+ */
+export interface OracleStatusRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof OracleStatusRequest
+     */
+    'taskID': string;
+}
+/**
+ * Response schema for checking the status of a data transfer task. Includes the task ID and status of the task.
+ * @export
+ * @interface OracleStatusResponse
+ */
+export interface OracleStatusResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof OracleStatusResponse
+     */
+    'taskID'?: string;
+    /**
+     * The type of the Oracle task.
+     * @type {Enum}
+     * @memberof OracleStatusResponse
+     */
+    'type': OracleStatusResponseTypeEnum;
+    /**
+     * 
+     * @type {TransactRequestSourceAssetNetworkId}
+     * @memberof OracleStatusResponse
+     */
+    'srcNetworkId'?: TransactRequestSourceAssetNetworkId;
+    /**
+     * 
+     * @type {ExecuteOracleTask200ResponseSrcContract}
+     * @memberof OracleStatusResponse
+     */
+    'srcContract': ExecuteOracleTask200ResponseSrcContract;
+    /**
+     * 
+     * @type {TransactRequestSourceAssetNetworkId}
+     * @memberof OracleStatusResponse
+     */
+    'dstNetworkId'?: TransactRequestSourceAssetNetworkId;
+    /**
+     * 
+     * @type {ExecuteOracleTask200ResponseDstContract}
+     * @memberof OracleStatusResponse
+     */
+    'dstContract': ExecuteOracleTask200ResponseDstContract;
+    /**
+     * The timestamp when the Oracle task was created or last updated.
+     * @type {number}
+     * @memberof OracleStatusResponse
+     */
+    'timestamp': number;
+    /**
+     * The list of operations performed by the Oracle task.
+     * @type {Array<ExecuteOracleTask200ResponseOperationsInner>}
+     * @memberof OracleStatusResponse
+     */
+    'operations': Array<ExecuteOracleTask200ResponseOperationsInner>;
+    /**
+     * The current status of the Oracle task.
+     * @type {Enum}
+     * @memberof OracleStatusResponse
+     */
+    'status': OracleStatusResponseStatusEnum;
+    /**
+     * The mode of operation for registered tasks.
+     * @type {string}
+     * @memberof OracleStatusResponse
+     */
+    'mode': OracleStatusResponseModeEnum;
+    /**
+     * The interval for polling in milliseconds. Only if taskMode is POLLING.
+     * @type {number}
+     * @memberof OracleStatusResponse
+     */
+    'pollingInterval'?: number;
+}
+
+export const OracleStatusResponseTypeEnum = {
+    Read: 'READ',
+    Update: 'UPDATE',
+    ReadAndUpdate: 'READ_AND_UPDATE'
+} as const;
+
+export type OracleStatusResponseTypeEnum = typeof OracleStatusResponseTypeEnum[keyof typeof OracleStatusResponseTypeEnum];
+export const OracleStatusResponseStatusEnum = {
+    Active: 'ACTIVE',
+    Inactive: 'INACTIVE'
+} as const;
+
+export type OracleStatusResponseStatusEnum = typeof OracleStatusResponseStatusEnum[keyof typeof OracleStatusResponseStatusEnum];
+export const OracleStatusResponseModeEnum = {
+    Polling: 'POLLING',
+    EventListening: 'EVENT_LISTENING',
+    Immediate: 'IMMEDIATE'
+} as const;
+
+export type OracleStatusResponseModeEnum = typeof OracleStatusResponseModeEnum[keyof typeof OracleStatusResponseModeEnum];
+
+/**
+ * Represents a repeatable Oracle task with additional properties for mode, polling interval, and source event signature.
+ * @export
+ * @interface OracleTask
+ */
+export interface OracleTask {
+    /**
+     * A unique identifier for the Oracle task.
+     * @type {string}
+     * @memberof OracleTask
+     */
+    'id': string;
+    /**
+     * The type of the Oracle task.
+     * @type {Enum}
+     * @memberof OracleTask
+     */
+    'type': OracleTaskTypeEnum;
+    /**
+     * 
+     * @type {TransactRequestSourceAssetNetworkId}
+     * @memberof OracleTask
+     */
+    'srcNetworkId'?: TransactRequestSourceAssetNetworkId;
+    /**
+     * 
+     * @type {ExecuteOracleTask200ResponseSrcContract}
+     * @memberof OracleTask
+     */
+    'srcContract': ExecuteOracleTask200ResponseSrcContract;
+    /**
+     * 
+     * @type {TransactRequestSourceAssetNetworkId}
+     * @memberof OracleTask
+     */
+    'dstNetworkId'?: TransactRequestSourceAssetNetworkId;
+    /**
+     * 
+     * @type {ExecuteOracleTask200ResponseDstContract}
+     * @memberof OracleTask
+     */
+    'dstContract': ExecuteOracleTask200ResponseDstContract;
+    /**
+     * The timestamp when the Oracle task was created or last updated.
+     * @type {number}
+     * @memberof OracleTask
+     */
+    'timestamp': number;
+    /**
+     * The list of operations performed by the Oracle task.
+     * @type {Array<ExecuteOracleTask200ResponseOperationsInner>}
+     * @memberof OracleTask
+     */
+    'operations': Array<ExecuteOracleTask200ResponseOperationsInner>;
+    /**
+     * The current status of the Oracle task.
+     * @type {Enum}
+     * @memberof OracleTask
+     */
+    'status': OracleTaskStatusEnum;
+    /**
+     * The mode of operation for registered tasks.
+     * @type {string}
+     * @memberof OracleTask
+     */
+    'mode': OracleTaskModeEnum;
+    /**
+     * The interval for polling in milliseconds. Only if taskMode is POLLING.
+     * @type {number}
+     * @memberof OracleTask
+     */
+    'pollingInterval'?: number;
+}
+
+export const OracleTaskTypeEnum = {
+    Read: 'READ',
+    Update: 'UPDATE',
+    ReadAndUpdate: 'READ_AND_UPDATE'
+} as const;
+
+export type OracleTaskTypeEnum = typeof OracleTaskTypeEnum[keyof typeof OracleTaskTypeEnum];
+export const OracleTaskStatusEnum = {
+    Active: 'ACTIVE',
+    Inactive: 'INACTIVE'
+} as const;
+
+export type OracleTaskStatusEnum = typeof OracleTaskStatusEnum[keyof typeof OracleTaskStatusEnum];
+export const OracleTaskModeEnum = {
+    Polling: 'POLLING',
+    EventListening: 'EVENT_LISTENING',
+    Immediate: 'IMMEDIATE'
+} as const;
+
+export type OracleTaskModeEnum = typeof OracleTaskModeEnum[keyof typeof OracleTaskModeEnum];
+
+/**
+ * Request schema for unregistering a data transfer task. Includes the context ID of the task to be unregistered.
+ * @export
+ * @interface OracleUnregisterRequest
+ */
+export interface OracleUnregisterRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof OracleUnregisterRequest
+     */
+    'taskID': string;
+}
+/**
+ * Response schema for unregistering a data transfer task. Includes the task ID and status of the unregistration.
+ * @export
+ * @interface OracleUnregisterResponse
+ */
+export interface OracleUnregisterResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof OracleUnregisterResponse
+     */
+    'taskID'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof OracleUnregisterResponse
+     */
+    'status'?: OracleUnregisterResponseStatusEnum;
+}
+
+export const OracleUnregisterResponseStatusEnum = {
+    Success: 'SUCCESS',
+    Failed: 'FAILED'
+} as const;
+
+export type OracleUnregisterResponseStatusEnum = typeof OracleUnregisterResponseStatusEnum[keyof typeof OracleUnregisterResponseStatusEnum];
+
+/**
  * Response for a pause transaction request. Returns the current status of the SATP session post-pause action.
  * @export
  * @interface Pause200Response
@@ -1524,6 +2738,195 @@ export interface PauseResponse {
      * @memberof PauseResponse
      */
     'statusResponse': Transact200ResponseStatusResponse;
+}
+/**
+ * Response schema for registering a repeatable task. Includes the task ID and status of the registration.
+ * @export
+ * @interface RegisterOracleTask200Response
+ */
+export interface RegisterOracleTask200Response {
+    /**
+     * 
+     * @type {string}
+     * @memberof RegisterOracleTask200Response
+     */
+    'taskID'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RegisterOracleTask200Response
+     */
+    'status'?: RegisterOracleTask200ResponseStatusEnum;
+}
+
+export const RegisterOracleTask200ResponseStatusEnum = {
+    Success: 'SUCCESS',
+    Failed: 'FAILED'
+} as const;
+
+export type RegisterOracleTask200ResponseStatusEnum = typeof RegisterOracleTask200ResponseStatusEnum[keyof typeof RegisterOracleTask200ResponseStatusEnum];
+
+/**
+ * Request schema for registering a repeatable task.
+ * @export
+ * @interface RegisterOracleTaskRequest
+ */
+export interface RegisterOracleTaskRequest {
+    /**
+     * 
+     * @type {TransactRequestSourceAssetNetworkId}
+     * @memberof RegisterOracleTaskRequest
+     */
+    'sourceNetworkId'?: TransactRequestSourceAssetNetworkId;
+    /**
+     * 
+     * @type {TransactRequestSourceAssetNetworkId}
+     * @memberof RegisterOracleTaskRequest
+     */
+    'destinationNetworkId'?: TransactRequestSourceAssetNetworkId;
+    /**
+     * 
+     * @type {RegisterOracleTaskRequestSourceContract}
+     * @memberof RegisterOracleTaskRequest
+     */
+    'sourceContract'?: RegisterOracleTaskRequestSourceContract;
+    /**
+     * 
+     * @type {RegisterOracleTaskRequestDestinationContract}
+     * @memberof RegisterOracleTaskRequest
+     */
+    'destinationContract'?: RegisterOracleTaskRequestDestinationContract;
+    /**
+     * The mode of operation for the repeatable task.
+     * @type {string}
+     * @memberof RegisterOracleTaskRequest
+     */
+    'taskMode': RegisterOracleTaskRequestTaskModeEnum;
+    /**
+     * The interval for polling in milliseconds. Only if taskMode is POLLING.
+     * @type {number}
+     * @memberof RegisterOracleTaskRequest
+     */
+    'pollingInterval'?: number;
+    /**
+     * The type of task to be registered.
+     * @type {string}
+     * @memberof RegisterOracleTaskRequest
+     */
+    'taskType': RegisterOracleTaskRequestTaskTypeEnum;
+}
+
+export const RegisterOracleTaskRequestTaskModeEnum = {
+    Polling: 'POLLING',
+    EventListening: 'EVENT_LISTENING'
+} as const;
+
+export type RegisterOracleTaskRequestTaskModeEnum = typeof RegisterOracleTaskRequestTaskModeEnum[keyof typeof RegisterOracleTaskRequestTaskModeEnum];
+export const RegisterOracleTaskRequestTaskTypeEnum = {
+    Read: 'READ',
+    Update: 'UPDATE',
+    ReadAndUpdate: 'READ_AND_UPDATE'
+} as const;
+
+export type RegisterOracleTaskRequestTaskTypeEnum = typeof RegisterOracleTaskRequestTaskTypeEnum[keyof typeof RegisterOracleTaskRequestTaskTypeEnum];
+
+/**
+ * The contract address on the destination blockchain. Only if taskType is UPDATE or READ_AND_UPDATE.
+ * @export
+ * @interface RegisterOracleTaskRequestDestinationContract
+ */
+export interface RegisterOracleTaskRequestDestinationContract {
+    /**
+     * The name of the contract.
+     * @type {string}
+     * @memberof RegisterOracleTaskRequestDestinationContract
+     */
+    'contractName'?: string;
+    /**
+     * The address of the contract.
+     * @type {string}
+     * @memberof RegisterOracleTaskRequestDestinationContract
+     */
+    'contractAddress'?: string | null;
+    /**
+     * The ABI (Application Binary Interface) of the contract.
+     * @type {Array<object>}
+     * @memberof RegisterOracleTaskRequestDestinationContract
+     */
+    'contractAbi'?: Array<object> | null;
+    /**
+     * The bytecode of the contract.
+     * @type {string}
+     * @memberof RegisterOracleTaskRequestDestinationContract
+     */
+    'contractBytecode'?: string | null;
+    /**
+     * The name of the method to be invoked on the contract.
+     * @type {string}
+     * @memberof RegisterOracleTaskRequestDestinationContract
+     */
+    'methodName'?: string;
+    /**
+     * The parameters to be passed to the contract method.
+     * @type {Array<ExecuteOracleTaskRequestSourceContractParamsInner>}
+     * @memberof RegisterOracleTaskRequestDestinationContract
+     */
+    'params'?: Array<ExecuteOracleTaskRequestSourceContractParamsInner>;
+    /**
+     * The event signatures to listen for on the source network. To be defined if task mode is EVENT_LISTENING.
+     * @type {string}
+     * @memberof RegisterOracleTaskRequestDestinationContract
+     */
+    'eventSignature'?: string;
+}
+/**
+ * The contract address on the source blockchain. Only if taskType is READ or READ_AND_UPDATE.
+ * @export
+ * @interface RegisterOracleTaskRequestSourceContract
+ */
+export interface RegisterOracleTaskRequestSourceContract {
+    /**
+     * The name of the contract.
+     * @type {string}
+     * @memberof RegisterOracleTaskRequestSourceContract
+     */
+    'contractName'?: string;
+    /**
+     * The address of the contract.
+     * @type {string}
+     * @memberof RegisterOracleTaskRequestSourceContract
+     */
+    'contractAddress'?: string | null;
+    /**
+     * The ABI (Application Binary Interface) of the contract.
+     * @type {Array<object>}
+     * @memberof RegisterOracleTaskRequestSourceContract
+     */
+    'contractAbi'?: Array<object> | null;
+    /**
+     * The bytecode of the contract.
+     * @type {string}
+     * @memberof RegisterOracleTaskRequestSourceContract
+     */
+    'contractBytecode'?: string | null;
+    /**
+     * The name of the method to be invoked on the contract.
+     * @type {string}
+     * @memberof RegisterOracleTaskRequestSourceContract
+     */
+    'methodName'?: string;
+    /**
+     * The parameters to be passed to the contract method.
+     * @type {Array<ExecuteOracleTaskRequestSourceContractParamsInner>}
+     * @memberof RegisterOracleTaskRequestSourceContract
+     */
+    'params'?: Array<ExecuteOracleTaskRequestSourceContractParamsInner>;
+    /**
+     * The event signatures to listen for on the source network. To be defined if task mode is EVENT_LISTENING.
+     * @type {string}
+     * @memberof RegisterOracleTaskRequestSourceContract
+     */
+    'eventSignature'?: string;
 }
 /**
  * 
@@ -2262,6 +3665,46 @@ export interface TransactResponse {
      */
     'statusResponse': Transact200ResponseStatusResponse;
 }
+/**
+ * Response schema for unregistering a data transfer task. Includes the task ID and status of the unregistration.
+ * @export
+ * @interface UnregisterOracleTask200Response
+ */
+export interface UnregisterOracleTask200Response {
+    /**
+     * 
+     * @type {string}
+     * @memberof UnregisterOracleTask200Response
+     */
+    'taskID'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UnregisterOracleTask200Response
+     */
+    'status'?: UnregisterOracleTask200ResponseStatusEnum;
+}
+
+export const UnregisterOracleTask200ResponseStatusEnum = {
+    Success: 'SUCCESS',
+    Failed: 'FAILED'
+} as const;
+
+export type UnregisterOracleTask200ResponseStatusEnum = typeof UnregisterOracleTask200ResponseStatusEnum[keyof typeof UnregisterOracleTask200ResponseStatusEnum];
+
+/**
+ * Request schema for unregistering a data transfer task. Includes the context ID of the task to be unregistered.
+ * @export
+ * @interface UnregisterOracleTaskRequest
+ */
+export interface UnregisterOracleTaskRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof UnregisterOracleTaskRequest
+     */
+    'taskID': string;
+}
 
 /**
  * AdminApi - axios parameter creator
@@ -2829,6 +4272,320 @@ export class GetApproveAddressApi extends BaseAPI {
      */
     public getApproveAddress(approveAddressRequest: GetApproveAddressApproveAddressRequestParameter, options?: AxiosRequestConfig) {
         return GetApproveAddressApiFp(this.configuration).getApproveAddress(approveAddressRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
+ * OracleApi - axios parameter creator
+ * @export
+ */
+export const OracleApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * Execute a registered data transfer task from source to target blockchain
+         * @summary Execute data transfer task
+         * @param {ExecuteOracleTaskRequest} executeOracleTaskRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        executeOracleTask: async (executeOracleTaskRequest: ExecuteOracleTaskRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'executeOracleTaskRequest' is not null or undefined
+            assertParamExists('executeOracleTask', 'executeOracleTaskRequest', executeOracleTaskRequest)
+            const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/execute`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(executeOracleTaskRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Get oracle task status.
+         * @summary Get oracle task status
+         * @param {GetOracleTaskStatusRequest} getOracleTaskStatusRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getOracleTaskStatus: async (getOracleTaskStatusRequest: GetOracleTaskStatusRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'getOracleTaskStatusRequest' is not null or undefined
+            assertParamExists('getOracleTaskStatus', 'getOracleTaskStatusRequest', getOracleTaskStatusRequest)
+            const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/status`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(getOracleTaskStatusRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Register data transfer from source to target blockchain
+         * @summary Register data transfer task
+         * @param {RegisterOracleTaskRequest} registerOracleTaskRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        registerOracleTask: async (registerOracleTaskRequest: RegisterOracleTaskRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'registerOracleTaskRequest' is not null or undefined
+            assertParamExists('registerOracleTask', 'registerOracleTaskRequest', registerOracleTaskRequest)
+            const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/register`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(registerOracleTaskRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Unregister data transfer task from source to target blockchain
+         * @summary Unregister data transfer task
+         * @param {UnregisterOracleTaskRequest} unregisterOracleTaskRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        unregisterOracleTask: async (unregisterOracleTaskRequest: UnregisterOracleTaskRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'unregisterOracleTaskRequest' is not null or undefined
+            assertParamExists('unregisterOracleTask', 'unregisterOracleTaskRequest', unregisterOracleTaskRequest)
+            const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/unregister`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(unregisterOracleTaskRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * OracleApi - functional programming interface
+ * @export
+ */
+export const OracleApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = OracleApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * Execute a registered data transfer task from source to target blockchain
+         * @summary Execute data transfer task
+         * @param {ExecuteOracleTaskRequest} executeOracleTaskRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async executeOracleTask(executeOracleTaskRequest: ExecuteOracleTaskRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ExecuteOracleTask200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.executeOracleTask(executeOracleTaskRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Get oracle task status.
+         * @summary Get oracle task status
+         * @param {GetOracleTaskStatusRequest} getOracleTaskStatusRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getOracleTaskStatus(getOracleTaskStatusRequest: GetOracleTaskStatusRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetOracleTaskStatus200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getOracleTaskStatus(getOracleTaskStatusRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Register data transfer from source to target blockchain
+         * @summary Register data transfer task
+         * @param {RegisterOracleTaskRequest} registerOracleTaskRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async registerOracleTask(registerOracleTaskRequest: RegisterOracleTaskRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RegisterOracleTask200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.registerOracleTask(registerOracleTaskRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Unregister data transfer task from source to target blockchain
+         * @summary Unregister data transfer task
+         * @param {UnregisterOracleTaskRequest} unregisterOracleTaskRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async unregisterOracleTask(unregisterOracleTaskRequest: UnregisterOracleTaskRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UnregisterOracleTask200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.unregisterOracleTask(unregisterOracleTaskRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * OracleApi - factory interface
+ * @export
+ */
+export const OracleApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = OracleApiFp(configuration)
+    return {
+        /**
+         * Execute a registered data transfer task from source to target blockchain
+         * @summary Execute data transfer task
+         * @param {ExecuteOracleTaskRequest} executeOracleTaskRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        executeOracleTask(executeOracleTaskRequest: ExecuteOracleTaskRequest, options?: any): AxiosPromise<ExecuteOracleTask200Response> {
+            return localVarFp.executeOracleTask(executeOracleTaskRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Get oracle task status.
+         * @summary Get oracle task status
+         * @param {GetOracleTaskStatusRequest} getOracleTaskStatusRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getOracleTaskStatus(getOracleTaskStatusRequest: GetOracleTaskStatusRequest, options?: any): AxiosPromise<GetOracleTaskStatus200Response> {
+            return localVarFp.getOracleTaskStatus(getOracleTaskStatusRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Register data transfer from source to target blockchain
+         * @summary Register data transfer task
+         * @param {RegisterOracleTaskRequest} registerOracleTaskRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        registerOracleTask(registerOracleTaskRequest: RegisterOracleTaskRequest, options?: any): AxiosPromise<RegisterOracleTask200Response> {
+            return localVarFp.registerOracleTask(registerOracleTaskRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Unregister data transfer task from source to target blockchain
+         * @summary Unregister data transfer task
+         * @param {UnregisterOracleTaskRequest} unregisterOracleTaskRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        unregisterOracleTask(unregisterOracleTaskRequest: UnregisterOracleTaskRequest, options?: any): AxiosPromise<UnregisterOracleTask200Response> {
+            return localVarFp.unregisterOracleTask(unregisterOracleTaskRequest, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * OracleApi - object-oriented interface
+ * @export
+ * @class OracleApi
+ * @extends {BaseAPI}
+ */
+export class OracleApi extends BaseAPI {
+    /**
+     * Execute a registered data transfer task from source to target blockchain
+     * @summary Execute data transfer task
+     * @param {ExecuteOracleTaskRequest} executeOracleTaskRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OracleApi
+     */
+    public executeOracleTask(executeOracleTaskRequest: ExecuteOracleTaskRequest, options?: AxiosRequestConfig) {
+        return OracleApiFp(this.configuration).executeOracleTask(executeOracleTaskRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Get oracle task status.
+     * @summary Get oracle task status
+     * @param {GetOracleTaskStatusRequest} getOracleTaskStatusRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OracleApi
+     */
+    public getOracleTaskStatus(getOracleTaskStatusRequest: GetOracleTaskStatusRequest, options?: AxiosRequestConfig) {
+        return OracleApiFp(this.configuration).getOracleTaskStatus(getOracleTaskStatusRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Register data transfer from source to target blockchain
+     * @summary Register data transfer task
+     * @param {RegisterOracleTaskRequest} registerOracleTaskRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OracleApi
+     */
+    public registerOracleTask(registerOracleTaskRequest: RegisterOracleTaskRequest, options?: AxiosRequestConfig) {
+        return OracleApiFp(this.configuration).registerOracleTask(registerOracleTaskRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Unregister data transfer task from source to target blockchain
+     * @summary Unregister data transfer task
+     * @param {UnregisterOracleTaskRequest} unregisterOracleTaskRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OracleApi
+     */
+    public unregisterOracleTask(unregisterOracleTaskRequest: UnregisterOracleTaskRequest, options?: AxiosRequestConfig) {
+        return OracleApiFp(this.configuration).unregisterOracleTask(unregisterOracleTaskRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
