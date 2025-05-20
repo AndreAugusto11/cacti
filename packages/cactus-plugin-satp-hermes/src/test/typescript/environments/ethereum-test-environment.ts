@@ -18,10 +18,6 @@ import {
 } from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
 import { IPluginBungeeHermesOptions } from "@hyperledger/cactus-plugin-bungee-hermes";
 //import { expect } from "@jest/globals";
-import {
-  GethTestLedger,
-  WHALE_ACCOUNT_ADDRESS,
-} from "@hyperledger/cactus-test-geth-ledger";
 import { ClaimFormat } from "../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 import { Asset, AssetTokenTypeEnum, NetworkId } from "../../../main/typescript";
 import { LedgerType } from "@hyperledger/cactus-core-api";
@@ -47,7 +43,6 @@ export class EthereumTestEnvironment {
     id: EthereumTestEnvironment.ETH_NETWORK_ID,
     ledgerType: LedgerType.Ethereum,
   };
-  public ledger!: GethTestLedger;
   public connector!: PluginLedgerConnectorEthereum;
   public connectorOptions!: IPluginLedgerConnectorEthereumOptions;
   public bungeeOptions!: IPluginBungeeHermesOptions;
@@ -101,9 +96,10 @@ export class EthereumTestEnvironment {
       bytecode: SATPWrapperContract.bytecode.object,
     };
 
-    const rpcApiWsHost = "ws://127.0.0.1:7540";
+    const rpcApiWsHost = "ws://127.0.0.1:7545";
     this.bridgeEthAccount = "0xc23455cE39a22CD43eFbc12B13f0A392592f5458";
-    this.keychainEntryValue = "test";
+    this.keychainEntryValue =
+      "0xefa66816f5d6053ec5eea1996434486cebd66b7dd4f385d3b95d298fced82eac";
     this.keychainEntryKey = this.bridgeEthAccount;
 
     this.keychainPlugin1 = new PluginKeychainMemory({
@@ -156,34 +152,37 @@ export class EthereumTestEnvironment {
   }
 
   public getTestOwnerAccount(): string {
-    return WHALE_ACCOUNT_ADDRESS;
+    return "0xc23455cE39a22CD43eFbc12B13f0A392592f5458";
   }
 
   public getBridgeEthAccount(): string {
-    return this.bridgeEthAccount;
+    return "0xc23455cE39a22CD43eFbc12B13f0A392592f5458";
   }
 
   public getTestOwnerSigningCredential(): Web3SigningCredential {
     return {
-      ethAccount: WHALE_ACCOUNT_ADDRESS,
-      secret: "",
-      type: Web3SigningCredentialType.GethKeychainPassword,
+      ethAccount: "0xc23455cE39a22CD43eFbc12B13f0A392592f5458",
+      secret:
+        "0xefa66816f5d6053ec5eea1996434486cebd66b7dd4f385d3b95d298fced82eac",
+      type: Web3SigningCredentialType.PrivateKeyHex,
     };
   }
 
   public getTestBridgeSigningCredential(): Web3SigningCredential {
     return {
-      ethAccount: this.bridgeEthAccount,
-      secret: "test",
-      type: Web3SigningCredentialType.GethKeychainPassword,
+      ethAccount: "0xc23455cE39a22CD43eFbc12B13f0A392592f5458",
+      secret:
+        "0xefa66816f5d6053ec5eea1996434486cebd66b7dd4f385d3b95d298fced82eac",
+      type: Web3SigningCredentialType.PrivateKeyHex,
     };
   }
 
   public getTestOracleSigningCredential(): Web3SigningCredential {
     return {
-      ethAccount: this.bridgeEthAccount,
-      secret: "test",
-      type: Web3SigningCredentialType.GethKeychainPassword,
+      ethAccount: "0xc23455cE39a22CD43eFbc12B13f0A392592f5458",
+      secret:
+        "0xefa66816f5d6053ec5eea1996434486cebd66b7dd4f385d3b95d298fced82eac",
+      type: Web3SigningCredentialType.PrivateKeyHex,
     };
   }
 
@@ -249,8 +248,8 @@ export class EthereumTestEnvironment {
       wrapperContractAddress: this.ethereumConfig.wrapperContractAddress,
       gas: this.ethereumConfig.gas,
       connectorOptions: {
-        rpcApiHttpHost: "http://127.0.0.1:7540",
-        rpcApiWsHost: "ws://127.0.0.1:7540",
+        rpcApiHttpHost: "http://127.0.0.1:7545",
+        rpcApiWsHost: "ws://127.0.0.1:7545",
       },
       claimFormats: this.ethereumConfig.claimFormats,
     } as INetworkOptions;
@@ -264,11 +263,11 @@ export class EthereumTestEnvironment {
         contractName: this.erc20TokenContract,
       },
       constructorArgs: [
-        WHALE_ACCOUNT_ADDRESS,
+        "0xc23455cE39a22CD43eFbc12B13f0A392592f5458",
         EthereumTestEnvironment.ETH_ASSET_ID,
       ],
       web3SigningCredential: {
-        ethAccount: WHALE_ACCOUNT_ADDRESS,
+        ethAccount: "0xc23455cE39a22CD43eFbc12B13f0A392592f5458",
         secret:
           "0xefa66816f5d6053ec5eea1996434486cebd66b7dd4f385d3b95d298fced82eac",
         type: Web3SigningCredentialType.PrivateKeyHex,
@@ -296,7 +295,7 @@ export class EthereumTestEnvironment {
       leafId: "Testing-event-ethereum-leaf",
       connectorOptions: this.connectorOptions,
       claimFormats: [claimFormat],
-      gas: 5000000,
+      gas: 6721975,
     };
 
     this.log.info("BRIDGE_ROLE given to SATPWrapperContract successfully");
@@ -319,6 +318,10 @@ export class EthereumTestEnvironment {
       },
       constructorArgs: [],
       web3SigningCredential: this.getTestOracleSigningCredential(),
+      gasConfig: {
+        gas: "6721975",
+        gasPrice: "20000000000",
+      },
     });
     expect(blOracleContract).toBeTruthy();
     expect(blOracleContract.transactionReceipt).toBeTruthy();
@@ -334,7 +337,7 @@ export class EthereumTestEnvironment {
       signingCredential: this.getTestOracleSigningCredential(),
       connectorOptions: this.connectorOptions,
       claimFormats: [claimFormat],
-      gas: 5000000,
+      gas: 6721975,
     };
 
     return blOracleContract.transactionReceipt.contractAddress!;
@@ -348,11 +351,16 @@ export class EthereumTestEnvironment {
       },
       invocationType: EthContractInvocationType.Send,
       methodName: "mint",
-      params: [WHALE_ACCOUNT_ADDRESS, amount],
+      params: ["0xc23455cE39a22CD43eFbc12B13f0A392592f5458", amount],
       web3SigningCredential: {
-        ethAccount: WHALE_ACCOUNT_ADDRESS,
-        secret: "",
-        type: Web3SigningCredentialType.GethKeychainPassword,
+        ethAccount: "0xc23455cE39a22CD43eFbc12B13f0A392592f5458",
+        secret:
+          "0xefa66816f5d6053ec5eea1996434486cebd66b7dd4f385d3b95d298fced82eac",
+        type: Web3SigningCredentialType.PrivateKeyHex,
+      },
+      gasConfig: {
+        gas: "6721975",
+        gasPrice: "20000000000",
       },
     });
     expect(responseMint).toBeTruthy();
@@ -370,9 +378,10 @@ export class EthereumTestEnvironment {
       methodName: "giveRole",
       params: [wrapperAddress],
       web3SigningCredential: {
-        ethAccount: WHALE_ACCOUNT_ADDRESS,
-        secret: "",
-        type: Web3SigningCredentialType.GethKeychainPassword,
+        ethAccount: "0xc23455cE39a22CD43eFbc12B13f0A392592f5458",
+        secret:
+          "0xefa66816f5d6053ec5eea1996434486cebd66b7dd4f385d3b95d298fced82eac",
+        type: Web3SigningCredentialType.PrivateKeyHex,
       },
     });
 
@@ -394,9 +403,10 @@ export class EthereumTestEnvironment {
       methodName: "approve",
       params: [wrapperAddress, amount],
       web3SigningCredential: {
-        ethAccount: WHALE_ACCOUNT_ADDRESS,
-        secret: "",
-        type: Web3SigningCredentialType.GethKeychainPassword,
+        ethAccount: "0xc23455cE39a22CD43eFbc12B13f0A392592f5458",
+        secret:
+          "0xefa66816f5d6053ec5eea1996434486cebd66b7dd4f385d3b95d298fced82eac",
+        type: Web3SigningCredentialType.PrivateKeyHex,
       },
     });
     expect(responseApprove).toBeTruthy();
@@ -436,7 +446,7 @@ export class EthereumTestEnvironment {
     return {
       id: EthereumTestEnvironment.ETH_ASSET_ID,
       referenceId: EthereumTestEnvironment.ETHREFERENCE_ID,
-      owner: WHALE_ACCOUNT_ADDRESS,
+      owner: "0xc23455cE39a22CD43eFbc12B13f0A392592f5458",
       contractName: this.erc20TokenContract,
       contractAddress: this.assetContractAddress,
       networkId: this.network,
@@ -446,14 +456,14 @@ export class EthereumTestEnvironment {
 
   // Returns the whale account address used for testing transactions
   get transactRequestPubKey(): string {
-    return WHALE_ACCOUNT_ADDRESS;
+    return "0xc23455cE39a22CD43eFbc12B13f0A392592f5458";
   }
 
-  // // Stops and destroys the test ledger
-  // public async tearDown(): Promise<void> {
-  //   await this.ledger.stop();
-  //   await this.ledger.destroy();
-  // }
+  // Stops and destroys the test ledger
+  public async tearDown(): Promise<void> {
+    // await this.ledger.stop();
+    // await this.ledger.destroy();
+  }
 
   public async writeData(
     contractName: string,

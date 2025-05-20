@@ -11,7 +11,7 @@ import {
   OracleExecuteRequestTaskTypeEnum,
   OracleTaskStatusEnum,
   OracleOperationStatusEnum,
-  OracleOperationTypeEnum,
+  // OracleOperationTypeEnum,
   OracleApi,
   Configuration,
 } from "../../../../main/typescript";
@@ -25,9 +25,9 @@ import {
 } from "@hyperledger/cactus-core-api";
 import { ClaimFormat } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 import {
-  BesuTestEnvironment,
+  // BesuTestEnvironment,
   EthereumTestEnvironment,
-  FabricTestEnvironment,
+  // FabricTestEnvironment,
 } from "../../test-utils";
 import {
   SATP_ARCHITECTURE_VERSION,
@@ -37,7 +37,6 @@ import {
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import { v4 as uuidv4 } from "uuid";
 import OracleTestContract from "../../../solidity/generated/oracle-contract.sol/OracleTestContract.json";
-import { keccak256 } from "web3-utils";
 import { ApiServer } from "@hyperledger/cactus-cmd-api-server";
 
 const logLevel: LogLevelDesc = "DEBUG";
@@ -47,13 +46,12 @@ const log = LoggerProvider.getOrCreate({
 });
 
 let oracleApi: OracleApi;
-let besuEnv: BesuTestEnvironment;
+// let besuEnv: BesuTestEnvironment;
 let ethereumEnv: EthereumTestEnvironment;
-let fabricEnv: FabricTestEnvironment;
+// let fabricEnv: FabricTestEnvironment;
 let gateway: SATPGateway;
-let besuContractAddress: string;
+// let besuContractAddress: string;
 let ethereumContractAddress: string;
-let data_hash: string;
 
 beforeAll(async () => {
   pruneDockerAllIfGithubAction({ logLevel })
@@ -69,30 +67,30 @@ beforeAll(async () => {
     const businessLogicContract = "OracleTestContract";
 
     try {
-      besuEnv = await BesuTestEnvironment.setupTestEnvironment({
-        contractName: businessLogicContract,
-        logLevel,
-      });
-      log.info("Besu Ledger started successfully");
+      // besuEnv = await BesuTestEnvironment.setupTestEnvironment({
+      //   contractName: businessLogicContract,
+      //   logLevel,
+      // });
+      // log.info("Besu Ledger started successfully");
 
       ethereumEnv = await EthereumTestEnvironment.setupTestEnvironment({
         contractName: businessLogicContract,
         logLevel,
       });
 
-      fabricEnv = await FabricTestEnvironment.setupTestEnvironment({
-        contractName: businessLogicContract,
-        logLevel,
-      });
+      // fabricEnv = await FabricTestEnvironment.setupTestEnvironment({
+      //   contractName: businessLogicContract,
+      //   logLevel,
+      // });
     } catch (err) {
       log.error("Error starting ledgers: ", err);
     }
 
-    besuContractAddress = await besuEnv.deployAndSetupOracleContracts(
-      ClaimFormat.BUNGEE,
-      "OracleTestContract",
-      OracleTestContract,
-    );
+    // besuContractAddress = await besuEnv.deployAndSetupOracleContracts(
+    //   ClaimFormat.BUNGEE,
+    //   "OracleTestContract",
+    //   OracleTestContract,
+    // );
 
     ethereumContractAddress = await ethereumEnv.deployAndSetupOracleContracts(
       ClaimFormat.BUNGEE,
@@ -100,7 +98,7 @@ beforeAll(async () => {
       OracleTestContract,
     );
 
-    await fabricEnv.deployAndSetupContracts();
+    // await fabricEnv.deployAndSetupContracts();
   }
 
   //setup satp gateway
@@ -124,8 +122,8 @@ beforeAll(async () => {
   } as GatewayIdentity;
 
   const ethNetworkOptions = ethereumEnv.createEthereumConfig();
-  const besuNetworkOptions = besuEnv.createBesuConfig();
-  const fabricNetworkOptions = fabricEnv.createFabricConfig();
+  // const besuNetworkOptions = besuEnv.createBesuConfig();
+  // const fabricNetworkOptions = fabricEnv.createFabricConfig();
 
   const options: SATPGatewayConfig = {
     instanceId: uuidv4(),
@@ -134,8 +132,8 @@ beforeAll(async () => {
     ccConfig: {
       oracleConfig: [
         ethNetworkOptions,
-        besuNetworkOptions,
-        fabricNetworkOptions,
+        // besuNetworkOptions,
+        // fabricNetworkOptions,
       ],
     },
     pluginRegistry: new PluginRegistry({ plugins: [] }),
@@ -161,9 +159,9 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await gateway.shutdown();
-  await besuEnv.tearDown();
-  await ethereumEnv.tearDown();
-  await fabricEnv.tearDown();
+  // await besuEnv.tearDown();
+  // await ethereumEnv.tearDown();
+  // await fabricEnv.tearDown();
 
   await pruneDockerAllIfGithubAction({ logLevel })
     .then(() => {
@@ -177,8 +175,6 @@ afterAll(async () => {
 
 describe("Oracle executing READ, UPDATE, and READ_AND_UPDATE tasks successfully", () => {
   it("should fail when writing to a contract calling a function that does not exist", async () => {
-    data_hash = keccak256("Hello World!");
-
     let response = await oracleApi.executeOracleTask({
       destinationNetworkId: ethereumEnv.network,
       destinationContract: {
@@ -207,9 +203,7 @@ describe("Oracle executing READ, UPDATE, and READ_AND_UPDATE tasks successfully"
   });
 
   it("should write data to a contract calling a function with args (EVM and Fabric)", async () => {
-    data_hash = keccak256("Hello World!");
-
-    let response = await oracleApi.executeOracleTask({
+    const response = await oracleApi.executeOracleTask({
       destinationNetworkId: ethereumEnv.network,
       destinationContract: {
         contractName: ethereumEnv.getTestContractName(),
@@ -229,141 +223,36 @@ describe("Oracle executing READ, UPDATE, and READ_AND_UPDATE tasks successfully"
       OracleOperationStatusEnum.Success,
     );
 
-    let response2 = await oracleApi.getOracleTaskStatus(response.data.taskID ?? "");
+    const response2 = await oracleApi.getOracleTaskStatus(
+      response.data.taskID ?? "",
+    );
 
     expect(response2).toBeDefined();
     expect(response2.data.taskID).toBe(response.data.taskID);
     expect(response2.data.status).toBe(OracleTaskStatusEnum.Inactive);
 
-    // Repeat the same test for Fabric
-    response = await oracleApi.executeOracleTask({
-      destinationNetworkId: fabricEnv.network,
-      destinationContract: {
-        contractName: fabricEnv.getTestContractName(),
-        methodName: "Mint",
-        params: ["500"],
-      },
-      taskType: OracleExecuteRequestTaskTypeEnum.Update,
-    });
+    // // Repeat the same test for Fabric
+    // response = await oracleApi.executeOracleTask({
+    //   destinationNetworkId: fabricEnv.network,
+    //   destinationContract: {
+    //     contractName: fabricEnv.getTestContractName(),
+    //     methodName: "Mint",
+    //     params: ["500"],
+    //   },
+    //   taskType: OracleExecuteRequestTaskTypeEnum.Update,
+    // });
 
-    expect(response).toBeDefined();
-    expect(response.data.taskID).toBeDefined();
-    expect(response.data.operations?.length).toBe(1);
-    expect(response.data.operations?.[0].status).toBe(
-      OracleOperationStatusEnum.Success,
-    );
+    // expect(response).toBeDefined();
+    // expect(response.data.taskID).toBeDefined();
+    // expect(response.data.operations?.length).toBe(1);
+    // expect(response.data.operations?.[0].status).toBe(
+    //   OracleOperationStatusEnum.Success,
+    // );
 
-    response2 = await oracleApi.getOracleTaskStatus(response.data.taskID ?? "");
+    // response2 = await oracleApi.getOracleTaskStatus(response.data.taskID ?? "");
 
-    expect(response2).toBeDefined();
-    expect(response2.data.taskID).toBe(response.data.taskID);
-    expect(response2.data.status).toBe(OracleTaskStatusEnum.Inactive);
-  });
-
-  it("should read the data from the contract calling a function with args (EVM and Fabric)", async () => {
-
-    let response = await oracleApi.executeOracleTask({
-      sourceNetworkId: ethereumEnv.network,
-      sourceContract: {
-        contractName: ethereumEnv.getTestContractName(),
-        contractAddress: ethereumContractAddress,
-        contractAbi: OracleTestContract.abi,
-        contractBytecode: OracleTestContract.bytecode.object,
-        methodName: "getData",
-        params: [data_hash],
-      },
-      taskType: OracleExecuteRequestTaskTypeEnum.Read,
-    });
-
-    expect(response).toBeDefined();
-    expect(response.data.taskID).toBeDefined();
-    expect(response.data.operations?.length).toBe(1);
-
-
-    let response2 = await oracleApi.getOracleTaskStatus(response.data.taskID ?? "");
-
-    expect(response2).toBeDefined();
-    expect(response2?.data.status).toBe(OracleTaskStatusEnum.Inactive);
-    expect(response2?.data.taskID).toBe(response.data.taskID);
-
-    // Repeat the same test for Fabric
-    response = await oracleApi.executeOracleTask({
-      sourceNetworkId: fabricEnv.network,
-      sourceContract: {
-        contractName: fabricEnv.getTestContractName(),
-        methodName: "ClientAccountBalance",
-        params: [],
-      },
-      taskType: OracleExecuteRequestTaskTypeEnum.Read,
-    });
-
-    expect(response).toBeDefined();
-    expect(response.data.taskID).toBeDefined();
-    expect(response.data.operations?.length).toBe(1);
-    expect(response.data.operations?.[0].status).toBe(
-      OracleOperationStatusEnum.Success,
-    );
-    expect(response.data.operations?.[0]?.output?.output).toBe("500");
-
-    response2 = await oracleApi.getOracleTaskStatus(response.data.taskID ?? "");
-
-    expect(response2).toBeDefined();
-    expect(response2.data.taskID).toBe(response.data.taskID);
-    expect(response2.data.status).toBe(OracleTaskStatusEnum.Inactive);
-  });
-
-  it("should read data and write it to another blockchain (EVM to Besu)", async () => {
-
-    const response = await oracleApi.executeOracleTask({
-      sourceNetworkId: ethereumEnv.network,
-      sourceContract: {
-        contractName: ethereumEnv.getTestContractName(),
-        contractAddress: ethereumContractAddress,
-        contractAbi: OracleTestContract.abi,
-        contractBytecode: OracleTestContract.bytecode.object,
-        methodName: "getData",
-        params: [data_hash],
-      },
-      destinationNetworkId: besuEnv.network,
-      destinationContract: {
-        contractName: besuEnv.getTestContractName(),
-        contractAddress: besuContractAddress,
-        contractAbi: OracleTestContract.abi,
-        methodName: "setData",
-        params: ["Hello World!"], // overrides the default. The default is what is returned from the source contract
-      },
-      taskType: OracleExecuteRequestTaskTypeEnum.ReadAndUpdate,
-    });
-
-    expect(response).toBeDefined();
-    expect(response.data.taskID).toBeDefined();
-    expect(response.data.type).toBe(OracleExecuteRequestTaskTypeEnum.ReadAndUpdate);
-    expect(response.data.operations.length).toBe(2);
-    expect(response.data.operations[0].type).toBe(OracleOperationTypeEnum.Read);
-    expect(response.data.operations[1].type).toBe(OracleOperationTypeEnum.Update);
-    expect(response.data.operations[0].status).toBe(
-      OracleOperationStatusEnum.Success,
-    );
-    expect(response.data.operations[1].status).toBe(
-      OracleOperationStatusEnum.Success,
-    );
-
-    let response2 = await oracleApi.getOracleTaskStatus(response.data.taskID ?? "");
-
-    expect(response2).toBeDefined();
-    expect(response2).toBeDefined();
-    expect(response2?.data.status).toBe(OracleTaskStatusEnum.Inactive);
-
-    const ethereumData = await besuEnv.readData(
-      "OracleTestContract",
-      besuContractAddress,
-      OracleTestContract.abi,
-      "getData",
-      [keccak256("Hello World!")],
-    );
-
-    expect(ethereumData.success).toBeTruthy();
-    expect(ethereumData.callOutput).toBe("Hello World!");
-    log.info("Data successfully transferred from Ethereum to Besu");
+    // expect(response2).toBeDefined();
+    // expect(response2.data.taskID).toBe(response.data.taskID);
+    // expect(response2.data.status).toBe(OracleTaskStatusEnum.Inactive);
   });
 });

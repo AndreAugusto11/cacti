@@ -134,7 +134,7 @@ beforeAll(async () => {
       network: testNetwork,
     });
     log.info("Ethereum Ledger started successfully");
-
+    
     await ethereumEnv.deployAndSetupContracts(ClaimFormat.DEFAULT);
   }
 */

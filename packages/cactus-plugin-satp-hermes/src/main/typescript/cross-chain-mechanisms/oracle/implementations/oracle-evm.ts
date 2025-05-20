@@ -159,6 +159,10 @@ export class OracleEVM extends OracleAbstract {
       methodName: args.methodName,
       params: args.params,
       web3SigningCredential: this.signingCredential,
+      gasConfig: {
+        gas: "6721975",
+        gasPrice: "20000000000",
+      },
     })) as {
       success: boolean;
       out: { transactionReceipt: { transactionHash?: string } };
@@ -259,7 +263,10 @@ export class OracleEVM extends OracleAbstract {
         );
       }
 
-      const output_params = this.extractNamedParams(this.decodedEventToDict(decoded), filter);
+      const output_params = this.extractNamedParams(
+        this.decodedEventToDict(decoded),
+        filter,
+      );
 
       callback(output_params);
     });
@@ -318,7 +325,7 @@ export class OracleEVM extends OracleAbstract {
       // Skip numeric keys to avoid indexed parameters
       if (!isNaN(Number(key))) continue;
 
-      result[key] = value !== null && value !== undefined ? String(value) : '';
+      result[key] = value !== null && value !== undefined ? String(value) : "";
     }
 
     return result;
