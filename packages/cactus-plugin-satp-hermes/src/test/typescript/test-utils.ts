@@ -8,7 +8,7 @@ import { TransactRequest } from "../../main/typescript";
 import { Configuration } from "../../main/typescript/generated/gateway-client/typescript-axios";
 import fs from "fs-extra";
 import path from "path";
-import { expect } from "@jest/globals";
+//import { expect } from "@jest/globals";
 import { GatewayIdentity } from "../../main/typescript/core/types";
 import { BesuTestEnvironment } from "./environments/besu-test-environment";
 import { EthereumTestEnvironment } from "./environments/ethereum-test-environment";
@@ -395,7 +395,14 @@ export async function createPGDatabase(
 
 export async function setupDBTable(config: Knex.Config): Promise<void> {
   const knexInstanceClient = knex(config);
-  await knexInstanceClient.migrate.latest();
+  console.log("Starting database migrations...");
+  try {
+    await knexInstanceClient.migrate.latest();
+    console.log("Database migrations completed successfully.");
+  } catch (error) {
+    console.error("Error running migrations:", error);
+    throw error;
+  }
 }
 
 export interface IContractJson {

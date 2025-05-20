@@ -17,7 +17,7 @@ import {
   Web3SigningCredentialType,
 } from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
 import { IPluginBungeeHermesOptions } from "@hyperledger/cactus-plugin-bungee-hermes";
-import { expect } from "@jest/globals";
+//import { expect } from "@jest/globals";
 import {
   GethTestLedger,
   WHALE_ACCOUNT_ADDRESS,

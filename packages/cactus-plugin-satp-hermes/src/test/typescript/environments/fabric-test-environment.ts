@@ -31,7 +31,7 @@ import { Config } from "node-ssh";
 import { randomUUID as uuidv4 } from "node:crypto";
 import fs from "fs-extra";
 import path from "path";
-import { expect } from "@jest/globals";
+//import { expect } from "@jest/globals";
 import { ClaimFormat } from "../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 import { Asset, NetworkId } from "../../../main/typescript";
 import { LedgerType } from "@hyperledger/cactus-core-api";
