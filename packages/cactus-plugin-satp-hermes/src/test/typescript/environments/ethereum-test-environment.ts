@@ -82,13 +82,13 @@ export class EthereumTestEnvironment {
 
   // Initializes the Ethereum ledger, accounts, and connector for testing
   public async init(logLevel: LogLevelDesc): Promise<void> {
-    this.ledger = new GethTestLedger({
-      containerImageName: "ghcr.io/hyperledger/cacti-geth-all-in-one",
-      containerImageVersion: "2023-07-27-2a8c48ed6",
-      networkName: this.dockerNetwork,
-    });
+    // this.ledger = new GethTestLedger({
+    //   containerImageName: "ghcr.io/hyperledger/cacti-geth-all-in-one",
+    //   containerImageVersion: "2023-07-27-2a8c48ed6",
+    //   networkName: this.dockerNetwork,
+    // });
 
-    await this.ledger.start(false, []);
+    // await this.ledger.start(false, []);
 
     const SATPContract1 = {
       contractName: "SATPContract",
@@ -101,8 +101,8 @@ export class EthereumTestEnvironment {
       bytecode: SATPWrapperContract.bytecode.object,
     };
 
-    const rpcApiWsHost = await this.ledger.getRpcApiWebSocketHost();
-    this.bridgeEthAccount = await this.ledger.newEthPersonalAccount();
+    const rpcApiWsHost = "ws://127.0.0.1:7540";
+    this.bridgeEthAccount = "0xc23455cE39a22CD43eFbc12B13f0A392592f5458";
     this.keychainEntryValue = "test";
     this.keychainEntryKey = this.bridgeEthAccount;
 
@@ -249,8 +249,8 @@ export class EthereumTestEnvironment {
       wrapperContractAddress: this.ethereumConfig.wrapperContractAddress,
       gas: this.ethereumConfig.gas,
       connectorOptions: {
-        rpcApiHttpHost: await this.ledger.getRpcApiHttpHost(false),
-        rpcApiWsHost: await this.ledger.getRpcApiWebSocketHost(false),
+        rpcApiHttpHost: "http://127.0.0.1:7540",
+        rpcApiWsHost: "ws://127.0.0.1:7540",
       },
       claimFormats: this.ethereumConfig.claimFormats,
     } as INetworkOptions;
@@ -269,8 +269,9 @@ export class EthereumTestEnvironment {
       ],
       web3SigningCredential: {
         ethAccount: WHALE_ACCOUNT_ADDRESS,
-        secret: "",
-        type: Web3SigningCredentialType.GethKeychainPassword,
+        secret:
+          "0xefa66816f5d6053ec5eea1996434486cebd66b7dd4f385d3b95d298fced82eac",
+        type: Web3SigningCredentialType.PrivateKeyHex,
       },
     });
     expect(deployOutSATPContract).toBeTruthy();
@@ -288,8 +289,9 @@ export class EthereumTestEnvironment {
       networkIdentification: this.network,
       signingCredential: {
         ethAccount: this.bridgeEthAccount,
-        secret: "test",
-        type: Web3SigningCredentialType.GethKeychainPassword,
+        secret:
+          "0xefa66816f5d6053ec5eea1996434486cebd66b7dd4f385d3b95d298fced82eac",
+        type: Web3SigningCredentialType.PrivateKeyHex,
       },
       leafId: "Testing-event-ethereum-leaf",
       connectorOptions: this.connectorOptions,
@@ -447,11 +449,11 @@ export class EthereumTestEnvironment {
     return WHALE_ACCOUNT_ADDRESS;
   }
 
-  // Stops and destroys the test ledger
-  public async tearDown(): Promise<void> {
-    await this.ledger.stop();
-    await this.ledger.destroy();
-  }
+  // // Stops and destroys the test ledger
+  // public async tearDown(): Promise<void> {
+  //   await this.ledger.stop();
+  //   await this.ledger.destroy();
+  // }
 
   public async writeData(
     contractName: string,
