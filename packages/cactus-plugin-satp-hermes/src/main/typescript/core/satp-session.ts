@@ -43,7 +43,6 @@ import {
   lockExpirationTimeError,
   LockTypeError,
   LoggingProfileError,
-  PubKeyError,
   SATPVersionError,
   ServerGatewayPubkeyError,
   SessionCompletedError,

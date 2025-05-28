@@ -112,15 +112,13 @@ export async function getStatusService(
   const startTime =
     sessionData.receivedTimestamps?.stage0?.newSessionRequestMessageTimestamp;
   const originNetwork: Transact200ResponseStatusResponseOriginNetwork =
-    getNetworkDetails({
-      id: sessionData.senderAsset?.networkId?.id,
-      ledgerType: sessionData.senderAsset?.networkId?.type as LedgerType,
-    } as NetworkId);
+    getNetworkDetails(
+      sessionData.senderAsset?.networkId as unknown as NetworkId,
+    );
   const destinationNetwork: Transact200ResponseStatusResponseOriginNetwork =
-    getNetworkDetails({
-      id: sessionData.senderAsset?.networkId?.id,
-      ledgerType: sessionData.senderAsset?.networkId?.type as LedgerType,
-    } as NetworkId);
+    getNetworkDetails(
+      sessionData.receiverAsset?.networkId as unknown as NetworkId,
+    );
   if (!sessionData.hashes) {
     return {
       status: StatusResponseStatusEnum.Invalid,
