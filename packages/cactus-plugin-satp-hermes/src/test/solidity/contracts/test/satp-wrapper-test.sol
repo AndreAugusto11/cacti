@@ -1,47 +1,39 @@
 // SPDX-License-Identifier: GPL-3.0
         
-pragma solidity >=0.4.22 <0.9.0;
+pragma solidity 0.8.20;
 
-// This import is automatically injected by Remix
-import "remix_tests.sol"; 
-
-// This import is required to use custom transaction context
-// Although it may fail compilation in 'Solidity Compiler' plugin
-// But it will work fine in 'Solidity Unit Testing' plugin
-import "remix_accounts.sol";
-
-import "../../../../solidity/satp-wrapper.sol";
+import "../../../../main/solidity/satp-wrapper.sol";
 import "../satp-erc20.sol";
 
 contract SATPWrapTest {
 
-    SATPContract contract1;
-    SATPContract contract2;
+    SATPTokenContract contract1;
+    SATPTokenContract contract2;
 
     InteractionSignature[] signatures;
     
     SATPWrapperContract wrapperContract;
 
     string[] lockInteractions;
-    Types[][] lockVariables;
+    VarType[][] lockVariables;
     string[] unlockInteractions;
-    Types[][] unlockVariables;
+    VarType[][] unlockVariables;
     string[] minInteractions;
-    Types[][] mintVariables;
+    VarType[][] mintVariables;
     string[] burnInteractions;
-    Types[][] burnVariables;
+    VarType[][] burnVariables;
     string[] assignInteractions;
-    Types[][] assignVariables;
+    VarType[][] assignVariables;
     string[] checkPermissionInteractions;
-    Types[][] checkPermissionVariables;
+    VarType[][] checkPermissionVariables;
 
     function beforeEach() public {
         // Remix does not offer a set of methods that can change the msg.sender so every contract owner is the same
 
         wrapperContract = new SATPWrapperContract(address(this));
 
-        contract1 = new SATPContract(address(wrapperContract), "ID1");
-        contract2 = new SATPContract(address(this), "ID2");      
+        contract1 = new SATPTokenContract(address(wrapperContract), "ID1");
+        contract2 = new SATPTokenContract(address(this), "ID2");      
 
         lockInteractions.push("transfer(address,address,uint256)");
     

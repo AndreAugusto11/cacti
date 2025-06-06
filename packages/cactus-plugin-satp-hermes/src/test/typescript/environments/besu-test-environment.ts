@@ -373,7 +373,7 @@ export class BesuTestEnvironment {
       contractName: this.erc20TokenContract,
       keychainId: this.keychainPlugin1.getKeychainId(),
       invocationType: BesuContractInvocationType.Send,
-      methodName: "giveRole",
+      methodName: "giveBridgeRole",
       params: [wrapperAddress],
       signingCredential: {
         ethAccount: this.firstHighNetWorthAccount,

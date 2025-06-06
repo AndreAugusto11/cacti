@@ -1,4 +1,14 @@
 [profile.default]
+# The source directories
+src = './src/main/solidity/contracts'
+
+allow_paths = ['./src/test/solidity/contracts/']
+# The test directory
+test = './src/test/solidity/contracts/test'
+
+# The artifact directory
+out = './src/test/solidity/generated'
+
 solc-version = "0.8.20"
 evm-version = "paris"
 libs = ["node_modules", "lib"]

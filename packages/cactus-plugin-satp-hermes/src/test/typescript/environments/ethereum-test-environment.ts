@@ -375,7 +375,7 @@ export class EthereumTestEnvironment {
         keychainId: this.keychainPlugin1.getKeychainId(),
       },
       invocationType: EthContractInvocationType.Send,
-      methodName: "giveRole",
+      methodName: "giveBridgeRole",
       params: [wrapperAddress],
       web3SigningCredential: {
         ethAccount: WHALE_ACCOUNT_ADDRESS,

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNKNOWN 
-pragma solidity >=0.7.0;
+pragma solidity 0.8.20;
 
 interface ITraceableContract {
   //All transactions that change the state of and asset, should emmit this event
