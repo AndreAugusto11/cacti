@@ -1,0 +1,528 @@
+openapi: 3.0.3
+info:
+  description: Implementation for Carbon Credit Plugin logic
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  title: Hyperledger Cactus Plugin - Carbon Credit
+  version: 1.0.0
+servers:
+- url: /
+paths:
+  /api/v1/@hyperledger/cactus-plugin-carbon-credit/specific-buy:
+    post:
+      description: Acquire a specific basket of TCO2s from a marketplace.
+      operationId: specificBuyRequest
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SpecificBuyRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpecificBuyResponse'
+          description: Successful response
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/@hyperledger/cactus-plugin-carbon-credit/specific-buy
+      x-content-type: application/json
+      x-accepts: application/json
+  /api/v1/@hyperledger/cactus-plugin-carbon-credit/random-buy:
+    post:
+      description: Acquire a random basket of TCO2s from a marketplace.
+      operationId: randomBuyRequest
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RandomBuyRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RandomBuyResponse'
+          description: Successful response
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/@hyperledger/cactus-plugin-carbon-credit/random-buy
+      x-content-type: application/json
+      x-accepts: application/json
+  /api/v1/@hyperledger/cactus-plugin-carbon-credit/retire:
+    post:
+      description: Retire a specific basket of TCO2s on a marketplace.
+      operationId: retireRequest
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RetireRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetireResponse'
+          description: Successful response
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/@hyperledger/cactus-plugin-carbon-credit/retire
+      x-content-type: application/json
+      x-accepts: application/json
+  /api/v1/@hyperledger/cactus-plugin-carbon-credit/get-available-tco2s:
+    post:
+      description: Get a list of available TCO2s (Tokenized Carbon Offset Units).
+      operationId: getAvailableTCO2sRequest
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetAvailableTCO2sRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAvailableTCO2sResponse'
+          description: Successful response with a list of available TCO2s.
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/@hyperledger/cactus-plugin-carbon-credit/get-available-tco2s
+      x-content-type: application/json
+      x-accepts: application/json
+  /api/v1/@hyperledger/cactus-plugin-carbon-credit/get-tco2-metadata:
+    post:
+      description: Get metadata for a specific TCO2.
+      operationId: getTCO2MetadataRequest
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetTCO2MetadataRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TCO2Metadata'
+          description: Successful response with VCU metadata.
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/@hyperledger/cactus-plugin-carbon-credit/get-tco2-metadata
+      x-content-type: application/json
+      x-accepts: application/json
+  /api/v1/@hyperledger/cactus-plugin-carbon-credit/get-purchase-price:
+    post:
+      description: Get the purchase price for a specific TCO2.
+      operationId: getPurchasePriceRequest
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetPurchasePriceRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPurchasePriceResponse'
+          description: Successful response with the purchase price.
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/@hyperledger/cactus-plugin-carbon-credit/get-purchase-price
+      x-content-type: application/json
+      x-accepts: application/json
+components:
+  schemas:
+    Marketplace:
+      enum:
+      - Toucan
+      type: string
+    Network:
+      enum:
+      - polygon
+      - celo
+      - alfajores
+      type: string
+    NetworkConfig:
+      properties:
+        rpcUrl:
+          type: string
+        network:
+          $ref: '#/components/schemas/Network'
+      required:
+      - network
+      - rpcUrl
+      type: object
+    SpecificBuyRequest:
+      example:
+        paymentToken: paymentToken
+        marketplace: null
+        items:
+          key: items
+        walletObject:
+          privateKey: privateKey
+          address: address
+          providerURL: providerURL
+        network: null
+      properties:
+        marketplace:
+          $ref: '#/components/schemas/Marketplace'
+        network:
+          $ref: '#/components/schemas/Network'
+        paymentToken:
+          type: string
+        items:
+          additionalProperties:
+            type: string
+          description: A mapping from address (string) to amount (string).
+          type: object
+        walletObject:
+          $ref: '#/components/schemas/SpecificBuyRequest_walletObject'
+      required:
+      - items
+      - marketplace
+      - network
+      - paymentToken
+      - walletObject
+      type: object
+    SpecificBuyResponse:
+      example:
+        assetAmounts:
+        - amount: amount
+          address: address
+        - amount: amount
+          address: address
+        buyTxHash: buyTxHash
+        txHashSwap: txHashSwap
+      properties:
+        txHashSwap:
+          type: string
+        buyTxHash:
+          type: string
+        assetAmounts:
+          items:
+            $ref: '#/components/schemas/SpecificBuyResponse_assetAmounts_inner'
+          type: array
+      required:
+      - assetAmounts
+      - buyTxHash
+      - txHashSwap
+      type: object
+    RandomBuyRequest:
+      example:
+        paymentToken: paymentToken
+        amount: amount
+        marketplace: null
+        walletObject:
+          privateKey: privateKey
+          address: address
+          providerURL: providerURL
+        network: null
+      properties:
+        marketplace:
+          $ref: '#/components/schemas/Marketplace'
+        network:
+          $ref: '#/components/schemas/Network'
+        paymentToken:
+          type: string
+        amount:
+          type: string
+        walletObject:
+          $ref: '#/components/schemas/SpecificBuyRequest_walletObject'
+      required:
+      - amount
+      - marketplace
+      - network
+      - walletObject
+      type: object
+    RandomBuyResponse:
+      example:
+        assetAmounts:
+        - amount: amount
+          address: address
+        - amount: amount
+          address: address
+        txHashSwap: txHashSwap
+        tco2List:
+        - amount: amount
+          address: address
+        - amount: amount
+          address: address
+      properties:
+        txHashSwap:
+          type: string
+        assetAmounts:
+          items:
+            $ref: '#/components/schemas/SpecificBuyResponse_assetAmounts_inner'
+          type: array
+        tco2List:
+          items:
+            $ref: '#/components/schemas/SpecificBuyResponse_assetAmounts_inner'
+          type: array
+      required:
+      - assetAmounts
+      - txHashSwap
+      type: object
+    RetireRequest:
+      example:
+        tco2s:
+        - tco2s
+        - tco2s
+        retirementReason: retirementReason
+        marketplace: null
+        amounts:
+        - amounts
+        - amounts
+        entityName: entityName
+        beneficiaryName: beneficiaryName
+        beneficiaryAddress: beneficiaryAddress
+        message: message
+        walletObject:
+          privateKey: privateKey
+          address: address
+          providerURL: providerURL
+        network: null
+      properties:
+        marketplace:
+          $ref: '#/components/schemas/Marketplace'
+        network:
+          $ref: '#/components/schemas/Network'
+        entityName:
+          type: string
+        tco2s:
+          items:
+            type: string
+          type: array
+        amounts:
+          items:
+            type: string
+          type: array
+        beneficiaryAddress:
+          type: string
+        beneficiaryName:
+          type: string
+        message:
+          type: string
+        retirementReason:
+          type: string
+        walletObject:
+          $ref: '#/components/schemas/SpecificBuyRequest_walletObject'
+      required:
+      - amounts
+      - beneficiaryAddress
+      - beneficiaryName
+      - entityName
+      - marketplace
+      - network
+      - retirementReason
+      - tco2s
+      - walletObject
+      type: object
+    RetireResponse:
+      example:
+        txHashesRetire:
+        - txHashesRetire
+        - txHashesRetire
+        retirementCertificateIds:
+        - 0.8008281904610115
+        - 0.8008281904610115
+      properties:
+        txHashesRetire:
+          items:
+            type: string
+          type: array
+        retirementCertificateIds:
+          items:
+            type: number
+          type: array
+      required:
+      - retirementCertificateIds
+      - txHashesRetire
+      type: object
+    GetAvailableTCO2sRequest:
+      example:
+        filterCriteria: filterCriteria
+        marketplace: null
+        limit: limit
+        orderBy: orderBy
+        network: null
+      properties:
+        marketplace:
+          $ref: '#/components/schemas/Marketplace'
+        network:
+          $ref: '#/components/schemas/Network'
+        filterCriteria:
+          description: "A string to filter the results by (e.g., supply)."
+          type: string
+        orderBy:
+          type: string
+        limit:
+          type: string
+      required:
+      - marketplace
+      - network
+      type: object
+    GetAvailableTCO2sResponse:
+      example:
+        totalCount: 0.8008281904610115
+        tco2List:
+        - address: address
+          projectId: projectId
+        - address: address
+          projectId: projectId
+      properties:
+        tco2List:
+          items:
+            $ref: '#/components/schemas/GetAvailableTCO2sResponse_tco2List_inner'
+          type: array
+        totalCount:
+          type: number
+      required:
+      - tco2List
+      - totalCount
+      type: object
+    GetTCO2MetadataRequest:
+      example:
+        marketplace: null
+        projectIdentifier: projectIdentifier
+        tco2Identifier: tco2Identifier
+        network: null
+      properties:
+        marketplace:
+          $ref: '#/components/schemas/Marketplace'
+        network:
+          $ref: '#/components/schemas/Network'
+        projectIdentifier:
+          type: string
+        tco2Identifier:
+          type: string
+      required:
+      - marketplace
+      - network
+      - projectIdentifier
+      - tco2Identifier
+      type: object
+    TCO2Metadata:
+      example:
+        symbol: symbol
+        totalSupply: 0.8008281904610115
+        name: name
+        attributes:
+          totalVintageQuantity: totalVintageQuantity
+          region: region
+          methodology: methodology
+      properties:
+        name:
+          type: string
+        symbol:
+          type: string
+        totalSupply:
+          type: number
+        attributes:
+          $ref: '#/components/schemas/TCO2Metadata_attributes'
+      required:
+      - attributes
+      - name
+      - symbol
+      - totalSupply
+      type: object
+    GetPurchasePriceRequest:
+      example:
+        unit: unit
+        amount: amount
+        marketplace: null
+        network: null
+      properties:
+        marketplace:
+          $ref: '#/components/schemas/Marketplace'
+        network:
+          $ref: '#/components/schemas/Network'
+        unit:
+          description: The token address to retrieve the price for.
+          type: string
+        amount:
+          description: The amount of Units to retrieve the price for.
+          type: string
+      required:
+      - amount
+      - marketplace
+      - network
+      - unit
+      type: object
+    GetPurchasePriceResponse:
+      example:
+        price: 0
+      properties:
+        price:
+          description: The current price in USDC for the requested amount.
+          type: integer
+      required:
+      - price
+      type: object
+    SpecificBuyRequest_walletObject:
+      description: An object containing the private key and provider URL for the wallet.
+      example:
+        privateKey: privateKey
+        address: address
+        providerURL: providerURL
+      properties:
+        address:
+          type: string
+        privateKey:
+          type: string
+        providerURL:
+          type: string
+      required:
+      - privateKey
+      - providerURL
+      type: object
+    SpecificBuyResponse_assetAmounts_inner:
+      example:
+        amount: amount
+        address: address
+      properties:
+        address:
+          type: string
+        amount:
+          type: string
+      required:
+      - address
+      - amount
+      type: object
+    GetAvailableTCO2sResponse_tco2List_inner:
+      example:
+        address: address
+        projectId: projectId
+      properties:
+        address:
+          type: string
+        projectId:
+          type: string
+      required:
+      - address
+      - projectId
+      type: object
+    TCO2Metadata_attributes:
+      example:
+        totalVintageQuantity: totalVintageQuantity
+        region: region
+        methodology: methodology
+      properties:
+        region:
+          type: string
+        totalVintageQuantity:
+          type: string
+        methodology:
+          type: string
+      type: object
+

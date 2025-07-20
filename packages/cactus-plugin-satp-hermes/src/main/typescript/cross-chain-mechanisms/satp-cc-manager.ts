@@ -9,6 +9,7 @@ import { IOntologyManagerOptions } from "./bridge/ontology/ontology-manager";
 import { INetworkOptions } from "./bridge/bridge-types";
 import { GatewayOrchestrator } from "../services/gateway/gateway-orchestrator";
 import { OracleManager } from "./oracle/oracle-manager";
+
 export interface ISATPCrossChainManagerOptions {
   orquestrator: GatewayOrchestrator;
   logLevel?: LogLevelDesc;
