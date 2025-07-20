@@ -182,6 +182,9 @@
       "path": "./packages/cactus-plugin-satp-hermes/tsconfig.json"
     },
     {
+      "path": "./packages/cactus-plugin-carbon-credit/tsconfig.json"
+    },
+    {
       "path": "./examples/cactus-example-cbdc-bridging-backend/tsconfig.json"
     },
     {

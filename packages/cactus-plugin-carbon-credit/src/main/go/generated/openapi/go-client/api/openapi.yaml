@@ -1,0 +1,51 @@
+openapi: 3.0.3
+info:
+  description: Implementation for Carbon Credit Plugin logic
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  title: Hyperledger Cactus Plugin - Carbon Credit
+  version: 0.0.1
+servers:
+- url: /
+paths:
+  /api/v1/@hyperledger/cactus-plugin-carbon-credit/hello-world:
+    post:
+      description: ""
+      operationId: helloWorldRequest
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HelloWorldRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HelloWorldResponse'
+          description: Successful response
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/@hyperledger/cactus-plugin-carbon-credit/hello-world
+components:
+  schemas:
+    HelloWorldRequest:
+      example:
+        name: name
+      properties:
+        name:
+          type: string
+      required:
+      - name
+      type: object
+    HelloWorldResponse:
+      example:
+        message: message
+      properties:
+        message:
+          type: string
+      required:
+      - message
+      type: object

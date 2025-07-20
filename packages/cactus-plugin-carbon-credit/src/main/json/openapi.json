@@ -1,0 +1,73 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Hyperledger Cactus Plugin - Carbon Credit",
+    "description": "Implementation for Carbon Credit Plugin logic",
+    "version": "0.0.1",
+    "license": {
+      "name": "Apache-2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "components": {
+    "schemas": {
+      "HelloWorldRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "HelloWorldResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ]
+      }
+    }
+  },
+  "paths": {
+    "/api/v1/@hyperledger/cactus-plugin-carbon-credit/hello-world": {
+      "post": {
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/@hyperledger/cactus-plugin-carbon-credit/hello-world"
+          }
+        },
+        "operationId": "helloWorldRequest",
+        "description": "",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HelloWorldRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HelloWorldResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
