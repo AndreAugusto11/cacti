@@ -6,8 +6,15 @@ client.go
 configuration.go
 go.mod
 go.sum
+model_buy_request.go
+model_buy_response.go
+model_get_available_vcus_response.go
+model_get_vcu_metadata_request.go
+model_get_vcu_metadata_response.go
 model_hello_world_request.go
 model_hello_world_response.go
+model_retire_request.go
+model_retire_response.go
+model_vcu.go
 response.go
-test/api_default_test.go
 utils.go

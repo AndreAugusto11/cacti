@@ -26,6 +26,107 @@ import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError } from './base';
 /**
  * 
  * @export
+ * @interface BuyRequest
+ */
+export interface BuyRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof BuyRequest
+     */
+    'platform': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof BuyRequest
+     */
+    'paymentToken': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof BuyRequest
+     */
+    'amount': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof BuyRequest
+     */
+    'walletObject': string;
+}
+/**
+ * 
+ * @export
+ * @interface BuyResponse
+ */
+export interface BuyResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof BuyResponse
+     */
+    'txHashSwap': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof BuyResponse
+     */
+    'poolTokenAmount': string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof BuyResponse
+     */
+    'tco2List'?: Array<string>;
+}
+/**
+ * 
+ * @export
+ * @interface GetAvailableVCUsResponse
+ */
+export interface GetAvailableVCUsResponse {
+    /**
+     * 
+     * @type {Array<VCU>}
+     * @memberof GetAvailableVCUsResponse
+     */
+    'vcus': Array<VCU>;
+}
+/**
+ * 
+ * @export
+ * @interface GetVCUMetadataRequest
+ */
+export interface GetVCUMetadataRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof GetVCUMetadataRequest
+     */
+    'vcuId': string;
+}
+/**
+ * 
+ * @export
+ * @interface GetVCUMetadataResponse
+ */
+export interface GetVCUMetadataResponse {
+    /**
+     * 
+     * @type {VCU}
+     * @memberof GetVCUMetadataResponse
+     */
+    'vcu': VCU;
+    /**
+     * 
+     * @type {{ [key: string]: string; }}
+     * @memberof GetVCUMetadataResponse
+     */
+    'metadata': { [key: string]: string; };
+}
+/**
+ * 
+ * @export
  * @interface HelloWorldRequest
  */
 export interface HelloWorldRequest {
@@ -49,6 +150,105 @@ export interface HelloWorldResponse {
      */
     'message': string;
 }
+/**
+ * 
+ * @export
+ * @interface RetireRequest
+ */
+export interface RetireRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof RetireRequest
+     */
+    'platform': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RetireRequest
+     */
+    'walletObject': string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof RetireRequest
+     */
+    'objectsList': Array<string>;
+    /**
+     * 
+     * @type {Array<number>}
+     * @memberof RetireRequest
+     */
+    'amounts': Array<number>;
+    /**
+     * 
+     * @type {string}
+     * @memberof RetireRequest
+     */
+    'beneficiary': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RetireRequest
+     */
+    'message': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RetireRequest
+     */
+    'retirementReason': string;
+}
+/**
+ * 
+ * @export
+ * @interface RetireResponse
+ */
+export interface RetireResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof RetireResponse
+     */
+    'txHashRetire': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RetireResponse
+     */
+    'retirementCertificate'?: string;
+}
+/**
+ * 
+ * @export
+ * @interface VCU
+ */
+export interface VCU {
+    /**
+     * 
+     * @type {string}
+     * @memberof VCU
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof VCU
+     */
+    'name': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof VCU
+     */
+    'amount': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof VCU
+     */
+    'tokenAddress': string;
+}
 
 /**
  * DefaultApi - axios parameter creator
@@ -56,6 +256,101 @@ export interface HelloWorldResponse {
  */
 export const DefaultApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
+        /**
+         * Acquires carbon inventory from a marketplace.
+         * @param {BuyRequest} [buyRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        buyRequest: async (buyRequest?: BuyRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/@hyperledger/cactus-plugin-carbon-credit/buy`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(buyRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Get a list of available VCUs (Verified Carbon Units).
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getAvailableVCUsRequest: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/@hyperledger/cactus-plugin-carbon-credit/get-available-vcus`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Get metadata for a specific VCU.
+         * @param {GetVCUMetadataRequest} [getVCUMetadataRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getVCUMetadataRequest: async (getVCUMetadataRequest?: GetVCUMetadataRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/@hyperledger/cactus-plugin-carbon-credit/get-vcu-metadata`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(getVCUMetadataRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
         /**
          * 
          * @param {HelloWorldRequest} [helloWorldRequest] 
@@ -89,6 +384,39 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * Abstract burn operation that finalises an offset on the underlying registry for a specific beneficiary and message.
+         * @param {RetireRequest} [retireRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        retireRequest: async (retireRequest?: RetireRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/@hyperledger/cactus-plugin-carbon-credit/retire`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(retireRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -100,6 +428,35 @@ export const DefaultApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = DefaultApiAxiosParamCreator(configuration)
     return {
         /**
+         * Acquires carbon inventory from a marketplace.
+         * @param {BuyRequest} [buyRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async buyRequest(buyRequest?: BuyRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BuyResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.buyRequest(buyRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Get a list of available VCUs (Verified Carbon Units).
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getAvailableVCUsRequest(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetAvailableVCUsResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getAvailableVCUsRequest(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Get metadata for a specific VCU.
+         * @param {GetVCUMetadataRequest} [getVCUMetadataRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getVCUMetadataRequest(getVCUMetadataRequest?: GetVCUMetadataRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetVCUMetadataResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getVCUMetadataRequest(getVCUMetadataRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * 
          * @param {HelloWorldRequest} [helloWorldRequest] 
          * @param {*} [options] Override http request option.
@@ -107,6 +464,16 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          */
         async helloWorldRequest(helloWorldRequest?: HelloWorldRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<HelloWorldResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.helloWorldRequest(helloWorldRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Abstract burn operation that finalises an offset on the underlying registry for a specific beneficiary and message.
+         * @param {RetireRequest} [retireRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async retireRequest(retireRequest?: RetireRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RetireResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.retireRequest(retireRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -120,6 +487,32 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
     const localVarFp = DefaultApiFp(configuration)
     return {
         /**
+         * Acquires carbon inventory from a marketplace.
+         * @param {BuyRequest} [buyRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        buyRequest(buyRequest?: BuyRequest, options?: any): AxiosPromise<BuyResponse> {
+            return localVarFp.buyRequest(buyRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Get a list of available VCUs (Verified Carbon Units).
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getAvailableVCUsRequest(options?: any): AxiosPromise<GetAvailableVCUsResponse> {
+            return localVarFp.getAvailableVCUsRequest(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Get metadata for a specific VCU.
+         * @param {GetVCUMetadataRequest} [getVCUMetadataRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getVCUMetadataRequest(getVCUMetadataRequest?: GetVCUMetadataRequest, options?: any): AxiosPromise<GetVCUMetadataResponse> {
+            return localVarFp.getVCUMetadataRequest(getVCUMetadataRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @param {HelloWorldRequest} [helloWorldRequest] 
          * @param {*} [options] Override http request option.
@@ -127,6 +520,15 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         helloWorldRequest(helloWorldRequest?: HelloWorldRequest, options?: any): AxiosPromise<HelloWorldResponse> {
             return localVarFp.helloWorldRequest(helloWorldRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Abstract burn operation that finalises an offset on the underlying registry for a specific beneficiary and message.
+         * @param {RetireRequest} [retireRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        retireRequest(retireRequest?: RetireRequest, options?: any): AxiosPromise<RetireResponse> {
+            return localVarFp.retireRequest(retireRequest, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -139,6 +541,38 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
  */
 export class DefaultApi extends BaseAPI {
     /**
+     * Acquires carbon inventory from a marketplace.
+     * @param {BuyRequest} [buyRequest] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public buyRequest(buyRequest?: BuyRequest, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).buyRequest(buyRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Get a list of available VCUs (Verified Carbon Units).
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getAvailableVCUsRequest(options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getAvailableVCUsRequest(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Get metadata for a specific VCU.
+     * @param {GetVCUMetadataRequest} [getVCUMetadataRequest] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getVCUMetadataRequest(getVCUMetadataRequest?: GetVCUMetadataRequest, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getVCUMetadataRequest(getVCUMetadataRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 
      * @param {HelloWorldRequest} [helloWorldRequest] 
      * @param {*} [options] Override http request option.
@@ -147,6 +581,17 @@ export class DefaultApi extends BaseAPI {
      */
     public helloWorldRequest(helloWorldRequest?: HelloWorldRequest, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).helloWorldRequest(helloWorldRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Abstract burn operation that finalises an offset on the underlying registry for a specific beneficiary and message.
+     * @param {RetireRequest} [retireRequest] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public retireRequest(retireRequest?: RetireRequest, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).retireRequest(retireRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

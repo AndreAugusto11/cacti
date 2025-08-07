@@ -77,13 +77,25 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
+*DefaultApi* | [**BuyRequest**](docs/DefaultApi.md#buyrequest) | **Post** /api/v1/@hyperledger/cactus-plugin-carbon-credit/buy | 
+*DefaultApi* | [**GetAvailableVCUsRequest**](docs/DefaultApi.md#getavailablevcusrequest) | **Get** /api/v1/@hyperledger/cactus-plugin-carbon-credit/get-available-vcus | 
+*DefaultApi* | [**GetVCUMetadataRequest**](docs/DefaultApi.md#getvcumetadatarequest) | **Post** /api/v1/@hyperledger/cactus-plugin-carbon-credit/get-vcu-metadata | 
 *DefaultApi* | [**HelloWorldRequest**](docs/DefaultApi.md#helloworldrequest) | **Post** /api/v1/@hyperledger/cactus-plugin-carbon-credit/hello-world | 
+*DefaultApi* | [**RetireRequest**](docs/DefaultApi.md#retirerequest) | **Post** /api/v1/@hyperledger/cactus-plugin-carbon-credit/retire | 
 
 
 ## Documentation For Models
 
+ - [BuyRequest](docs/BuyRequest.md)
+ - [BuyResponse](docs/BuyResponse.md)
+ - [GetAvailableVCUsResponse](docs/GetAvailableVCUsResponse.md)
+ - [GetVCUMetadataRequest](docs/GetVCUMetadataRequest.md)
+ - [GetVCUMetadataResponse](docs/GetVCUMetadataResponse.md)
  - [HelloWorldRequest](docs/HelloWorldRequest.md)
  - [HelloWorldResponse](docs/HelloWorldResponse.md)
+ - [RetireRequest](docs/RetireRequest.md)
+ - [RetireResponse](docs/RetireResponse.md)
+ - [VCU](docs/VCU.md)
 
 
 ## Documentation For Authorization

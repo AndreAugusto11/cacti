@@ -29,6 +29,82 @@ paths:
         http:
           verbLowerCase: post
           path: /api/v1/@hyperledger/cactus-plugin-carbon-credit/hello-world
+  /api/v1/@hyperledger/cactus-plugin-carbon-credit/buy:
+    post:
+      description: Acquires carbon inventory from a marketplace.
+      operationId: buyRequest
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BuyRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BuyResponse'
+          description: Successful response
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/@hyperledger/cactus-plugin-carbon-credit/buy
+  /api/v1/@hyperledger/cactus-plugin-carbon-credit/retire:
+    post:
+      description: Abstract burn operation that finalises an offset on the underlying
+        registry for a specific beneficiary and message.
+      operationId: retireRequest
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RetireRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetireResponse'
+          description: Successful response
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/@hyperledger/cactus-plugin-carbon-credit/retire
+  /api/v1/@hyperledger/cactus-plugin-carbon-credit/get-available-vcus:
+    get:
+      description: Get a list of available VCUs (Verified Carbon Units).
+      operationId: getAvailableVCUsRequest
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAvailableVCUsResponse'
+          description: Successful response with a list of available VCUs.
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: get
+          path: /api/v1/@hyperledger/cactus-plugin-carbon-credit/get-available-vcus
+  /api/v1/@hyperledger/cactus-plugin-carbon-credit/get-vcu-metadata:
+    post:
+      description: Get metadata for a specific VCU.
+      operationId: getVCUMetadataRequest
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetVCUMetadataRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetVCUMetadataResponse'
+          description: Successful response with VCU metadata.
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/@hyperledger/cactus-plugin-carbon-credit/get-vcu-metadata
 components:
   schemas:
     HelloWorldRequest:
@@ -48,4 +124,167 @@ components:
           type: string
       required:
       - message
+      type: object
+    BuyRequest:
+      example:
+        paymentToken: paymentToken
+        amount: 0.8008281904610115
+        walletObject: walletObject
+        platform: platform
+      properties:
+        platform:
+          type: string
+        paymentToken:
+          type: string
+        amount:
+          type: number
+        walletObject:
+          type: string
+      required:
+      - amount
+      - paymentToken
+      - platform
+      - walletObject
+      type: object
+    BuyResponse:
+      example:
+        txHashSwap: txHashSwap
+        poolTokenAmount: poolTokenAmount
+        tco2List:
+        - tco2List
+        - tco2List
+      properties:
+        txHashSwap:
+          type: string
+        poolTokenAmount:
+          type: string
+        tco2List:
+          items:
+            type: string
+          type: array
+      required:
+      - poolTokenAmount
+      - txHashSwap
+      type: object
+    RetireRequest:
+      example:
+        retirementReason: retirementReason
+        amounts:
+        - 0.8008281904610115
+        - 0.8008281904610115
+        beneficiary: beneficiary
+        objectsList:
+        - objectsList
+        - objectsList
+        message: message
+        walletObject: walletObject
+        platform: platform
+      properties:
+        platform:
+          type: string
+        walletObject:
+          type: string
+        objectsList:
+          items:
+            type: string
+          type: array
+        amounts:
+          items:
+            type: number
+          type: array
+        beneficiary:
+          type: string
+        message:
+          type: string
+        retirementReason:
+          type: string
+      required:
+      - amounts
+      - beneficiary
+      - message
+      - objectsList
+      - platform
+      - retirementReason
+      - walletObject
+      type: object
+    RetireResponse:
+      example:
+        txHashRetire: txHashRetire
+        retirementCertificate: retirementCertificate
+      properties:
+        txHashRetire:
+          type: string
+        retirementCertificate:
+          type: string
+      required:
+      - txHashRetire
+      type: object
+    VCU:
+      example:
+        tokenAddress: tokenAddress
+        amount: 0.8008281904610115
+        name: name
+        id: id
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        amount:
+          type: number
+        tokenAddress:
+          type: string
+      required:
+      - amount
+      - id
+      - name
+      - tokenAddress
+      type: object
+    GetAvailableVCUsResponse:
+      example:
+        vcus:
+        - tokenAddress: tokenAddress
+          amount: 0.8008281904610115
+          name: name
+          id: id
+        - tokenAddress: tokenAddress
+          amount: 0.8008281904610115
+          name: name
+          id: id
+      properties:
+        vcus:
+          items:
+            $ref: '#/components/schemas/VCU'
+          type: array
+      required:
+      - vcus
+      type: object
+    GetVCUMetadataRequest:
+      example:
+        vcuId: vcuId
+      properties:
+        vcuId:
+          type: string
+      required:
+      - vcuId
+      type: object
+    GetVCUMetadataResponse:
+      example:
+        metadata:
+          key: metadata
+        vcu:
+          tokenAddress: tokenAddress
+          amount: 0.8008281904610115
+          name: name
+          id: id
+      properties:
+        vcu:
+          $ref: '#/components/schemas/VCU'
+        metadata:
+          additionalProperties:
+            type: string
+          type: object
+      required:
+      - metadata
+      - vcu
       type: object

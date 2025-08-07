@@ -32,6 +32,171 @@
         "required": [
           "message"
         ]
+      },
+      "BuyRequest": {
+        "type": "object",
+        "properties": {
+          "platform": {
+            "type": "string"
+          },
+          "paymentToken": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          },
+          "walletObject": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "platform",
+          "paymentToken",
+          "amount",
+          "walletObject"
+        ]
+      },
+      "BuyResponse": {
+        "type": "object",
+        "properties": {
+          "txHashSwap": {
+            "type": "string"
+          },
+          "poolTokenAmount": {
+            "type": "string"
+          },
+          "tco2List": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "txHashSwap",
+          "poolTokenAmount"
+        ]
+      },
+      "RetireRequest": {
+        "type": "object",
+        "properties": {
+          "platform": {
+            "type": "string"
+          },
+          "walletObject": {
+            "type": "string"
+          },
+          "objectsList": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "amounts": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "beneficiary": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "retirementReason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "platform",
+          "walletObject",
+          "objectsList",
+          "amounts",
+          "beneficiary",
+          "message",
+          "retirementReason"
+        ]
+      },
+      "RetireResponse": {
+        "type": "object",
+        "properties": {
+          "txHashRetire": {
+            "type": "string"
+          },
+          "retirementCertificate": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "txHashRetire"
+        ]
+      },
+      "VCU": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          },
+          "tokenAddress": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "amount",
+          "tokenAddress"
+        ]
+      },
+      "GetAvailableVCUsResponse": {
+        "type": "object",
+        "properties": {
+          "vcus": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VCU"
+            }
+          }
+        },
+        "required": [
+          "vcus"
+        ]
+      },
+      "GetVCUMetadataRequest": {
+        "type": "object",
+        "properties": {
+          "vcuId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "vcuId"
+        ]
+      },
+      "GetVCUMetadataResponse": {
+        "type": "object",
+        "properties": {
+          "vcu": {
+            "$ref": "#/components/schemas/VCU"
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "vcu",
+          "metadata"
+        ]
       }
     }
   },
@@ -62,6 +227,129 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/HelloWorldResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/@hyperledger/cactus-plugin-carbon-credit/buy": {
+      "post": {
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/@hyperledger/cactus-plugin-carbon-credit/buy"
+          }
+        },
+        "operationId": "buyRequest",
+        "description": "Acquires carbon inventory from a marketplace.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BuyRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BuyResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/@hyperledger/cactus-plugin-carbon-credit/retire": {
+      "post": {
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/@hyperledger/cactus-plugin-carbon-credit/retire"
+          }
+        },
+        "operationId": "retireRequest",
+        "description": "Abstract burn operation that finalises an offset on the underlying registry for a specific beneficiary and message.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RetireRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RetireResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/@hyperledger/cactus-plugin-carbon-credit/get-available-vcus": {
+      "get": {
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "get",
+            "path": "/api/v1/@hyperledger/cactus-plugin-carbon-credit/get-available-vcus"
+          }
+        },
+        "operationId": "getAvailableVCUsRequest",
+        "description": "Get a list of available VCUs (Verified Carbon Units).",
+        "responses": {
+          "200": {
+            "description": "Successful response with a list of available VCUs.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAvailableVCUsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/@hyperledger/cactus-plugin-carbon-credit/get-vcu-metadata": {
+      "post": {
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/@hyperledger/cactus-plugin-carbon-credit/get-vcu-metadata"
+          }
+        },
+        "operationId": "getVCUMetadataRequest",
+        "description": "Get metadata for a specific VCU.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetVCUMetadataRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response with VCU metadata.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetVCUMetadataResponse"
                 }
               }
             }
