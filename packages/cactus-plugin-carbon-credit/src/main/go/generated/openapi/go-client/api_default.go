@@ -361,7 +361,7 @@ func (r ApiRetireRequestRequest) Execute() (*RetireResponse, *http.Response, err
 /*
 RetireRequest Method for RetireRequest
 
-Abstract burn operation that finalises an offset on the underlying registry for a specific beneficiary and message.
+Abstract burn operation that finalizes an offset on the underlying registry for a specific beneficiary and message.
 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiRetireRequestRequest

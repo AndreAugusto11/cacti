@@ -90,6 +90,8 @@ Class | Method | HTTP request | Description
  - [GetAvailableVCUsRequest](docs/GetAvailableVCUsRequest.md)
  - [GetAvailableVCUsResponse](docs/GetAvailableVCUsResponse.md)
  - [GetVCUMetadataRequest](docs/GetVCUMetadataRequest.md)
+ - [Network](docs/Network.md)
+ - [Platform](docs/Platform.md)
  - [RetireRequest](docs/RetireRequest.md)
  - [RetireResponse](docs/RetireResponse.md)
  - [VCUMetadata](docs/VCUMetadata.md)

@@ -63,10 +63,14 @@
         "@hyperledger/cactus-common": "2.1.0",
         "@hyperledger/cactus-core": "2.1.0",
         "@hyperledger/cactus-core-api": "2.1.0",
+        "@hyperledger/cactus-plugin-ledger-connector-ethereum": "2.1.0",
         "axios": "1.8.4",
+        "ethers": "5.6.4",
         "express": "5.1.0",
         "http-proxy-middleware": "3.0.5",
-        "minimist": "1.2.8"
+        "minimist": "1.2.8",
+        "safe-stable-stringify": "2.5.0",
+        "toucan-sdk": "1.0.6-beta"
     },
     "devDependencies": {
         "@hyperledger/cactus-test-tooling": "2.1.0",

@@ -10,7 +10,6 @@ import {
   IListenOptions,
   Servers,
 } from "@hyperledger/cactus-common";
-import { PluginRegistry } from "@hyperledger/cactus-core";
 import { Configuration } from "@hyperledger/cactus-core-api";
 
 import {
@@ -20,7 +19,9 @@ import {
   RetireRequest,
   GetVCUMetadataRequest,
   GetAvailableVCUsRequest,
+  Network,
 } from "../../../main/typescript/public-api";
+import { Web3SigningCredentialPrivateKeyHex } from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
 
 const testLogLevel: LogLevelDesc = "info";
 
@@ -31,7 +32,7 @@ describe("Carbon Credit API Integration Tests", () => {
   const server = http.createServer(expressApp);
 
   //////////////////////////////////
-  // Configuração
+  // configuration
   //////////////////////////////////
 
   beforeAll(async () => {
@@ -49,8 +50,11 @@ describe("Carbon Credit API Integration Tests", () => {
 
     connector = new PluginCarbonCredit({
       instanceId: uuidV4(),
+      signingCredential: {
+        ethAccount: "0x123",
+        secret: "0x",
+      } as Web3SigningCredentialPrivateKeyHex,
       logLevel: testLogLevel,
-      pluginRegistry: new PluginRegistry(),
     });
 
     // Registar todos os endpoints do plugin, incluindo os novos
@@ -65,6 +69,7 @@ describe("Carbon Credit API Integration Tests", () => {
   test("buy endpoint returns placeholder data", async () => {
     const request: BuyRequest = {
       platform: "Toucan",
+      network: Network.Polygon,
       paymentToken: "USDC",
       amount: 100,
       walletObject: "test-wallet",
@@ -80,6 +85,7 @@ describe("Carbon Credit API Integration Tests", () => {
   test("retire endpoint returns placeholder data", async () => {
     const request: RetireRequest = {
       platform: "Toucan",
+      network: Network.Polygon,
       walletObject: "test-wallet",
       objectsList: ["0xABCD"],
       amounts: [100],
@@ -98,6 +104,7 @@ describe("Carbon Credit API Integration Tests", () => {
   test("getAvailableVCUs endpoint returns a list of VCUs", async () => {
     const request: GetAvailableVCUsRequest = {
       platform: "Toucan",
+      network: Network.Polygon,
     };
 
     const response = await apiClient.getAvailableVCUsRequest(request);
@@ -110,6 +117,7 @@ describe("Carbon Credit API Integration Tests", () => {
   test("getVCUMetadata endpoint returns metadata for a valid VCU ID", async () => {
     const request: GetVCUMetadataRequest = {
       platform: "Toucan",
+      network: Network.Polygon,
       projectIdentifier: "project-1234",
       vcuIdentifier: "VCU-1234",
     };

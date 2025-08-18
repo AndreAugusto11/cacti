@@ -8,8 +8,6 @@ import {
 } from "@hyperledger/cactus-core-api";
 import type { Express } from "express";
 
-import { PluginRegistry } from "@hyperledger/cactus-core";
-
 import {
   Checks,
   Logger,
@@ -21,7 +19,7 @@ import { BuyEndpoint } from "./web-services/buy-endpoint";
 import { RetireEndpoint } from "./web-services/retire-endpoint";
 import { GetAvailableVCUsEndpoint } from "./web-services/get-available-vcus-endpoint";
 import { GetVCUMetadataEndpoint } from "./web-services/get-vcu-metadata-endpoint";
-
+import { Web3SigningCredentialPrivateKeyHex } from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
 import {
   BuyRequest,
   BuyResponse,
@@ -31,19 +29,24 @@ import {
   GetVCUMetadataRequest,
   VCUMetadata,
   GetAvailableVCUsRequest,
+  Platform,
+  Network,
 } from "./generated/openapi/typescript-axios";
+import { ToucanLeaf } from "./implementations/toucan-leaf";
+import { CarbonMarketplaceAbstract } from "./carbon-marketplace-abstract";
 
 export interface IPluginCarbonCreditOptions extends ICactusPluginOptions {
   instanceId: string;
-  pluginRegistry: PluginRegistry;
+  signingCredential: Web3SigningCredentialPrivateKeyHex;
   logLevel?: LogLevelDesc;
 }
 
 export class PluginCarbonCredit implements ICactusPlugin, IPluginWebService {
+  public static readonly CLASS_NAME = "PluginCarbonCredit";
+
   private readonly instanceId: string;
   private readonly log: Logger;
   private endpoints: IWebServiceEndpoint[] | undefined;
-  public static readonly CLASS_NAME = "PluginCarbonCredit";
 
   public get className(): string {
     return PluginCarbonCredit.CLASS_NAME;
@@ -53,7 +56,6 @@ export class PluginCarbonCredit implements ICactusPlugin, IPluginWebService {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(options, `${fnTag} arg options`);
     Checks.truthy(options.instanceId, `${fnTag} options.instanceId`);
-    Checks.truthy(options.pluginRegistry, `${fnTag} options.pluginRegistry`);
 
     this.instanceId = options.instanceId;
 
@@ -123,6 +125,20 @@ export class PluginCarbonCredit implements ICactusPlugin, IPluginWebService {
 
   public getPackageName(): string {
     return `@hyperledger/cactus-plugin-carbon-credit`;
+  }
+
+  public getMarketplaceImplementation(
+    platform: string,
+  ): CarbonMarketplaceAbstract {
+    switch (platform) {
+      case Platform.Toucan:
+        return new ToucanLeaf({
+          network: Network.Polygon,
+          signingCredential: this.options.signingCredential,
+        });
+      default:
+        throw new Error(`Unsupported platform: ${platform}`);
+    }
   }
 
   public async buy(request: BuyRequest): Promise<BuyResponse> {

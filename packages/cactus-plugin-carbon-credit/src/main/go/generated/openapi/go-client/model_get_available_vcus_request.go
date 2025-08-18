@@ -19,7 +19,8 @@ var _ MappedNullable = &GetAvailableVCUsRequest{}
 
 // GetAvailableVCUsRequest struct for GetAvailableVCUsRequest
 type GetAvailableVCUsRequest struct {
-	Platform string `json:"platform"`
+	Platform Platform `json:"platform"`
+	Network Network `json:"network"`
 	FilterCriteria *string `json:"filterCriteria,omitempty"`
 	OrderBy *string `json:"orderBy,omitempty"`
 	Limit *string `json:"limit,omitempty"`
@@ -29,9 +30,10 @@ type GetAvailableVCUsRequest struct {
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewGetAvailableVCUsRequest(platform string) *GetAvailableVCUsRequest {
+func NewGetAvailableVCUsRequest(platform Platform, network Network) *GetAvailableVCUsRequest {
 	this := GetAvailableVCUsRequest{}
 	this.Platform = platform
+	this.Network = network
 	return &this
 }
 
@@ -44,9 +46,9 @@ func NewGetAvailableVCUsRequestWithDefaults() *GetAvailableVCUsRequest {
 }
 
 // GetPlatform returns the Platform field value
-func (o *GetAvailableVCUsRequest) GetPlatform() string {
+func (o *GetAvailableVCUsRequest) GetPlatform() Platform {
 	if o == nil {
-		var ret string
+		var ret Platform
 		return ret
 	}
 
@@ -55,7 +57,7 @@ func (o *GetAvailableVCUsRequest) GetPlatform() string {
 
 // GetPlatformOk returns a tuple with the Platform field value
 // and a boolean to check if the value has been set.
-func (o *GetAvailableVCUsRequest) GetPlatformOk() (*string, bool) {
+func (o *GetAvailableVCUsRequest) GetPlatformOk() (*Platform, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -63,8 +65,32 @@ func (o *GetAvailableVCUsRequest) GetPlatformOk() (*string, bool) {
 }
 
 // SetPlatform sets field value
-func (o *GetAvailableVCUsRequest) SetPlatform(v string) {
+func (o *GetAvailableVCUsRequest) SetPlatform(v Platform) {
 	o.Platform = v
+}
+
+// GetNetwork returns the Network field value
+func (o *GetAvailableVCUsRequest) GetNetwork() Network {
+	if o == nil {
+		var ret Network
+		return ret
+	}
+
+	return o.Network
+}
+
+// GetNetworkOk returns a tuple with the Network field value
+// and a boolean to check if the value has been set.
+func (o *GetAvailableVCUsRequest) GetNetworkOk() (*Network, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.Network, true
+}
+
+// SetNetwork sets field value
+func (o *GetAvailableVCUsRequest) SetNetwork(v Network) {
+	o.Network = v
 }
 
 // GetFilterCriteria returns the FilterCriteria field value if set, zero value otherwise.
@@ -174,6 +200,7 @@ func (o GetAvailableVCUsRequest) MarshalJSON() ([]byte, error) {
 func (o GetAvailableVCUsRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["platform"] = o.Platform
+	toSerialize["network"] = o.Network
 	if !IsNil(o.FilterCriteria) {
 		toSerialize["filterCriteria"] = o.FilterCriteria
 	}

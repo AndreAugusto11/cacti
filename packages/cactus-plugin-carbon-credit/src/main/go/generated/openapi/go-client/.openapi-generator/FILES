@@ -11,6 +11,8 @@ model_buy_response.go
 model_get_available_vcus_request.go
 model_get_available_vcus_response.go
 model_get_vcu_metadata_request.go
+model_network.go
+model_platform.go
 model_retire_request.go
 model_retire_response.go
 model_vcu_metadata.go

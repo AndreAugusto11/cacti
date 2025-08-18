@@ -11,11 +11,22 @@
   },
   "components": {
     "schemas": {
+      "Platform": {
+        "type": "string",
+        "enum": ["Toucan"]
+      },
+      "Network": {
+        "type": "string",
+        "enum": ["polygon", "ethereum", "celo", "alfajores"]
+      },
       "BuyRequest": {
         "type": "object",
         "properties": {
           "platform": {
-            "type": "string"
+            "$ref": "#/components/schemas/Platform"
+          },
+          "network": {
+            "$ref": "#/components/schemas/Network"
           },
           "paymentToken": {
             "type": "string"
@@ -29,6 +40,7 @@
         },
         "required": [
           "platform",
+          "network",
           "paymentToken",
           "amount",
           "walletObject"
@@ -59,7 +71,10 @@
         "type": "object",
         "properties": {
           "platform": {
-            "type": "string"
+            "$ref": "#/components/schemas/Platform"
+          },
+          "network": {
+            "$ref": "#/components/schemas/Network"
           },
           "walletObject": {
             "type": "string"
@@ -88,6 +103,7 @@
         },
         "required": [
           "platform",
+          "network",
           "walletObject",
           "objectsList",
           "amounts",
@@ -141,7 +157,10 @@
         "type": "object",
         "properties": {
           "platform": {
-            "type": "string"
+            "$ref": "#/components/schemas/Platform"
+          },
+          "network": {
+            "$ref": "#/components/schemas/Network"
           },
           "filterCriteria": {
             "type": "string"
@@ -154,7 +173,8 @@
           }
         },
         "required": [
-          "platform"
+          "platform",
+          "network"
         ]
       },
       "GetAvailableVCUsResponse": {
@@ -179,7 +199,10 @@
         "type": "object",
         "properties": {
           "platform": {
-            "type": "string"
+            "$ref": "#/components/schemas/Platform"
+          },
+          "network": {
+            "$ref": "#/components/schemas/Network"
           },
           "projectIdentifier": {
             "type": "string"
@@ -190,6 +213,7 @@
         },
         "required": [
           "platform",
+          "network",
           "projectIdentifier",
           "vcuIdentifier"
         ]
@@ -239,7 +263,7 @@
           }
         },
         "operationId": "retireRequest",
-        "description": "Abstract burn operation that finalises an offset on the underlying registry for a specific beneficiary and message.",
+        "description": "Abstract burn operation that finalizes an offset on the underlying registry for a specific beneficiary and message.",
         "requestBody": {
           "content": {
             "application/json": {

@@ -19,7 +19,8 @@ var _ MappedNullable = &BuyRequest{}
 
 // BuyRequest struct for BuyRequest
 type BuyRequest struct {
-	Platform string `json:"platform"`
+	Platform Platform `json:"platform"`
+	Network Network `json:"network"`
 	PaymentToken string `json:"paymentToken"`
 	Amount float32 `json:"amount"`
 	WalletObject string `json:"walletObject"`
@@ -29,9 +30,10 @@ type BuyRequest struct {
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewBuyRequest(platform string, paymentToken string, amount float32, walletObject string) *BuyRequest {
+func NewBuyRequest(platform Platform, network Network, paymentToken string, amount float32, walletObject string) *BuyRequest {
 	this := BuyRequest{}
 	this.Platform = platform
+	this.Network = network
 	this.PaymentToken = paymentToken
 	this.Amount = amount
 	this.WalletObject = walletObject
@@ -47,9 +49,9 @@ func NewBuyRequestWithDefaults() *BuyRequest {
 }
 
 // GetPlatform returns the Platform field value
-func (o *BuyRequest) GetPlatform() string {
+func (o *BuyRequest) GetPlatform() Platform {
 	if o == nil {
-		var ret string
+		var ret Platform
 		return ret
 	}
 
@@ -58,7 +60,7 @@ func (o *BuyRequest) GetPlatform() string {
 
 // GetPlatformOk returns a tuple with the Platform field value
 // and a boolean to check if the value has been set.
-func (o *BuyRequest) GetPlatformOk() (*string, bool) {
+func (o *BuyRequest) GetPlatformOk() (*Platform, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -66,8 +68,32 @@ func (o *BuyRequest) GetPlatformOk() (*string, bool) {
 }
 
 // SetPlatform sets field value
-func (o *BuyRequest) SetPlatform(v string) {
+func (o *BuyRequest) SetPlatform(v Platform) {
 	o.Platform = v
+}
+
+// GetNetwork returns the Network field value
+func (o *BuyRequest) GetNetwork() Network {
+	if o == nil {
+		var ret Network
+		return ret
+	}
+
+	return o.Network
+}
+
+// GetNetworkOk returns a tuple with the Network field value
+// and a boolean to check if the value has been set.
+func (o *BuyRequest) GetNetworkOk() (*Network, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.Network, true
+}
+
+// SetNetwork sets field value
+func (o *BuyRequest) SetNetwork(v Network) {
+	o.Network = v
 }
 
 // GetPaymentToken returns the PaymentToken field value
@@ -153,6 +179,7 @@ func (o BuyRequest) MarshalJSON() ([]byte, error) {
 func (o BuyRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["platform"] = o.Platform
+	toSerialize["network"] = o.Network
 	toSerialize["paymentToken"] = o.PaymentToken
 	toSerialize["amount"] = o.Amount
 	toSerialize["walletObject"] = o.WalletObject

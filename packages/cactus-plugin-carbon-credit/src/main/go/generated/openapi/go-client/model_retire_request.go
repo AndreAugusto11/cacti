@@ -19,7 +19,8 @@ var _ MappedNullable = &RetireRequest{}
 
 // RetireRequest struct for RetireRequest
 type RetireRequest struct {
-	Platform string `json:"platform"`
+	Platform Platform `json:"platform"`
+	Network Network `json:"network"`
 	WalletObject string `json:"walletObject"`
 	ObjectsList []string `json:"objectsList"`
 	Amounts []float32 `json:"amounts"`
@@ -32,9 +33,10 @@ type RetireRequest struct {
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewRetireRequest(platform string, walletObject string, objectsList []string, amounts []float32, beneficiary string, message string, retirementReason string) *RetireRequest {
+func NewRetireRequest(platform Platform, network Network, walletObject string, objectsList []string, amounts []float32, beneficiary string, message string, retirementReason string) *RetireRequest {
 	this := RetireRequest{}
 	this.Platform = platform
+	this.Network = network
 	this.WalletObject = walletObject
 	this.ObjectsList = objectsList
 	this.Amounts = amounts
@@ -53,9 +55,9 @@ func NewRetireRequestWithDefaults() *RetireRequest {
 }
 
 // GetPlatform returns the Platform field value
-func (o *RetireRequest) GetPlatform() string {
+func (o *RetireRequest) GetPlatform() Platform {
 	if o == nil {
-		var ret string
+		var ret Platform
 		return ret
 	}
 
@@ -64,7 +66,7 @@ func (o *RetireRequest) GetPlatform() string {
 
 // GetPlatformOk returns a tuple with the Platform field value
 // and a boolean to check if the value has been set.
-func (o *RetireRequest) GetPlatformOk() (*string, bool) {
+func (o *RetireRequest) GetPlatformOk() (*Platform, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -72,8 +74,32 @@ func (o *RetireRequest) GetPlatformOk() (*string, bool) {
 }
 
 // SetPlatform sets field value
-func (o *RetireRequest) SetPlatform(v string) {
+func (o *RetireRequest) SetPlatform(v Platform) {
 	o.Platform = v
+}
+
+// GetNetwork returns the Network field value
+func (o *RetireRequest) GetNetwork() Network {
+	if o == nil {
+		var ret Network
+		return ret
+	}
+
+	return o.Network
+}
+
+// GetNetworkOk returns a tuple with the Network field value
+// and a boolean to check if the value has been set.
+func (o *RetireRequest) GetNetworkOk() (*Network, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.Network, true
+}
+
+// SetNetwork sets field value
+func (o *RetireRequest) SetNetwork(v Network) {
+	o.Network = v
 }
 
 // GetWalletObject returns the WalletObject field value
@@ -231,6 +257,7 @@ func (o RetireRequest) MarshalJSON() ([]byte, error) {
 func (o RetireRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["platform"] = o.Platform
+	toSerialize["network"] = o.Network
 	toSerialize["walletObject"] = o.WalletObject
 	toSerialize["objectsList"] = o.ObjectsList
 	toSerialize["amounts"] = o.Amounts

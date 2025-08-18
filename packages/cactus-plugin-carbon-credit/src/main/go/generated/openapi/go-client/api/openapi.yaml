@@ -31,7 +31,7 @@ paths:
           path: /api/v1/@hyperledger/cactus-plugin-carbon-credit/buy
   /api/v1/@hyperledger/cactus-plugin-carbon-credit/retire:
     post:
-      description: Abstract burn operation that finalises an offset on the underlying
+      description: Abstract burn operation that finalizes an offset on the underlying
         registry for a specific beneficiary and message.
       operationId: retireRequest
       requestBody:
@@ -92,15 +92,29 @@ paths:
           path: /api/v1/@hyperledger/cactus-plugin-carbon-credit/get-vcu-metadata
 components:
   schemas:
+    Platform:
+      enum:
+      - Toucan
+      type: string
+    Network:
+      enum:
+      - polygon
+      - ethereum
+      - celo
+      - alfajores
+      type: string
     BuyRequest:
       example:
         paymentToken: paymentToken
         amount: 0.8008281904610115
         walletObject: walletObject
-        platform: platform
+        platform: null
+        network: null
       properties:
         platform:
-          type: string
+          $ref: '#/components/schemas/Platform'
+        network:
+          $ref: '#/components/schemas/Network'
         paymentToken:
           type: string
         amount:
@@ -109,6 +123,7 @@ components:
           type: string
       required:
       - amount
+      - network
       - paymentToken
       - platform
       - walletObject
@@ -145,10 +160,13 @@ components:
         - objectsList
         message: message
         walletObject: walletObject
-        platform: platform
+        platform: null
+        network: null
       properties:
         platform:
-          type: string
+          $ref: '#/components/schemas/Platform'
+        network:
+          $ref: '#/components/schemas/Network'
         walletObject:
           type: string
         objectsList:
@@ -169,6 +187,7 @@ components:
       - amounts
       - beneficiary
       - message
+      - network
       - objectsList
       - platform
       - retirementReason
@@ -217,10 +236,13 @@ components:
         filterCriteria: filterCriteria
         limit: limit
         orderBy: orderBy
-        platform: platform
+        platform: null
+        network: null
       properties:
         platform:
-          type: string
+          $ref: '#/components/schemas/Platform'
+        network:
+          $ref: '#/components/schemas/Network'
         filterCriteria:
           type: string
         orderBy:
@@ -228,6 +250,7 @@ components:
         limit:
           type: string
       required:
+      - network
       - platform
       type: object
     GetAvailableVCUsResponse:
@@ -251,15 +274,19 @@ components:
       example:
         vcuIdentifier: vcuIdentifier
         projectIdentifier: projectIdentifier
-        platform: platform
+        platform: null
+        network: null
       properties:
         platform:
-          type: string
+          $ref: '#/components/schemas/Platform'
+        network:
+          $ref: '#/components/schemas/Network'
         projectIdentifier:
           type: string
         vcuIdentifier:
           type: string
       required:
+      - network
       - platform
       - projectIdentifier
       - vcuIdentifier

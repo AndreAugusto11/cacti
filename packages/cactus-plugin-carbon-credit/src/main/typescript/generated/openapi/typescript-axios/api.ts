@@ -31,10 +31,16 @@ import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError } from './base';
 export interface BuyRequest {
     /**
      * 
-     * @type {string}
+     * @type {Platform}
      * @memberof BuyRequest
      */
-    'platform': string;
+    'platform': Platform;
+    /**
+     * 
+     * @type {Network}
+     * @memberof BuyRequest
+     */
+    'network': Network;
     /**
      * 
      * @type {string}
@@ -54,6 +60,8 @@ export interface BuyRequest {
      */
     'walletObject': string;
 }
+
+
 /**
  * 
  * @export
@@ -87,10 +95,16 @@ export interface BuyResponse {
 export interface GetAvailableVCUsRequest {
     /**
      * 
-     * @type {string}
+     * @type {Platform}
      * @memberof GetAvailableVCUsRequest
      */
-    'platform': string;
+    'platform': Platform;
+    /**
+     * 
+     * @type {Network}
+     * @memberof GetAvailableVCUsRequest
+     */
+    'network': Network;
     /**
      * 
      * @type {string}
@@ -110,6 +124,8 @@ export interface GetAvailableVCUsRequest {
      */
     'limit'?: string;
 }
+
+
 /**
  * 
  * @export
@@ -137,10 +153,16 @@ export interface GetAvailableVCUsResponse {
 export interface GetVCUMetadataRequest {
     /**
      * 
-     * @type {string}
+     * @type {Platform}
      * @memberof GetVCUMetadataRequest
      */
-    'platform': string;
+    'platform': Platform;
+    /**
+     * 
+     * @type {Network}
+     * @memberof GetVCUMetadataRequest
+     */
+    'network': Network;
     /**
      * 
      * @type {string}
@@ -154,6 +176,37 @@ export interface GetVCUMetadataRequest {
      */
     'vcuIdentifier': string;
 }
+
+
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+
+export const Network = {
+    Polygon: 'polygon',
+    Ethereum: 'ethereum',
+    Celo: 'celo',
+    Alfajores: 'alfajores'
+} as const;
+
+export type Network = typeof Network[keyof typeof Network];
+
+
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+
+export const Platform = {
+    Toucan: 'Toucan'
+} as const;
+
+export type Platform = typeof Platform[keyof typeof Platform];
+
+
 /**
  * 
  * @export
@@ -162,10 +215,16 @@ export interface GetVCUMetadataRequest {
 export interface RetireRequest {
     /**
      * 
-     * @type {string}
+     * @type {Platform}
      * @memberof RetireRequest
      */
-    'platform': string;
+    'platform': Platform;
+    /**
+     * 
+     * @type {Network}
+     * @memberof RetireRequest
+     */
+    'network': Network;
     /**
      * 
      * @type {string}
@@ -203,6 +262,8 @@ export interface RetireRequest {
      */
     'retirementReason': string;
 }
+
+
 /**
  * 
  * @export
@@ -360,7 +421,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * Abstract burn operation that finalises an offset on the underlying registry for a specific beneficiary and message.
+         * Abstract burn operation that finalizes an offset on the underlying registry for a specific beneficiary and message.
          * @param {RetireRequest} [retireRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -433,7 +494,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Abstract burn operation that finalises an offset on the underlying registry for a specific beneficiary and message.
+         * Abstract burn operation that finalizes an offset on the underlying registry for a specific beneficiary and message.
          * @param {RetireRequest} [retireRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -480,7 +541,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.getVCUMetadataRequest(getVCUMetadataRequest, options).then((request) => request(axios, basePath));
         },
         /**
-         * Abstract burn operation that finalises an offset on the underlying registry for a specific beneficiary and message.
+         * Abstract burn operation that finalizes an offset on the underlying registry for a specific beneficiary and message.
          * @param {RetireRequest} [retireRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -532,7 +593,7 @@ export class DefaultApi extends BaseAPI {
     }
 
     /**
-     * Abstract burn operation that finalises an offset on the underlying registry for a specific beneficiary and message.
+     * Abstract burn operation that finalizes an offset on the underlying registry for a specific beneficiary and message.
      * @param {RetireRequest} [retireRequest] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
