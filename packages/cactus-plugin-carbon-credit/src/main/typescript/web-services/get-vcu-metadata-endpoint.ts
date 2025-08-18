@@ -17,7 +17,7 @@ import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
 import {
   GetVCUMetadataRequest,
-  GetVCUMetadataResponse,
+  VCUMetadata,
 } from "./../generated/openapi/typescript-axios";
 
 import { PluginCarbonCredit } from "../plugin-carbon-credit";
@@ -89,20 +89,12 @@ export class GetVCUMetadataEndpoint implements IWebServiceEndpoint {
     this.log.debug(reqTag);
 
     const reqBody: GetVCUMetadataRequest = req.body;
-    const { vcuId } = reqBody;
-
-    if (!vcuId) {
-      const errorMessage = "Missing required parameter: vcuId.";
-      this.log.error(errorMessage);
-      res.status(400).json({ error: errorMessage });
-      return;
-    }
 
     try {
       this.log.info(
-        `Received a request to get metadata for VCU with ID: ${vcuId}`,
+        `Received a request to get metadata for VCU with ID: ${reqBody.vcuIdentifier}`,
       );
-      const vcuMetadataResponse: GetVCUMetadataResponse =
+      const vcuMetadataResponse: VCUMetadata =
         await this.options.connector.getVCUMetadata(reqBody);
       res.status(200).json(vcuMetadataResponse);
     } catch (ex) {

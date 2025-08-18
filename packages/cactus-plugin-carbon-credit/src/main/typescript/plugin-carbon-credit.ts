@@ -17,23 +17,20 @@ import {
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
 
-import { HelloWorldEndpoint } from "./web-services/hello-world-endpoint";
 import { BuyEndpoint } from "./web-services/buy-endpoint";
 import { RetireEndpoint } from "./web-services/retire-endpoint";
 import { GetAvailableVCUsEndpoint } from "./web-services/get-available-vcus-endpoint";
 import { GetVCUMetadataEndpoint } from "./web-services/get-vcu-metadata-endpoint";
 
 import {
-  HelloWorldRequest,
-  HelloWorldResponse,
   BuyRequest,
   BuyResponse,
   RetireRequest,
   RetireResponse,
   GetAvailableVCUsResponse,
   GetVCUMetadataRequest,
-  GetVCUMetadataResponse,
-  VCU,
+  VCUMetadata,
+  GetAvailableVCUsRequest,
 } from "./generated/openapi/typescript-axios";
 
 export interface IPluginCarbonCreditOptions extends ICactusPluginOptions {
@@ -92,13 +89,6 @@ export class PluginCarbonCredit implements ICactusPlugin, IPluginWebService {
       return this.endpoints;
     }
     const endpoints: IWebServiceEndpoint[] = [];
-    {
-      const endpoint = new HelloWorldEndpoint({
-        connector: this,
-        logLevel: this.options.logLevel,
-      });
-      endpoints.push(endpoint);
-    }
     {
       const endpoint = new BuyEndpoint({
         connector: this,
@@ -181,85 +171,70 @@ export class PluginCarbonCredit implements ICactusPlugin, IPluginWebService {
     return response;
   }
 
-  public async getAvailableVCUs(): Promise<GetAvailableVCUsResponse> {
-    this.log.info(`Fetching available VCUs.`);
+  public async getAvailableVCUs(
+    request: GetAvailableVCUsRequest,
+  ): Promise<GetAvailableVCUsResponse> {
+    const fnTag = `${this.className}#getAvailableVCUs()`;
+    this.log.info(`Fetching available VCUs for platform ${request.platform}`);
+
+    // Step 1: Fetch available VCUs from the platform
+    this.log.debug(`${fnTag} Fetching available VCUs...`);
 
     // Lógica para obter a lista de VCUs, inspirada na documentação de análise
-    const vcus: VCU[] = [
-      {
-        id: "VCU-1234",
-        name: "Carbon Project Alpha",
-        amount: 500,
-        tokenAddress: "0xTCO2_ADDRESS_1",
-      },
-      {
-        id: "VCU-5678",
-        name: "Reforestation Project Beta",
-        amount: 1200,
-        tokenAddress: "0xTCO2_ADDRESS_2",
-      },
-    ];
-
     const response: GetAvailableVCUsResponse = {
-      vcus,
+      objectsList: ["0xABCD", "0x1234"],
+      totalCount: 2,
     };
 
-    this.log.info(`Fetched ${vcus.length} VCUs successfully.`);
+    this.log.info(`There are ${response.totalCount} available VCUs.`);
     return response;
   }
 
   public async getVCUMetadata(
     request: GetVCUMetadataRequest,
-  ): Promise<GetVCUMetadataResponse> {
-    this.log.info(`Fetching metadata for VCU with ID: ${request.vcuId}`);
+  ): Promise<VCUMetadata> {
+    this.log.info(
+      `Fetching metadata for VCU with ID: ${request.vcuIdentifier}`,
+    );
 
     // Lógica para obter os metadados do VCU
     // Para este exemplo, vamos simular os dados
     const mockVCUMetadata = {
       "VCU-1234": {
-        vcu: {
-          id: "VCU-1234",
-          name: "Carbon Project Alpha",
-          amount: 500,
-          tokenAddress: "0xTCO2_ADDRESS_1",
-        },
-        metadata: {
-          registry: "Verra",
-          vintage: "2018",
-          projectType: "Reforestation",
-          location: "Amazon Rainforest",
-        },
+        name: "Carbon Project Alpha",
+        symbol: "CPA",
+        totalSupply: 500,
+        attributes: [
+          "registry:Verra",
+          "vintage:2018",
+          "projectType:Reforestation",
+          "location:Amazon Rainforest",
+        ],
       },
       "VCU-5678": {
-        vcu: {
-          id: "VCU-5678",
-          name: "Reforestation Project Beta",
-          amount: 1200,
-          tokenAddress: "0xTCO2_ADDRESS_2",
-        },
-        metadata: {
-          registry: "Verra",
-          vintage: "2020",
-          projectType: "Biochar",
-          location: "Patagonia",
-        },
+        name: "Reforestation Project Beta",
+        symbol: "RPB",
+        totalSupply: 1200,
+        attributes: [
+          "registry:Verra",
+          "vintage:2020",
+          "projectType:Biochar",
+          "location:Patagonia",
+        ],
       },
     };
 
     const result =
-      mockVCUMetadata[request.vcuId as keyof typeof mockVCUMetadata];
+      mockVCUMetadata[request.vcuIdentifier as keyof typeof mockVCUMetadata];
 
     if (!result) {
-      throw new Error(`VCU with ID ${request.vcuId} not found.`);
+      throw new Error(`VCU with ID ${request.vcuIdentifier} not found.`);
     }
 
-    const response: GetVCUMetadataResponse = {
-      vcu: result.vcu,
-      metadata: result.metadata,
-    };
-
-    this.log.info(`Fetched metadata for VCU ${request.vcuId} successfully.`);
-    return response;
+    this.log.info(
+      `Fetched metadata for VCU ${request.vcuIdentifier} successfully.`,
+    );
+    return result;
   }
 
   public async sell(): Promise<void> {
@@ -270,18 +245,5 @@ export class PluginCarbonCredit implements ICactusPlugin, IPluginWebService {
   public async listVCUs(): Promise<void> {
     // Placeholder for listing VCUs functionality
     this.log.info("List VCUs functionality not implemented yet.");
-  }
-
-  public async helloWorld(
-    request: HelloWorldRequest,
-  ): Promise<HelloWorldResponse> {
-    const fnTag = `${this.className}#helloWorld()`;
-    this.log.debug(`${fnTag} called with body: ${JSON.stringify(request)}`);
-
-    const response: HelloWorldResponse = {
-      message: `Hello, ${request.name}!`,
-    };
-
-    return response;
   }
 }

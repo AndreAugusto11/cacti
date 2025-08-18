@@ -3,6 +3,10 @@ import "jest-extended";
 import { PluginCarbonCredit } from "../../../main/typescript/plugin-carbon-credit";
 import { IPluginCarbonCreditOptions } from "../../../main/typescript/plugin-carbon-credit";
 import { PluginRegistry } from "@hyperledger/cactus-core";
+import {
+  GetAvailableVCUsRequest,
+  GetVCUMetadataRequest,
+} from "../../../main/typescript/public-api";
 
 const pluginOptions: IPluginCarbonCreditOptions = {
   instanceId: "test-instance-id",
@@ -55,31 +59,39 @@ describe("PluginCarbonCredit Functionality", () => {
 
   describe("GetAvailableVCUs Functionality", () => {
     test("getAvailableVCUs returns a list of VCUs", async () => {
-      const response = await plugin.getAvailableVCUs();
+      const request: GetAvailableVCUsRequest = {
+        platform: "Toucan",
+      };
+
+      const response = await plugin.getAvailableVCUs(request);
 
       expect(response).toBeDefined();
-      expect(response.vcus).toBeInstanceOf(Array);
-      expect(response.vcus.length).toBeGreaterThan(0);
-
-      const vcu1 = response.vcus[0];
-      expect(vcu1.id).toBe("VCU-1234");
-      expect(vcu1.name).toBe("Carbon Project Alpha");
+      expect(response.objectsList).toBeInstanceOf(Array);
+      expect(response.totalCount).toBe(2); // Placeholder, adjust as needed
     });
   });
 
   describe("VCU Metadata Functionality", () => {
     test("getVCUMetadata returns the correct data for a valid VCU ID", async () => {
-      const request = { vcuId: "VCU-1234" };
+      const request: GetVCUMetadataRequest = {
+        platform: "Toucan",
+        projectIdentifier: "project-1234",
+        vcuIdentifier: "VCU-1234",
+      };
       const response = await plugin.getVCUMetadata(request);
 
       expect(response).toBeDefined();
-      expect(response.vcu.id).toBe("VCU-1234");
-      expect(response.vcu.name).toBe("Carbon Project Alpha");
-      expect(response.metadata.registry).toBe("Verra");
+      expect(response.name).toEqual("Carbon Project Alpha");
+      expect(response.symbol).toEqual("CPA");
+      expect(response.totalSupply).toEqual(500);
     });
 
     test("getVCUMetadata throws an error for an invalid VCU ID", async () => {
-      const invalidRequest = { vcuId: "VCU-9999" };
+      const invalidRequest: GetVCUMetadataRequest = {
+        platform: "Toucan",
+        projectIdentifier: "project-1234",
+        vcuIdentifier: "VCU-9999",
+      };
 
       await expect(plugin.getVCUMetadata(invalidRequest)).rejects.toThrow(
         "VCU with ID VCU-9999 not found.",

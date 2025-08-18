@@ -3,7 +3,7 @@
   "info": {
     "title": "Hyperledger Cactus Plugin - Carbon Credit",
     "description": "Implementation for Carbon Credit Plugin logic",
-    "version": "0.0.1",
+    "version": "1.0.0",
     "license": {
       "name": "Apache-2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
@@ -11,28 +11,6 @@
   },
   "components": {
     "schemas": {
-      "HelloWorldRequest": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "name"
-        ]
-      },
-      "HelloWorldResponse": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "message"
-        ]
-      },
       "BuyRequest": {
         "type": "object",
         "properties": {
@@ -129,111 +107,96 @@
           }
         },
         "required": [
-          "txHashRetire"
+          "txHashRetire",
+          "retirementCertificate"
         ]
       },
-      "VCU": {
+      "VCUMetadata": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string"
-          },
           "name": {
             "type": "string"
           },
-          "amount": {
+          "symbol": {
+            "type": "string"
+          },
+          "totalSupply": {
             "type": "number"
           },
-          "tokenAddress": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "name",
-          "amount",
-          "tokenAddress"
-        ]
-      },
-      "GetAvailableVCUsResponse": {
-        "type": "object",
-        "properties": {
-          "vcus": {
+          "attributes": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/VCU"
-            }
-          }
-        },
-        "required": [
-          "vcus"
-        ]
-      },
-      "GetVCUMetadataRequest": {
-        "type": "object",
-        "properties": {
-          "vcuId": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "vcuId"
-        ]
-      },
-      "GetVCUMetadataResponse": {
-        "type": "object",
-        "properties": {
-          "vcu": {
-            "$ref": "#/components/schemas/VCU"
-          },
-          "metadata": {
-            "type": "object",
-            "additionalProperties": {
               "type": "string"
             }
           }
         },
         "required": [
-          "vcu",
-          "metadata"
+          "name",
+          "symbol",
+          "totalSupply",
+          "attributes"
+        ]
+      },
+      "GetAvailableVCUsRequest": {
+        "type": "object",
+        "properties": {
+          "platform": {
+            "type": "string"
+          },
+          "filterCriteria": {
+            "type": "string"
+          },
+          "orderBy": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "platform"
+        ]
+      },
+      "GetAvailableVCUsResponse": {
+        "type": "object",
+        "properties": {
+          "objectsList": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "totalCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "objectsList",
+          "totalCount"
+        ]
+      },
+      "GetVCUMetadataRequest": {
+        "type": "object",
+        "properties": {
+          "platform": {
+            "type": "string"
+          },
+          "projectIdentifier": {
+            "type": "string"
+          },
+          "vcuIdentifier": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "platform",
+          "projectIdentifier",
+          "vcuIdentifier"
         ]
       }
     }
   },
   "paths": {
-    "/api/v1/@hyperledger/cactus-plugin-carbon-credit/hello-world": {
-      "post": {
-        "x-hyperledger-cacti": {
-          "http": {
-            "verbLowerCase": "post",
-            "path": "/api/v1/@hyperledger/cactus-plugin-carbon-credit/hello-world"
-          }
-        },
-        "operationId": "helloWorldRequest",
-        "description": "",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/HelloWorldRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HelloWorldResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/v1/@hyperledger/cactus-plugin-carbon-credit/buy": {
       "post": {
         "x-hyperledger-cacti": {
@@ -310,6 +273,15 @@
         },
         "operationId": "getAvailableVCUsRequest",
         "description": "Get a list of available VCUs (Verified Carbon Units).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetAvailableVCUsRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Successful response with a list of available VCUs.",
@@ -349,7 +321,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetVCUMetadataResponse"
+                  "$ref": "#/components/schemas/VCUMetadata"
                 }
               }
             }

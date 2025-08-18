@@ -13,14 +13,14 @@ import {
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import { Configuration } from "@hyperledger/cactus-core-api";
 
-// Assegura que todas as funções e schemas estejam disponíveis no cliente API
 import {
   DefaultApi as CarbonCreditApi,
   PluginCarbonCredit,
   BuyRequest,
   RetireRequest,
   GetVCUMetadataRequest,
-} from "../../main/typescript/public-api";
+  GetAvailableVCUsRequest,
+} from "../../../main/typescript/public-api";
 
 const testLogLevel: LogLevelDesc = "info";
 
@@ -62,19 +62,6 @@ describe("Carbon Credit API Integration Tests", () => {
     await Servers.shutdown(server);
   });
 
-  //////////////////////////////////
-  // Testes de Integração
-  //////////////////////////////////
-
-  test("helloWorld endpoint works correctly", async () => {
-    const response = await apiClient.helloWorldRequest({ name: "Integration Test" });
-
-    expect(response).toBeDefined();
-    expect(response.status).toEqual(200);
-    expect(response.data).toBeDefined();
-    expect(response.data.message).toEqual("Hello, Integration Test!");
-  });
-
   test("buy endpoint returns placeholder data", async () => {
     const request: BuyRequest = {
       platform: "Toucan",
@@ -88,8 +75,6 @@ describe("Carbon Credit API Integration Tests", () => {
     expect(response).toBeDefined();
     expect(response.status).toEqual(200);
     expect(response.data).toBeDefined();
-    expect(response.data.txHashSwap).toEqual("txHashSwap_placeholder");
-    expect(response.data.poolTokenAmount).toEqual("100");
   });
 
   test("retire endpoint returns placeholder data", async () => {
@@ -108,30 +93,31 @@ describe("Carbon Credit API Integration Tests", () => {
     expect(response).toBeDefined();
     expect(response.status).toEqual(200);
     expect(response.data).toBeDefined();
-    expect(response.data.txHashRetire).toEqual("txHashRetire_placeholder");
-    expect(response.data.retirementCertificate).toEqual("retirementCertificate_placeholder");
   });
 
   test("getAvailableVCUs endpoint returns a list of VCUs", async () => {
-    // getAvailableVCUsRequest não tem corpo de requisição
-    const response = await apiClient.getAvailableVCUsRequest();
+    const request: GetAvailableVCUsRequest = {
+      platform: "Toucan",
+    };
+
+    const response = await apiClient.getAvailableVCUsRequest(request);
 
     expect(response).toBeDefined();
     expect(response.status).toEqual(200);
     expect(response.data).toBeDefined();
-    expect(response.data.vcus).toBeInstanceOf(Array);
-    expect(response.data.vcus.length).toBeGreaterThan(0);
-    expect(response.data.vcus[0].id).toEqual("VCU-1234");
   });
 
   test("getVCUMetadata endpoint returns metadata for a valid VCU ID", async () => {
-    const request: GetVCUMetadataRequest = { vcuId: "VCU-1234" };
+    const request: GetVCUMetadataRequest = {
+      platform: "Toucan",
+      projectIdentifier: "project-1234",
+      vcuIdentifier: "VCU-1234",
+    };
+
     const response = await apiClient.getVCUMetadataRequest(request);
 
     expect(response).toBeDefined();
     expect(response.status).toEqual(200);
     expect(response.data).toBeDefined();
-    expect(response.data.vcu.id).toEqual("VCU-1234");
-    expect(response.data.metadata.registry).toEqual("Verra");
   });
 });

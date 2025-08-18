@@ -5,30 +5,10 @@ info:
     name: Apache-2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
   title: Hyperledger Cactus Plugin - Carbon Credit
-  version: 0.0.1
+  version: 1.0.0
 servers:
 - url: /
 paths:
-  /api/v1/@hyperledger/cactus-plugin-carbon-credit/hello-world:
-    post:
-      description: ""
-      operationId: helloWorldRequest
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/HelloWorldRequest'
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HelloWorldResponse'
-          description: Successful response
-      x-hyperledger-cacti:
-        http:
-          verbLowerCase: post
-          path: /api/v1/@hyperledger/cactus-plugin-carbon-credit/hello-world
   /api/v1/@hyperledger/cactus-plugin-carbon-credit/buy:
     post:
       description: Acquires carbon inventory from a marketplace.
@@ -74,6 +54,11 @@ paths:
     get:
       description: Get a list of available VCUs (Verified Carbon Units).
       operationId: getAvailableVCUsRequest
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetAvailableVCUsRequest'
       responses:
         "200":
           content:
@@ -99,7 +84,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetVCUMetadataResponse'
+                $ref: '#/components/schemas/VCUMetadata'
           description: Successful response with VCU metadata.
       x-hyperledger-cacti:
         http:
@@ -107,24 +92,6 @@ paths:
           path: /api/v1/@hyperledger/cactus-plugin-carbon-credit/get-vcu-metadata
 components:
   schemas:
-    HelloWorldRequest:
-      example:
-        name: name
-      properties:
-        name:
-          type: string
-      required:
-      - name
-      type: object
-    HelloWorldResponse:
-      example:
-        message: message
-      properties:
-        message:
-          type: string
-      required:
-      - message
-      type: object
     BuyRequest:
       example:
         paymentToken: paymentToken
@@ -217,74 +184,83 @@ components:
         retirementCertificate:
           type: string
       required:
+      - retirementCertificate
       - txHashRetire
       type: object
-    VCU:
+    VCUMetadata:
       example:
-        tokenAddress: tokenAddress
-        amount: 0.8008281904610115
+        symbol: symbol
+        totalSupply: 0.8008281904610115
         name: name
-        id: id
+        attributes:
+        - attributes
+        - attributes
       properties:
-        id:
-          type: string
         name:
           type: string
-        amount:
+        symbol:
+          type: string
+        totalSupply:
           type: number
-        tokenAddress:
+        attributes:
+          items:
+            type: string
+          type: array
+      required:
+      - attributes
+      - name
+      - symbol
+      - totalSupply
+      type: object
+    GetAvailableVCUsRequest:
+      example:
+        filterCriteria: filterCriteria
+        limit: limit
+        orderBy: orderBy
+        platform: platform
+      properties:
+        platform:
+          type: string
+        filterCriteria:
+          type: string
+        orderBy:
+          type: string
+        limit:
           type: string
       required:
-      - amount
-      - id
-      - name
-      - tokenAddress
+      - platform
       type: object
     GetAvailableVCUsResponse:
       example:
-        vcus:
-        - tokenAddress: tokenAddress
-          amount: 0.8008281904610115
-          name: name
-          id: id
-        - tokenAddress: tokenAddress
-          amount: 0.8008281904610115
-          name: name
-          id: id
+        objectsList:
+        - objectsList
+        - objectsList
+        totalCount: 0.8008281904610115
       properties:
-        vcus:
+        objectsList:
           items:
-            $ref: '#/components/schemas/VCU'
+            type: string
           type: array
+        totalCount:
+          type: number
       required:
-      - vcus
+      - objectsList
+      - totalCount
       type: object
     GetVCUMetadataRequest:
       example:
-        vcuId: vcuId
+        vcuIdentifier: vcuIdentifier
+        projectIdentifier: projectIdentifier
+        platform: platform
       properties:
-        vcuId:
+        platform:
+          type: string
+        projectIdentifier:
+          type: string
+        vcuIdentifier:
           type: string
       required:
-      - vcuId
-      type: object
-    GetVCUMetadataResponse:
-      example:
-        metadata:
-          key: metadata
-        vcu:
-          tokenAddress: tokenAddress
-          amount: 0.8008281904610115
-          name: name
-          id: id
-      properties:
-        vcu:
-          $ref: '#/components/schemas/VCU'
-        metadata:
-          additionalProperties:
-            type: string
-          type: object
-      required:
-      - metadata
-      - vcu
+      - platform
+      - projectIdentifier
+      - vcuIdentifier
       type: object
