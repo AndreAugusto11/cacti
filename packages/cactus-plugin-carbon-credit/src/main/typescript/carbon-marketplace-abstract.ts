@@ -7,9 +7,9 @@ import {
   GetVCUMetadataRequest,
   Network,
   RetireRequest,
+  RetireResponse,
   VCUMetadata,
 } from "./public-api";
-import { RetireEndpoint } from "./web-services/retire-endpoint";
 import {
   GasTransactionConfig,
   Web3SigningCredentialPrivateKeyHex,
@@ -51,7 +51,7 @@ export abstract class CarbonMarketplaceAbstract {
    * @throws Will throw an error if the retirement fails.
    * @abstract
    */
-  public abstract retire(request: RetireRequest): Promise<RetireEndpoint>;
+  public abstract retire(request: RetireRequest): Promise<RetireResponse>;
 
   /**
    * Abstract method to get available VCUs.

@@ -22,12 +22,11 @@ import {
   GetVCUMetadataRequest,
   VCUMetadata,
   Network,
+  RetireResponse,
 } from "../public-api";
-import { RetireEndpoint } from "../web-services/retire-endpoint";
 import ToucanClient from "toucan-sdk";
 import { ethers } from "ethers";
-import { parseUnits } from "ethers";
-import { MaxUint256 } from "ethers";
+import { utils } from "ethers";
 import { Network as ToucanNetwork } from "toucan-sdk/dist/types";
 
 export interface IToucanLeafOptions extends CarbonMarketplaceAbstractOptions {}
@@ -82,10 +81,10 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
         return "alfajores";
       case Network.Celo:
         return "celo";
-      case Network.Base:
-        return "base";
-      case Network.BaseSepolia:
-        return "base-sepolia";
+      // case Network.Base:
+      //   return "base";
+      // case Network.BaseSepolia:
+      //   return "base-sepolia";
       default:
         throw new Error(`Unsupported network: ${network}`);
     }
@@ -118,7 +117,7 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
       this.logger.debug(
         `${fnTag}  Swapping ${_request.paymentToken} for pool tokens...`,
       );
-      const amountIn = parseUnits(_request.amount, 6);
+      const amountIn = utils.parseUnits(String(_request.amount), 6); // not this amount. This will be the amount of carbon credits in tonnes
       const path = [_request.paymentToken, process.env.NCT!];
       await usdc.approve(router.target, amountIn);
 
@@ -144,27 +143,27 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
         this.signer,
       );
 
-      await nct.approve(process.env.NCT!, MaxUint256); // infinite approval per #332
+      await nct.approve(process.env.NCT!, 2n ** 256n); // infinite approval per #332
 
       let tco2List: { address: string; amount: bigint }[] | undefined;
       const tco2s = ["0xABCD…", "0x1234…"]; // TCO2 token addresses
-      const tonnes = [parseUnits("3", 18), parseUnits("2", 18)];
+      const tonnes = [utils.parseUnits("3", 18), utils.parseUnits("2", 18)];
 
       const redeemStrategy = "specific"; // "specific" | "redeemMany" | "auto"
 
       if (redeemStrategy === "specific" && tco2s && tonnes) {
-        await this.toucanClient.selectiveRedeem("NCT", tco2s, tonnes);
-        tco2List = tco2s.map((addr, i) => ({
-          address: addr,
-          amount: tonnes[i],
-        }));
-      } else if (redeemStrategy === "redeemMany" && tco2s && tonnes) {
-        const tx = await nct.redeemMany(tco2s, tonnes);
-        await tx.wait();
-        tco2List = tco2s.map((addr, i) => ({
-          address: addr,
-          amount: tonnes[i],
-        }));
+        // await this.toucanClient.selectiveRedeem("NCT", tco2s, tonnes);
+        // tco2List = tco2s.map((addr, i) => ({
+        //   address: addr,
+        //   amount: tonnes[i],
+        // }));
+        // } else if (redeemStrategy === "redeemMany" && tco2s && tonnes) {
+        // const tx = await nct.redeemMany(tco2s, tonnes);
+        // await tx.wait();
+        // tco2List = tco2s.map((addr, i) => ({
+        //   address: addr,
+        //   amount: tonnes[i],
+        // }));
       } else {
         const nctBalance = await nct.balanceOf(this.signer.address);
         await nct.redeemAuto(nctBalance);
@@ -190,7 +189,7 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
     throw new Error("Method not implemented.");
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public retire(_request: RetireRequest): Promise<RetireEndpoint> {
+  public retire(_request: RetireRequest): Promise<RetireResponse> {
     throw new Error("Method not implemented.");
   }
 
@@ -226,6 +225,7 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
 
       // Apply filters (region, vintage, etc.)
       if (_request.filterCriteria != undefined) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         projects = projects.filter((p) => {
           // TODO: improve filtering to support multiple criteria
           return true;
