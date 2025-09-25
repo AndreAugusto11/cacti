@@ -132,22 +132,24 @@ components:
       type: object
     BuyResponse:
       example:
+        assetAmount: assetAmount
         txHashSwap: txHashSwap
-        poolTokenAmount: poolTokenAmount
         tco2List:
-        - tco2List
-        - tco2List
+        - amount: amount
+          address: address
+        - amount: amount
+          address: address
       properties:
         txHashSwap:
           type: string
-        poolTokenAmount:
+        assetAmount:
           type: string
         tco2List:
           items:
-            type: string
+            $ref: '#/components/schemas/BuyResponse_tco2List_inner'
           type: array
       required:
-      - poolTokenAmount
+      - assetAmount
       - txHashSwap
       type: object
     RetireRequest:
@@ -292,4 +294,17 @@ components:
       - platform
       - projectIdentifier
       - vcuIdentifier
+      type: object
+    BuyResponse_tco2List_inner:
+      example:
+        amount: amount
+        address: address
+      properties:
+        address:
+          type: string
+        amount:
+          type: string
+      required:
+      - address
+      - amount
       type: object

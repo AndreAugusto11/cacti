@@ -52,19 +52,28 @@
           "txHashSwap": {
             "type": "string"
           },
-          "poolTokenAmount": {
+          "assetAmount": {
             "type": "string"
           },
           "tco2List": {
             "type": "array",
             "items": {
-              "type": "string"
+              "type": "object",
+              "properties": {
+                "address": {
+                  "type": "string"
+                },
+                "amount": {
+                  "type": "string"
+                }
+              },
+              "required": ["address", "amount"]
             }
           }
         },
         "required": [
           "txHashSwap",
-          "poolTokenAmount"
+          "assetAmount"
         ]
       },
       "RetireRequest": {

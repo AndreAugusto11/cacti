@@ -8,6 +8,7 @@ go.mod
 go.sum
 model_buy_request.go
 model_buy_response.go
+model_buy_response_tco2_list_inner.go
 model_get_available_vcus_request.go
 model_get_available_vcus_response.go
 model_get_vcu_metadata_request.go

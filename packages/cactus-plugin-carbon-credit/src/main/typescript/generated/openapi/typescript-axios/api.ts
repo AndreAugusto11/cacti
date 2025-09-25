@@ -79,13 +79,32 @@ export interface BuyResponse {
      * @type {string}
      * @memberof BuyResponse
      */
-    'poolTokenAmount': string;
+    'assetAmount': string;
     /**
      * 
-     * @type {Array<string>}
+     * @type {Array<BuyResponseTco2ListInner>}
      * @memberof BuyResponse
      */
-    'tco2List'?: Array<string>;
+    'tco2List'?: Array<BuyResponseTco2ListInner>;
+}
+/**
+ * 
+ * @export
+ * @interface BuyResponseTco2ListInner
+ */
+export interface BuyResponseTco2ListInner {
+    /**
+     * 
+     * @type {string}
+     * @memberof BuyResponseTco2ListInner
+     */
+    'address': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof BuyResponseTco2ListInner
+     */
+    'amount': string;
 }
 /**
  * 

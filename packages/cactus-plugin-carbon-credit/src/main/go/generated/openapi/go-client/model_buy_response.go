@@ -20,18 +20,18 @@ var _ MappedNullable = &BuyResponse{}
 // BuyResponse struct for BuyResponse
 type BuyResponse struct {
 	TxHashSwap string `json:"txHashSwap"`
-	PoolTokenAmount string `json:"poolTokenAmount"`
-	Tco2List []string `json:"tco2List,omitempty"`
+	AssetAmount string `json:"assetAmount"`
+	Tco2List []BuyResponseTco2ListInner `json:"tco2List,omitempty"`
 }
 
 // NewBuyResponse instantiates a new BuyResponse object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewBuyResponse(txHashSwap string, poolTokenAmount string) *BuyResponse {
+func NewBuyResponse(txHashSwap string, assetAmount string) *BuyResponse {
 	this := BuyResponse{}
 	this.TxHashSwap = txHashSwap
-	this.PoolTokenAmount = poolTokenAmount
+	this.AssetAmount = assetAmount
 	return &this
 }
 
@@ -67,34 +67,34 @@ func (o *BuyResponse) SetTxHashSwap(v string) {
 	o.TxHashSwap = v
 }
 
-// GetPoolTokenAmount returns the PoolTokenAmount field value
-func (o *BuyResponse) GetPoolTokenAmount() string {
+// GetAssetAmount returns the AssetAmount field value
+func (o *BuyResponse) GetAssetAmount() string {
 	if o == nil {
 		var ret string
 		return ret
 	}
 
-	return o.PoolTokenAmount
+	return o.AssetAmount
 }
 
-// GetPoolTokenAmountOk returns a tuple with the PoolTokenAmount field value
+// GetAssetAmountOk returns a tuple with the AssetAmount field value
 // and a boolean to check if the value has been set.
-func (o *BuyResponse) GetPoolTokenAmountOk() (*string, bool) {
+func (o *BuyResponse) GetAssetAmountOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
-	return &o.PoolTokenAmount, true
+	return &o.AssetAmount, true
 }
 
-// SetPoolTokenAmount sets field value
-func (o *BuyResponse) SetPoolTokenAmount(v string) {
-	o.PoolTokenAmount = v
+// SetAssetAmount sets field value
+func (o *BuyResponse) SetAssetAmount(v string) {
+	o.AssetAmount = v
 }
 
 // GetTco2List returns the Tco2List field value if set, zero value otherwise.
-func (o *BuyResponse) GetTco2List() []string {
+func (o *BuyResponse) GetTco2List() []BuyResponseTco2ListInner {
 	if o == nil || IsNil(o.Tco2List) {
-		var ret []string
+		var ret []BuyResponseTco2ListInner
 		return ret
 	}
 	return o.Tco2List
@@ -102,7 +102,7 @@ func (o *BuyResponse) GetTco2List() []string {
 
 // GetTco2ListOk returns a tuple with the Tco2List field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *BuyResponse) GetTco2ListOk() ([]string, bool) {
+func (o *BuyResponse) GetTco2ListOk() ([]BuyResponseTco2ListInner, bool) {
 	if o == nil || IsNil(o.Tco2List) {
 		return nil, false
 	}
@@ -118,8 +118,8 @@ func (o *BuyResponse) HasTco2List() bool {
 	return false
 }
 
-// SetTco2List gets a reference to the given []string and assigns it to the Tco2List field.
-func (o *BuyResponse) SetTco2List(v []string) {
+// SetTco2List gets a reference to the given []BuyResponseTco2ListInner and assigns it to the Tco2List field.
+func (o *BuyResponse) SetTco2List(v []BuyResponseTco2ListInner) {
 	o.Tco2List = v
 }
 
@@ -134,7 +134,7 @@ func (o BuyResponse) MarshalJSON() ([]byte, error) {
 func (o BuyResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["txHashSwap"] = o.TxHashSwap
-	toSerialize["poolTokenAmount"] = o.PoolTokenAmount
+	toSerialize["assetAmount"] = o.AssetAmount
 	if !IsNil(o.Tco2List) {
 		toSerialize["tco2List"] = o.Tco2List
 	}

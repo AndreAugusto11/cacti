@@ -87,6 +87,7 @@ Class | Method | HTTP request | Description
 
  - [BuyRequest](docs/BuyRequest.md)
  - [BuyResponse](docs/BuyResponse.md)
+ - [BuyResponseTco2ListInner](docs/BuyResponseTco2ListInner.md)
  - [GetAvailableVCUsRequest](docs/GetAvailableVCUsRequest.md)
  - [GetAvailableVCUsResponse](docs/GetAvailableVCUsResponse.md)
  - [GetVCUMetadataRequest](docs/GetVCUMetadataRequest.md)

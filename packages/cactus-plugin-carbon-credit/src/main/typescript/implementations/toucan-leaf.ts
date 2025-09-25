@@ -29,7 +29,6 @@ import { ethers } from "ethers";
 import { parseUnits } from "ethers";
 import { MaxUint256 } from "ethers";
 import { Network as ToucanNetwork } from "toucan-sdk/dist/types";
-import { request } from "express";
 
 export interface IToucanLeafOptions extends CarbonMarketplaceAbstractOptions {}
 
@@ -150,6 +149,8 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
       let tco2List: { address: string; amount: bigint }[] | undefined;
       const tco2s = ["0xABCD…", "0x1234…"]; // TCO2 token addresses
       const tonnes = [parseUnits("3", 18), parseUnits("2", 18)];
+
+      const redeemStrategy = "specific"; // "specific" | "redeemMany" | "auto"
 
       if (redeemStrategy === "specific" && tco2s && tonnes) {
         await this.toucanClient.selectiveRedeem("NCT", tco2s, tonnes);
