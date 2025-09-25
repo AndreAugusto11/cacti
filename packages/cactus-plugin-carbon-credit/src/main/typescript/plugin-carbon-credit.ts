@@ -129,11 +129,12 @@ export class PluginCarbonCredit implements ICactusPlugin, IPluginWebService {
 
   public getMarketplaceImplementation(
     platform: string,
+    network: Network,
   ): CarbonMarketplaceAbstract {
     switch (platform) {
       case Platform.Toucan:
         return new ToucanLeaf({
-          network: Network.Polygon,
+          network: network,
           signingCredential: this.options.signingCredential,
         });
       default:
@@ -142,27 +143,13 @@ export class PluginCarbonCredit implements ICactusPlugin, IPluginWebService {
   }
 
   public async buy(request: BuyRequest): Promise<BuyResponse> {
-    const fnTag = `${this.className}#buy()`;
     this.log.info(`Received buy request for ${request.amount} units.`);
 
-    // Step 1: Swap USDC for pool tokens (e.g., NCT)
-    this.log.debug(
-      `${fnTag}  Swapping ${request.paymentToken} for pool tokens...`,
-    );
-    const txHashSwap = "txHashSwap_placeholder"; // Replace with real swap logic
-    const poolTokenAmount = "100"; // Replace with real calculation logic
+    const marketplaceImplementation: CarbonMarketplaceAbstract =
+      this.getMarketplaceImplementation(request.platform, request.network);
 
-    // Step 2: Redeem pool tokens for specific TCO2s
-    this.log.debug(`${fnTag} Redeeming pool tokens for TCO2s...`);
-    const tco2List = ["0xABCD", "0x1234"]; // Replace with real redemption logic
+    const response = await marketplaceImplementation.buy(request);
 
-    const response: BuyResponse = {
-      txHashSwap,
-      poolTokenAmount,
-      tco2List,
-    };
-
-    this.log.info(`Buy operation completed successfully.`);
     return response;
   }
 
@@ -190,67 +177,26 @@ export class PluginCarbonCredit implements ICactusPlugin, IPluginWebService {
   public async getAvailableVCUs(
     request: GetAvailableVCUsRequest,
   ): Promise<GetAvailableVCUsResponse> {
-    const fnTag = `${this.className}#getAvailableVCUs()`;
-    this.log.info(`Fetching available VCUs for platform ${request.platform}`);
+    const marketplaceImplementation: CarbonMarketplaceAbstract =
+      this.getMarketplaceImplementation(request.platform, request.network);
 
-    // Step 1: Fetch available VCUs from the platform
-    this.log.debug(`${fnTag} Fetching available VCUs...`);
+    const response = await marketplaceImplementation.getAvailableVCUs(request);
 
-    // Lógica para obter a lista de VCUs, inspirada na documentação de análise
-    const response: GetAvailableVCUsResponse = {
-      objectsList: ["0xABCD", "0x1234"],
-      totalCount: 2,
-    };
-
-    this.log.info(`There are ${response.totalCount} available VCUs.`);
     return response;
   }
 
   public async getVCUMetadata(
     request: GetVCUMetadataRequest,
   ): Promise<VCUMetadata> {
-    this.log.info(
-      `Fetching metadata for VCU with ID: ${request.vcuIdentifier}`,
-    );
+    const marketplaceImplementation: CarbonMarketplaceAbstract =
+      this.getMarketplaceImplementation(request.platform, request.network);
 
-    // Lógica para obter os metadados do VCU
-    // Para este exemplo, vamos simular os dados
-    const mockVCUMetadata = {
-      "VCU-1234": {
-        name: "Carbon Project Alpha",
-        symbol: "CPA",
-        totalSupply: 500,
-        attributes: [
-          "registry:Verra",
-          "vintage:2018",
-          "projectType:Reforestation",
-          "location:Amazon Rainforest",
-        ],
-      },
-      "VCU-5678": {
-        name: "Reforestation Project Beta",
-        symbol: "RPB",
-        totalSupply: 1200,
-        attributes: [
-          "registry:Verra",
-          "vintage:2020",
-          "projectType:Biochar",
-          "location:Patagonia",
-        ],
-      },
-    };
+    const response = await marketplaceImplementation.getVCUMetadata(request);
 
-    const result =
-      mockVCUMetadata[request.vcuIdentifier as keyof typeof mockVCUMetadata];
-
-    if (!result) {
+    if (!response) {
       throw new Error(`VCU with ID ${request.vcuIdentifier} not found.`);
     }
-
-    this.log.info(
-      `Fetched metadata for VCU ${request.vcuIdentifier} successfully.`,
-    );
-    return result;
+    return response;
   }
 
   public async sell(): Promise<void> {

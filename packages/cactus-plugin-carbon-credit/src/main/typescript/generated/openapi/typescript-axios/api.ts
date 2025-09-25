@@ -188,7 +188,9 @@ export const Network = {
     Polygon: 'polygon',
     Ethereum: 'ethereum',
     Celo: 'celo',
-    Alfajores: 'alfajores'
+    Alfajores: 'alfajores',
+    Base: 'base',
+    BaseSepolia: 'base-sepolia'
 } as const;
 
 export type Network = typeof Network[keyof typeof Network];

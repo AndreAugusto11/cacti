@@ -9,12 +9,14 @@ import {
   Platform,
 } from "../../../main/typescript/public-api";
 import { Web3SigningCredentialPrivateKeyHex } from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
+import { ethers } from "ethers";
+import { formatUnits } from "ethers/lib/utils";
 
 const pluginOptions: IPluginCarbonCreditOptions = {
   instanceId: "test-instance-id",
   signingCredential: {
-    ethAccount: "0x123",
-    secret: "0x",
+    ethAccount: "0xb5271339c211cC1EEeD30a2f9f447063a5faD1F0",
+    secret: "739ed7c97109f28bc8f13b354b30bbd01a47061be7676c3c3934aa4a56540de4",
   } as Web3SigningCredentialPrivateKeyHex,
   logLevel: "DEBUG",
 };
@@ -75,7 +77,7 @@ describe("PluginCarbonCredit Functionality", () => {
 
       expect(response).toBeDefined();
       expect(response.objectsList).toBeInstanceOf(Array);
-      expect(response.totalCount).toBe(2); // Placeholder, adjust as needed
+      expect(response.totalCount).toBe(33); // Placeholder, adjust as needed
     });
   });
 
@@ -84,15 +86,16 @@ describe("PluginCarbonCredit Functionality", () => {
       const request: GetVCUMetadataRequest = {
         platform: Platform.Toucan,
         network: Network.Polygon,
-        projectIdentifier: "project-1234",
-        vcuIdentifier: "VCU-1234",
+        projectIdentifier: "VCS-1529",
+        vcuIdentifier: "0x6362364A37F34d39a1f4993fb595dAB4116dAf0d",
       };
       const response = await plugin.getVCUMetadata(request);
 
       expect(response).toBeDefined();
-      expect(response.name).toEqual("Carbon Project Alpha");
-      expect(response.symbol).toEqual("CPA");
-      expect(response.totalSupply).toEqual(500);
+      expect(response.name).toEqual("Toucan Protocol: TCO2-VCS-1529-2012");
+      expect(formatUnits(response.totalSupply, 18)).toEqual(
+        "44268.372690982378475475",
+      );
     });
 
     test("getVCUMetadata throws an error for an invalid VCU ID", async () => {

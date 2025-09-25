@@ -24,6 +24,8 @@ const (
 	ETHEREUM Network = "ethereum"
 	CELO Network = "celo"
 	ALFAJORES Network = "alfajores"
+	BASE Network = "base"
+	BASE_SEPOLIA Network = "base-sepolia"
 )
 
 // All allowed values of Network enum
@@ -32,6 +34,8 @@ var AllowedNetworkEnumValues = []Network{
 	"ethereum",
 	"celo",
 	"alfajores",
+	"base",
+	"base-sepolia",
 }
 
 func (v *Network) UnmarshalJSON(src []byte) error {

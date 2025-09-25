@@ -102,6 +102,8 @@ components:
       - ethereum
       - celo
       - alfajores
+      - base
+      - base-sepolia
       type: string
     BuyRequest:
       example:

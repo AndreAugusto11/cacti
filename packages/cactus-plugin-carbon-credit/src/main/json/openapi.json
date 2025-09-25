@@ -17,7 +17,7 @@
       },
       "Network": {
         "type": "string",
-        "enum": ["polygon", "ethereum", "celo", "alfajores"]
+        "enum": ["polygon", "ethereum", "celo", "alfajores", "base", "base-sepolia"]
       },
       "BuyRequest": {
         "type": "object",
