@@ -11,7 +11,7 @@
   },
   "components": {
     "schemas": {
-      "Platform": {
+      "Marketplace": {
         "type": "string",
         "enum": ["Toucan"]
       },
@@ -19,11 +19,11 @@
         "type": "string",
         "enum": ["polygon", "ethereum", "celo", "alfajores", "base", "base-sepolia"]
       },
-      "BuyRequest": {
+      "SpecificBuyRequest": {
         "type": "object",
         "properties": {
-          "platform": {
-            "$ref": "#/components/schemas/Platform"
+          "marketplace": {
+            "$ref": "#/components/schemas/Marketplace"
           },
           "network": {
             "$ref": "#/components/schemas/Network"
@@ -31,22 +31,37 @@
           "paymentToken": {
             "type": "string"
           },
-          "amount": {
-            "type": "number"
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "address": {
+                  "type": "string"
+                },
+                "amount": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "address",
+                "amount"
+              ]
+            }
           },
           "walletObject": {
             "type": "string"
           }
         },
         "required": [
-          "platform",
+          "marketplace",
           "network",
           "paymentToken",
-          "amount",
+          "items",
           "walletObject"
         ]
       },
-      "BuyResponse": {
+      "SpecificBuyResponse": {
         "type": "object",
         "properties": {
           "txHashSwap": {
@@ -67,7 +82,69 @@
                   "type": "string"
                 }
               },
-              "required": ["address", "amount"]
+              "required": [
+                "address",
+                "amount"
+              ]
+            }
+          }
+        },
+        "required": [
+          "txHashSwap",
+          "assetAmount"
+        ]
+      },
+      "RandomBuyRequest": {
+        "type": "object",
+        "properties": {
+          "marketplace": {
+            "$ref": "#/components/schemas/Marketplace"
+          },
+          "network": {
+            "$ref": "#/components/schemas/Network"
+          },
+          "paymentToken": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          },
+          "walletObject": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "marketplace",
+          "network",
+          "amount",
+          "walletObject"
+        ]
+      },
+      "RandomBuyResponse": {
+        "type": "object",
+        "properties": {
+          "txHashSwap": {
+            "type": "string"
+          },
+          "assetAmount": {
+            "type": "string"
+          },
+          "tco2List": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "address": {
+                  "type": "string"
+                },
+                "amount": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "address",
+                "amount"
+              ]
             }
           }
         },
@@ -79,8 +156,8 @@
       "RetireRequest": {
         "type": "object",
         "properties": {
-          "platform": {
-            "$ref": "#/components/schemas/Platform"
+          "marketplace": {
+            "$ref": "#/components/schemas/Marketplace"
           },
           "network": {
             "$ref": "#/components/schemas/Network"
@@ -88,7 +165,7 @@
           "walletObject": {
             "type": "string"
           },
-          "objectsList": {
+          "tco2s": {
             "type": "array",
             "items": {
               "type": "string"
@@ -100,7 +177,10 @@
               "type": "number"
             }
           },
-          "beneficiary": {
+          "beneficiaryAddress": {
+            "type": "string"
+          },
+          "beneficiaryName": {
             "type": "string"
           },
           "message": {
@@ -111,12 +191,13 @@
           }
         },
         "required": [
-          "platform",
+          "marketplace",
           "network",
           "walletObject",
-          "objectsList",
+          "tco2s",
           "amounts",
-          "beneficiary",
+          "beneficiaryAddress",
+          "beneficiaryName",
           "message",
           "retirementReason"
         ]
@@ -136,37 +217,11 @@
           "retirementCertificate"
         ]
       },
-      "VCUMetadata": {
+      "GetAvailableTCO2sRequest": {
         "type": "object",
         "properties": {
-          "name": {
-            "type": "string"
-          },
-          "symbol": {
-            "type": "string"
-          },
-          "totalSupply": {
-            "type": "number"
-          },
-          "attributes": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        },
-        "required": [
-          "name",
-          "symbol",
-          "totalSupply",
-          "attributes"
-        ]
-      },
-      "GetAvailableVCUsRequest": {
-        "type": "object",
-        "properties": {
-          "platform": {
-            "$ref": "#/components/schemas/Platform"
+          "marketplace": {
+            "$ref": "#/components/schemas/Marketplace"
           },
           "network": {
             "$ref": "#/components/schemas/Network"
@@ -182,14 +237,14 @@
           }
         },
         "required": [
-          "platform",
+          "marketplace",
           "network"
         ]
       },
-      "GetAvailableVCUsResponse": {
+      "GetAvailableTCO2sResponse": {
         "type": "object",
         "properties": {
-          "objectsList": {
+          "tco2List": {
             "type": "array",
             "items": {
               "type": "string"
@@ -200,15 +255,15 @@
           }
         },
         "required": [
-          "objectsList",
+          "tco2List",
           "totalCount"
         ]
       },
       "GetVCUMetadataRequest": {
         "type": "object",
         "properties": {
-          "platform": {
-            "$ref": "#/components/schemas/Platform"
+          "marketplace": {
+            "$ref": "#/components/schemas/Marketplace"
           },
           "network": {
             "$ref": "#/components/schemas/Network"
@@ -221,30 +276,79 @@
           }
         },
         "required": [
-          "platform",
+          "marketplace",
           "network",
           "projectIdentifier",
           "vcuIdentifier"
         ]
+      },
+      "VCUMetadata": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "symbol": {
+            "type": "string"
+          },
+          "totalSupply": {
+            "type": "number"
+          },
+          "attributes": {
+            "type": "object",
+            "properties": {
+              "region": { "type": "string" },
+              "vintage": { "type": "string" },
+              "methodology": { "type": "string" },
+              "other": { "type": "string" }
+            }
+          }
+        },
+        "required": [
+          "name",
+          "symbol",
+          "totalSupply",
+          "attributes"
+        ]
+      },
+      "GetPurchasePriceRequest": {
+        "type": "object",
+        "properties": {
+          "platform": { "$ref": "#/components/schemas/Marketplace" },
+          "network": { "$ref": "#/components/schemas/Network" },
+          "unit": {
+            "type": "string",
+            "description": "The token address to retrieve the price for."
+          },
+          "amount": {
+            "type": "number",
+            "description": "The amount of Units to price."
+          }
+        },
+        "required": ["platform", "network", "unit", "amount"]
+      },
+      "GetPurchasePriceResponse": {
+        "type": "object",
+        "properties": {
+          "price": {
+            "type": "string",
+            "description": "The current price in USDC for the requested amount."
+          }
+        },
+        "required": ["price"]
       }
     }
   },
   "paths": {
-    "/api/v1/@hyperledger/cactus-plugin-carbon-credit/buy": {
+    "/api/v1/@hyperledger/cactus-plugin-carbon-credit/specific-buy": {
       "post": {
-        "x-hyperledger-cacti": {
-          "http": {
-            "verbLowerCase": "post",
-            "path": "/api/v1/@hyperledger/cactus-plugin-carbon-credit/buy"
-          }
-        },
-        "operationId": "buyRequest",
-        "description": "Acquires carbon inventory from a marketplace.",
+        "operationId": "specificBuyRequest",
+        "description": "Acquire a specific basket of TCO2s from a marketplace.",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/BuyRequest"
+                "$ref": "#/components/schemas/SpecificBuyRequest"
               }
             }
           }
@@ -255,7 +359,34 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BuyResponse"
+                  "$ref": "#/components/schemas/SpecificBuyResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/@hyperledger/cactus-plugin-carbon-credit/random-buy": {
+      "post": {
+        "operationId": "randomBuyRequest",
+        "description": "Acquire a random basket of TCO2s from a marketplace.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RandomBuyRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RandomBuyResponse"
                 }
               }
             }
@@ -310,7 +441,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/GetAvailableVCUsRequest"
+                "$ref": "#/components/schemas/GetAvailableTCO2sRequest"
               }
             }
           }
@@ -321,7 +452,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetAvailableVCUsResponse"
+                  "$ref": "#/components/schemas/GetAvailableTCO2sResponse"
                 }
               }
             }

@@ -16,9 +16,9 @@ import {
 } from "@hyperledger/cactus-core-api";
 
 import {
-  BuyRequest,
-  BuyResponse,
-} from "./../generated/openapi/typescript-axios"; // confirmar depois se é necessário esse import
+  RandomBuyRequest,
+  RandomBuyResponse,
+} from "../generated/openapi/typescript-axios"; // confirmar depois se é necessário esse import
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
 import { PluginCarbonCredit } from "../plugin-carbon-credit";
@@ -30,13 +30,13 @@ export interface IBuyEndpointOptions {
   connector: PluginCarbonCredit;
 }
 
-export class BuyEndpoint implements IWebServiceEndpoint {
-  public static readonly CLASS_NAME = "BuyEndpoint";
+export class RandomBuyEndpoint implements IWebServiceEndpoint {
+  public static readonly CLASS_NAME = "RandomBuyEndpoint";
   private readonly log: Logger;
   // private readonly connector: PluginCarbonCredit;
 
   public get className(): string {
-    return BuyEndpoint.CLASS_NAME;
+    return RandomBuyEndpoint.CLASS_NAME;
   }
 
   constructor(public readonly options: IBuyEndpointOptions) {
@@ -50,8 +50,36 @@ export class BuyEndpoint implements IWebServiceEndpoint {
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public get oasPath(): (typeof OAS.paths)["/api/v1/@hyperledger/cactus-plugin-carbon-credit/buy"] {
-    return OAS.paths["/api/v1/@hyperledger/cactus-plugin-carbon-credit/buy"];
+  public get oasPath(): (typeof OAS.paths)["/api/v1/@hyperledger/cactus-plugin-carbon-credit/specific-buy"] & {
+    post: {
+      "x-hyperledger-cacti": {
+        http: {
+          path: string;
+          verbLowerCase: string;
+        };
+      };
+      operationId: string;
+      description: string;
+      requestBody: any;
+      responses: any;
+    };
+  } {
+    return OAS.paths[
+      "/api/v1/@hyperledger/cactus-plugin-carbon-credit/specific-buy"
+    ] as (typeof OAS.paths)["/api/v1/@hyperledger/cactus-plugin-carbon-credit/specific-buy"] & {
+      post: {
+        "x-hyperledger-cacti": {
+          http: {
+            path: string;
+            verbLowerCase: string;
+          };
+        };
+        operationId: string;
+        description: string;
+        requestBody: any;
+        responses: any;
+      };
+    };
   }
 
   public getPath(): string {
@@ -91,24 +119,22 @@ export class BuyEndpoint implements IWebServiceEndpoint {
     const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;
     this.log.debug(reqTag);
 
-    const reqBody: BuyRequest = req.body;
-    const { platform, paymentToken, amount, walletObject } = reqBody;
+    const reqBody: RandomBuyRequest = req.body;
+    const { marketplace, paymentToken, amount, walletObject } = reqBody;
 
-    if (!platform || !paymentToken || !amount || !walletObject) {
+    if (!marketplace || !paymentToken || !amount || !walletObject) {
       const errorMessage =
-        "Missing required parameters: platform, paymentToken, amount, or walletObject.";
+        "Missing required parameters: marketplace, paymentToken, items, or walletObject.";
       this.log.error(errorMessage);
       res.status(400).json({ error: errorMessage });
       return;
     }
 
     try {
-      this.log.info(
-        `Received a buy request for ${amount} units on platform ${platform}`,
-      );
-      const buyResponse: BuyResponse =
-        await this.options.connector.buy(reqBody);
-      res.status(200).json(buyResponse);
+      this.log.info(`Received buy request for ${amount} units.`);
+      const randomBuyResponse: RandomBuyResponse =
+        await this.options.connector.randomBuy(reqBody);
+      res.status(200).json(randomBuyResponse);
     } catch (ex) {
       this.log.error(`Crash while serving ${reqTag}`, ex);
       res.status(500).json({

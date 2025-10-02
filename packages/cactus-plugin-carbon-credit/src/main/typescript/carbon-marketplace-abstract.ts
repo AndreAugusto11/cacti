@@ -1,14 +1,18 @@
 import type { LogLevelDesc } from "@hyperledger/cactus-common";
 import {
-  BuyRequest,
-  BuyResponse,
-  GetAvailableVCUsRequest,
-  GetAvailableVCUsResponse,
+  GetAvailableTCO2sRequest,
+  GetAvailableTCO2sResponse,
   GetVCUMetadataRequest,
   Network,
+  SpecificBuyRequest,
+  SpecificBuyResponse,
+  RandomBuyResponse,
+  RandomBuyRequest,
   RetireRequest,
   RetireResponse,
   VCUMetadata,
+  GetPurchasePriceRequest,
+  GetPurchasePriceResponse,
 } from "./public-api";
 import {
   GasTransactionConfig,
@@ -36,13 +40,26 @@ export abstract class CarbonMarketplaceAbstract {
   protected abstract readonly logLevel: LogLevelDesc;
 
   /**
-   * Abstract method to buy carbon credits.
-   * @param {BuyRequest} request - The request object containing details for the purchase.
-   * @returns {Promise<BuyResponse>} A promise that resolves to the response of the purchase.
+   * Abstract operation that acquires a specific basket of carbon credits from a marketplace.
+   * @param {SpecificBuyRequest} request - The request object containing details for the purchase.
+   * @returns {Promise<SpecificBuyResponse>} A promise that resolves to the response of the purchase.
    * @throws Will throw an error if the purchase fails.
    * @abstract
    */
-  public abstract buy(request: BuyRequest): Promise<BuyResponse>;
+  public abstract specificBuy(
+    request: SpecificBuyRequest,
+  ): Promise<SpecificBuyResponse>;
+
+  /**
+   * Abstract operation that acquires a random basket of carbon credits from a marketplace.
+   * @param {RandomBuyRequest} request - The request object containing details for the purchase.
+   * @returns {Promise<RandomBuyResponse>} A promise that resolves to the response of the purchase.
+   * @throws Will throw an error if the purchase fails.
+   * @abstract
+   */
+  public abstract randomBuy(
+    request: RandomBuyRequest,
+  ): Promise<RandomBuyResponse>;
 
   /**
    * Abstract method to retire a VCU.
@@ -59,9 +76,9 @@ export abstract class CarbonMarketplaceAbstract {
    * @throws Will throw an error if the retrieval fails.
    * @abstract
    */
-  public abstract getAvailableVCUs(
-    request: GetAvailableVCUsRequest,
-  ): Promise<GetAvailableVCUsResponse>;
+  public abstract getAvailableTCO2s(
+    request: GetAvailableTCO2sRequest,
+  ): Promise<GetAvailableTCO2sResponse>;
 
   /**
    * Abstract method to get the metadata of a VCU.
@@ -73,4 +90,15 @@ export abstract class CarbonMarketplaceAbstract {
   public abstract getVCUMetadata(
     req: GetVCUMetadataRequest,
   ): Promise<VCUMetadata>;
+
+  /**
+   * Abstract operation that retrieves the current price (in USDC) of a Unit token from a marketplace.
+   * @param {GetPurchasePriceRequest} request - The request object containing details for the purchase.
+   * @returns {Promise<GetPurchasePriceResponse>} The current price for the amount of Unit tokens in USDC.
+   * @throws Will throw an error if the retrieval fails.
+   * @abstract
+   */
+  public abstract getPurchasePrice(
+    request: GetPurchasePriceRequest,
+  ): Promise<GetPurchasePriceResponse>;
 }

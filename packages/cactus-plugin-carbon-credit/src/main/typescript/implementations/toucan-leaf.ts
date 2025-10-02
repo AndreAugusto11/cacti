@@ -14,20 +14,26 @@ import {
 } from "../carbon-marketplace-abstract";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 import {
-  BuyRequest,
-  BuyResponse,
+  SpecificBuyRequest,
+  SpecificBuyResponse,
+  RandomBuyRequest,
+  RandomBuyResponse,
   RetireRequest,
-  GetAvailableVCUsRequest,
-  GetAvailableVCUsResponse,
+  RetireResponse,
+  GetAvailableTCO2sRequest,
+  GetAvailableTCO2sResponse,
   GetVCUMetadataRequest,
+  GetPurchasePriceRequest,
+  GetPurchasePriceResponse,
   VCUMetadata,
   Network,
-  RetireResponse,
 } from "../public-api";
 import ToucanClient from "toucan-sdk";
 import { ethers } from "ethers";
 import { utils } from "ethers";
 import { Network as ToucanNetwork } from "toucan-sdk/dist/types";
+import dotenv from "dotenv";
+dotenv.config({ path: "packages/cactus-plugin-carbon-credit/.env" });
 
 export interface IToucanLeafOptions extends CarbonMarketplaceAbstractOptions {}
 
@@ -42,6 +48,7 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
 
   private readonly toucanClient: ToucanClient;
   private readonly signer: ethers.Wallet;
+  private readonly provider: ethers.providers.JsonRpcProvider;
 
   constructor(public readonly options: IToucanLeafOptions) {
     super();
@@ -62,15 +69,29 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
     }
     this.signingCredential = options.signingCredential;
 
-    const provider = new ethers.providers.JsonRpcProvider(
-      "https://polygon-rpc.com/",
+    //const provider = new ethers.providers.JsonRpcProvider(
+    //  "https://polygon-rpc.com/", https://celo-alfajores.drpc.org
+    //);
+
+    this.provider = new ethers.providers.JsonRpcProvider(
+      process.env.POLYGON_RPC,
     );
 
-    this.signer = new ethers.Wallet(this.signingCredential.secret, provider);
+    // Example: log RPC to confirm
+    console.log("Using RPC:", process.env.POLYGON_RPC);
+
+    this.signer = new ethers.Wallet(
+      this.signingCredential.secret,
+      this.provider,
+    );
 
     const toucanNetwork = this.convertNetwork(options.network);
 
-    this.toucanClient = new ToucanClient(toucanNetwork, provider, this.signer);
+    this.toucanClient = new ToucanClient(
+      toucanNetwork,
+      this.provider,
+      this.signer,
+    );
   }
 
   private convertNetwork(network: Network): ToucanNetwork {
@@ -91,9 +112,94 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public async buy(_request: BuyRequest): Promise<BuyResponse> {
+  public async specificBuy(
+    _request: SpecificBuyRequest,
+  ): Promise<SpecificBuyResponse> {
     try {
-      const fnTag = `${ToucanLeaf.CLASS_NAME}#buy()`;
+      const fnTag = `${ToucanLeaf.CLASS_NAME}#specificBuy()`;
+      this.logger.info(
+        `Received specific buy request for ${_request.items} units.`,
+      );
+
+      // 1. Setup
+      const router = new ethers.Contract(
+        process.env.ROUTER!, // Ex: SushiSwap em Polygon
+        [
+          "function swapExactTokensForTokens(uint256 amountIn,uint256 amountOutMin,address[] path,address to,uint256 deadline) external returns (uint256[] memory)",
+        ],
+        this.signer,
+      );
+
+      const usdc = new ethers.Contract(
+        _request.paymentToken,
+        [
+          "function approve(address spender, uint256 value) external returns (bool)",
+        ],
+        this.signer,
+      );
+
+      // 2. Swap USDC → NCT
+      this.logger.debug(
+        `${fnTag}  Swapping ${_request.paymentToken} for pool tokens...`,
+      );
+      const amountIn = utils.parseUnits(String(_request.paymentToken), 6); // not this amount. This will be the amount of carbon credits in tonnes
+      const path = [_request.paymentToken, process.env.NCT!];
+      await usdc.approve(router.target, amountIn);
+
+      const swapTx = await router.swapExactTokensForTokens(
+        amountIn,
+        0, // set `amountOutMin` for real slippage control
+        path,
+        this.signer.address,
+        Math.floor(Date.now() / 1000) + 60 * 10,
+      );
+
+      const receipt = await swapTx.wait();
+      const txHashSwap = receipt.hash;
+
+      // 3. Approve NCT + Redeem chosen TCO2s
+      this.logger.debug(`${fnTag} Redeeming pool tokens for TCO2s...`);
+
+      const nct = new ethers.Contract(
+        process.env.NCT!,
+        [
+          "function approve(address spender, uint256 value) external returns (bool)",
+        ],
+        this.signer,
+      );
+
+      const tco2s = receipt.items.addresses; // TCO2 token addresses
+      const tonnes = _request.items.map((item) =>
+        utils.parseUnits(item.amount.toString(), 18),
+      );
+      const amount = tonnes.reduce((a, b) => a + b.toBigInt(), 0n).toString();
+
+      await nct.approve(nct.target, 2n ** 256n); // infinite approval per #332
+      await this.toucanClient.redeemMany("NCT", tco2s, tonnes);
+      const tco2ListString = tco2s.map((addr: any, i: number) => ({
+        address: addr,
+        amount: tonnes[i],
+      }));
+
+      this.logger.info(`Buy operation completed successfully.`);
+
+      return {
+        txHashSwap,
+        assetAmount: amount,
+        tco2List: tco2ListString || [],
+      };
+    } catch (err) {
+      this.logger.error("Error in buy:", err);
+      throw new Error("Failed to buy VCUs");
+    }
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public async randomBuy(
+    _request: RandomBuyRequest,
+  ): Promise<RandomBuyResponse> {
+    try {
+      const fnTag = `${ToucanLeaf.CLASS_NAME}#randomBuy()`;
       this.logger.info(`Received buy request for ${_request.amount} units.`);
 
       // 1. Setup
@@ -104,6 +210,10 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
         ],
         this.signer,
       );
+
+      if (_request.paymentToken === undefined) {
+        _request.paymentToken = "USDC";
+      }
 
       const usdc = new ethers.Contract(
         _request.paymentToken,
@@ -132,7 +242,7 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
       const receipt = await swapTx.wait();
       const txHashSwap = receipt.hash;
 
-      // 3. Redeem NCT para TCO2
+      // 3. Approve NCT + Redeem chosen TCO2s
       this.logger.debug(`${fnTag} Redeeming pool tokens for TCO2s...`);
 
       const nct = new ethers.Contract(
@@ -143,64 +253,55 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
         this.signer,
       );
 
+      const nctBalance = await nct.balanceOf(this.signer.address);
       await nct.approve(process.env.NCT!, 2n ** 256n); // infinite approval per #332
+      // For non-custodial front-ends consider limited approvals equal to `nctBalance` instead.
+      const redeemTx = await nct.redeemAuto(nctBalance);
+      await redeemTx.wait();
 
-      let tco2List: { address: string; amount: bigint }[] | undefined;
-      const tco2s = ["0xABCD…", "0x1234…"]; // TCO2 token addresses
-      const tonnes = [utils.parseUnits("3", 18), utils.parseUnits("2", 18)];
-
-      const redeemStrategy = "specific"; // "specific" | "redeemMany" | "auto"
-
-      if (redeemStrategy === "specific" && tco2s && tonnes) {
-        // await this.toucanClient.selectiveRedeem("NCT", tco2s, tonnes);
-        // tco2List = tco2s.map((addr, i) => ({
-        //   address: addr,
-        //   amount: tonnes[i],
-        // }));
-        // } else if (redeemStrategy === "redeemMany" && tco2s && tonnes) {
-        // const tx = await nct.redeemMany(tco2s, tonnes);
-        // await tx.wait();
-        // tco2List = tco2s.map((addr, i) => ({
-        //   address: addr,
-        //   amount: tonnes[i],
-        // }));
-      } else {
-        const nctBalance = await nct.balanceOf(this.signer.address);
-        await nct.redeemAuto(nctBalance);
-        // nesse caso não sabemos exatamente a lista sem parsear os eventos
+      // 4. Parse events to build tco2List
+      const tco2List: { address: string; amount: string }[] = [];
+      for (const log of receipt.logs) {
+        try {
+          const parsed = nct.interface.parseLog(log);
+          if (parsed && parsed.name === "Redeem") {
+            const [tco2Addr, amt] = parsed.args;
+            tco2List.push({
+              address: tco2Addr,
+              amount: amt.toString(),
+            });
+          }
+        } catch {
+          // ignore logs that don’t match
+        }
       }
-
-      const tco2ListString = tco2List?.map((t) => ({
-        address: t.address,
-        amount: t.amount.toString(),
-      }));
 
       this.logger.info(`Buy operation completed successfully.`);
 
       return {
         txHashSwap,
-        assetAmount: amountIn.toString(),
-        tco2List: tco2ListString || [],
+        assetAmount: nctBalance.toString(),
+        tco2List,
       };
     } catch (err) {
-      console.error("Error in buy:", err);
+      this.logger.error("Error in buy:", err);
       throw new Error("Failed to buy VCUs");
     }
     throw new Error("Method not implemented.");
   }
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
   public retire(_request: RetireRequest): Promise<RetireResponse> {
     throw new Error("Method not implemented.");
   }
 
-  public async getAvailableVCUs(
+  public async getAvailableTCO2s(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _request: GetAvailableVCUsRequest,
-  ): Promise<GetAvailableVCUsResponse> {
+    _request: GetAvailableTCO2sRequest,
+  ): Promise<GetAvailableTCO2sResponse> {
     try {
-      const fnTag = `${ToucanLeaf.CLASS_NAME}#getAvailableVCUs()`;
+      const fnTag = `${ToucanLeaf.CLASS_NAME}#getAvailableTCO2s()`;
       this.logger.info(
-        `Fetching available VCUs for platform ${_request.platform}`,
+        `Fetching available VCUs for marketplace ${_request.marketplace}`,
       );
 
       this.logger.debug(`${fnTag} Fetching available VCUs...`);
@@ -238,7 +339,7 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
       }
 
       // Apply limit
-      const objectsList =
+      const tco2List =
         _request.limit != null
           ? projects.slice(0, Number(_request.limit)).map((p) => p.addr)
           : projects.slice(0, 100).map((p) => p.addr);
@@ -246,11 +347,11 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
       this.logger.info(`There are ${projects.length} available VCUs.`);
 
       return {
-        objectsList,
+        tco2List,
         totalCount: projects.length,
       };
     } catch (err) {
-      console.error("Error in getAvailableVCUs:", err);
+      this.logger.error("Error in getAvailableTCO2s:", err);
       throw new Error("Failed to fetch available VCUs");
     }
   }
@@ -263,11 +364,11 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
       this.logger.info(
         `Fetching metadata for VCU with ID: ${_req.vcuIdentifier}`,
       );
-      // Search for available TCO2s already sorted by quality score
+      // Fetch redeemable TCO2s ordered by Toucan score
       const tco2Addresses: string[] =
         await this.toucanClient.getScoredTCO2s("NCT");
 
-      // Collect basic metadata to enable filtering and sorting
+      // Pull project data
       const projects = await Promise.all(
         tco2Addresses.map(async (addr) => {
           const tco2 = await this.toucanClient.getTCO2Contract(addr);
@@ -281,6 +382,7 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
         }),
       );
 
+      // Find matching project + VCU
       const found = projects.find(
         (p) =>
           p.addr === _req.vcuIdentifier &&
@@ -297,12 +399,52 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
       return {
         name: found.name,
         symbol: found.symbol,
-        totalSupply: found.totalSupply,
-        attributes: found.attrs, // Ensure 'attrs' is present in the found object
+        totalSupply: Number(found.totalSupply),
+        attributes: {
+          region: found.attrs.region ?? "",
+          vintage: found.attrs.vintage ?? "",
+          methodology: found.attrs.methodology ?? "",
+          other: found.attrs.other ?? "",
+        },
       };
     } catch (err) {
-      console.error("Error in getVCUMetadata:", err);
+      this.logger.error("Error in getVCUMetadata:", err);
       throw new Error(`VCU with ID ${_req.vcuIdentifier} not found.`);
     }
+  }
+
+  public async getPurchasePrice(
+    request: GetPurchasePriceRequest,
+  ): Promise<GetPurchasePriceResponse> {
+    // Placeholder logic for price retrieval
+    this.logger.info(
+      `Fetching purchase price for ${request.amount} units of carbon credits.`,
+    );
+
+    // Sushi/Uniswap-v2-compatible router on Polygon
+    const router = new ethers.Contract(
+      "0x1b02da8cb0d097eb8d57a175b88c7d8b47997506",
+      [
+        "function getAmountsIn(uint256 amountOut, address[] calldata path) external view returns (uint256[] memory)",
+      ],
+      this.provider,
+    );
+    // Inputs
+    const USDC = process.env.USDC!; // e.g. 6 decimals
+    const UNIT = request.unit; // Unit token to price (e.g. NCT, 18 decimals)
+    const unitAmount = utils.parseUnits(request.amount.toString(), 18); // price 10 Units
+    // USDC -> UNIT path
+    const path = [USDC, UNIT];
+    // amounts[0] = USDC required, amounts[1] = UNIT out
+    const amounts = await router.getAmountsIn(unitAmount, path);
+    const usdcRequired = amounts[0];
+
+    this.logger.info(
+      `The total purchase price for ${request.amount} units is ${usdcRequired} USDC.`,
+    );
+
+    return {
+      price: usdcRequired.toString(),
+    };
   }
 }

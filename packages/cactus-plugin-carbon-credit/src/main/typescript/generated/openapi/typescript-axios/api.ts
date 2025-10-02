@@ -26,120 +26,37 @@ import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError } from './base';
 /**
  * 
  * @export
- * @interface BuyRequest
+ * @interface GetAvailableTCO2sRequest
  */
-export interface BuyRequest {
+export interface GetAvailableTCO2sRequest {
     /**
      * 
-     * @type {Platform}
-     * @memberof BuyRequest
+     * @type {Marketplace}
+     * @memberof GetAvailableTCO2sRequest
      */
-    'platform': Platform;
+    'marketplace': Marketplace;
     /**
      * 
      * @type {Network}
-     * @memberof BuyRequest
+     * @memberof GetAvailableTCO2sRequest
      */
     'network': Network;
     /**
      * 
      * @type {string}
-     * @memberof BuyRequest
-     */
-    'paymentToken': string;
-    /**
-     * 
-     * @type {number}
-     * @memberof BuyRequest
-     */
-    'amount': number;
-    /**
-     * 
-     * @type {string}
-     * @memberof BuyRequest
-     */
-    'walletObject': string;
-}
-
-
-/**
- * 
- * @export
- * @interface BuyResponse
- */
-export interface BuyResponse {
-    /**
-     * 
-     * @type {string}
-     * @memberof BuyResponse
-     */
-    'txHashSwap': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof BuyResponse
-     */
-    'assetAmount': string;
-    /**
-     * 
-     * @type {Array<BuyResponseTco2ListInner>}
-     * @memberof BuyResponse
-     */
-    'tco2List'?: Array<BuyResponseTco2ListInner>;
-}
-/**
- * 
- * @export
- * @interface BuyResponseTco2ListInner
- */
-export interface BuyResponseTco2ListInner {
-    /**
-     * 
-     * @type {string}
-     * @memberof BuyResponseTco2ListInner
-     */
-    'address': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof BuyResponseTco2ListInner
-     */
-    'amount': string;
-}
-/**
- * 
- * @export
- * @interface GetAvailableVCUsRequest
- */
-export interface GetAvailableVCUsRequest {
-    /**
-     * 
-     * @type {Platform}
-     * @memberof GetAvailableVCUsRequest
-     */
-    'platform': Platform;
-    /**
-     * 
-     * @type {Network}
-     * @memberof GetAvailableVCUsRequest
-     */
-    'network': Network;
-    /**
-     * 
-     * @type {string}
-     * @memberof GetAvailableVCUsRequest
+     * @memberof GetAvailableTCO2sRequest
      */
     'filterCriteria'?: string;
     /**
      * 
      * @type {string}
-     * @memberof GetAvailableVCUsRequest
+     * @memberof GetAvailableTCO2sRequest
      */
     'orderBy'?: string;
     /**
      * 
      * @type {string}
-     * @memberof GetAvailableVCUsRequest
+     * @memberof GetAvailableTCO2sRequest
      */
     'limit'?: string;
 }
@@ -148,21 +65,67 @@ export interface GetAvailableVCUsRequest {
 /**
  * 
  * @export
- * @interface GetAvailableVCUsResponse
+ * @interface GetAvailableTCO2sResponse
  */
-export interface GetAvailableVCUsResponse {
+export interface GetAvailableTCO2sResponse {
     /**
      * 
      * @type {Array<string>}
-     * @memberof GetAvailableVCUsResponse
+     * @memberof GetAvailableTCO2sResponse
      */
-    'objectsList': Array<string>;
+    'tco2List': Array<string>;
     /**
      * 
      * @type {number}
-     * @memberof GetAvailableVCUsResponse
+     * @memberof GetAvailableTCO2sResponse
      */
     'totalCount': number;
+}
+/**
+ * 
+ * @export
+ * @interface GetPurchasePriceRequest
+ */
+export interface GetPurchasePriceRequest {
+    /**
+     * 
+     * @type {Marketplace}
+     * @memberof GetPurchasePriceRequest
+     */
+    'platform': Marketplace;
+    /**
+     * 
+     * @type {Network}
+     * @memberof GetPurchasePriceRequest
+     */
+    'network': Network;
+    /**
+     * The token address to retrieve the price for.
+     * @type {string}
+     * @memberof GetPurchasePriceRequest
+     */
+    'unit': string;
+    /**
+     * The amount of Units to price.
+     * @type {number}
+     * @memberof GetPurchasePriceRequest
+     */
+    'amount': number;
+}
+
+
+/**
+ * 
+ * @export
+ * @interface GetPurchasePriceResponse
+ */
+export interface GetPurchasePriceResponse {
+    /**
+     * The current price in USDC for the requested amount.
+     * @type {string}
+     * @memberof GetPurchasePriceResponse
+     */
+    'price': string;
 }
 /**
  * 
@@ -172,10 +135,10 @@ export interface GetAvailableVCUsResponse {
 export interface GetVCUMetadataRequest {
     /**
      * 
-     * @type {Platform}
+     * @type {Marketplace}
      * @memberof GetVCUMetadataRequest
      */
-    'platform': Platform;
+    'marketplace': Marketplace;
     /**
      * 
      * @type {Network}
@@ -203,6 +166,19 @@ export interface GetVCUMetadataRequest {
  * @enum {string}
  */
 
+export const Marketplace = {
+    Toucan: 'Toucan'
+} as const;
+
+export type Marketplace = typeof Marketplace[keyof typeof Marketplace];
+
+
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+
 export const Network = {
     Polygon: 'polygon',
     Ethereum: 'ethereum',
@@ -218,16 +194,67 @@ export type Network = typeof Network[keyof typeof Network];
 /**
  * 
  * @export
- * @enum {string}
+ * @interface RandomBuyRequest
  */
+export interface RandomBuyRequest {
+    /**
+     * 
+     * @type {Marketplace}
+     * @memberof RandomBuyRequest
+     */
+    'marketplace': Marketplace;
+    /**
+     * 
+     * @type {Network}
+     * @memberof RandomBuyRequest
+     */
+    'network': Network;
+    /**
+     * 
+     * @type {string}
+     * @memberof RandomBuyRequest
+     */
+    'paymentToken'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof RandomBuyRequest
+     */
+    'amount': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof RandomBuyRequest
+     */
+    'walletObject': string;
+}
 
-export const Platform = {
-    Toucan: 'Toucan'
-} as const;
 
-export type Platform = typeof Platform[keyof typeof Platform];
-
-
+/**
+ * 
+ * @export
+ * @interface RandomBuyResponse
+ */
+export interface RandomBuyResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof RandomBuyResponse
+     */
+    'txHashSwap': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RandomBuyResponse
+     */
+    'assetAmount': string;
+    /**
+     * 
+     * @type {Array<SpecificBuyResponseTco2ListInner>}
+     * @memberof RandomBuyResponse
+     */
+    'tco2List'?: Array<SpecificBuyResponseTco2ListInner>;
+}
 /**
  * 
  * @export
@@ -236,10 +263,10 @@ export type Platform = typeof Platform[keyof typeof Platform];
 export interface RetireRequest {
     /**
      * 
-     * @type {Platform}
+     * @type {Marketplace}
      * @memberof RetireRequest
      */
-    'platform': Platform;
+    'marketplace': Marketplace;
     /**
      * 
      * @type {Network}
@@ -257,7 +284,7 @@ export interface RetireRequest {
      * @type {Array<string>}
      * @memberof RetireRequest
      */
-    'objectsList': Array<string>;
+    'tco2s': Array<string>;
     /**
      * 
      * @type {Array<number>}
@@ -269,7 +296,13 @@ export interface RetireRequest {
      * @type {string}
      * @memberof RetireRequest
      */
-    'beneficiary': string;
+    'beneficiaryAddress': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RetireRequest
+     */
+    'beneficiaryName': string;
     /**
      * 
      * @type {string}
@@ -307,6 +340,108 @@ export interface RetireResponse {
 /**
  * 
  * @export
+ * @interface SpecificBuyRequest
+ */
+export interface SpecificBuyRequest {
+    /**
+     * 
+     * @type {Marketplace}
+     * @memberof SpecificBuyRequest
+     */
+    'marketplace': Marketplace;
+    /**
+     * 
+     * @type {Network}
+     * @memberof SpecificBuyRequest
+     */
+    'network': Network;
+    /**
+     * 
+     * @type {string}
+     * @memberof SpecificBuyRequest
+     */
+    'paymentToken': string;
+    /**
+     * 
+     * @type {Array<SpecificBuyRequestItemsInner>}
+     * @memberof SpecificBuyRequest
+     */
+    'items': Array<SpecificBuyRequestItemsInner>;
+    /**
+     * 
+     * @type {string}
+     * @memberof SpecificBuyRequest
+     */
+    'walletObject': string;
+}
+
+
+/**
+ * 
+ * @export
+ * @interface SpecificBuyRequestItemsInner
+ */
+export interface SpecificBuyRequestItemsInner {
+    /**
+     * 
+     * @type {string}
+     * @memberof SpecificBuyRequestItemsInner
+     */
+    'address': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof SpecificBuyRequestItemsInner
+     */
+    'amount': number;
+}
+/**
+ * 
+ * @export
+ * @interface SpecificBuyResponse
+ */
+export interface SpecificBuyResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof SpecificBuyResponse
+     */
+    'txHashSwap': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SpecificBuyResponse
+     */
+    'assetAmount': string;
+    /**
+     * 
+     * @type {Array<SpecificBuyResponseTco2ListInner>}
+     * @memberof SpecificBuyResponse
+     */
+    'tco2List'?: Array<SpecificBuyResponseTco2ListInner>;
+}
+/**
+ * 
+ * @export
+ * @interface SpecificBuyResponseTco2ListInner
+ */
+export interface SpecificBuyResponseTco2ListInner {
+    /**
+     * 
+     * @type {string}
+     * @memberof SpecificBuyResponseTco2ListInner
+     */
+    'address': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SpecificBuyResponseTco2ListInner
+     */
+    'amount': string;
+}
+/**
+ * 
+ * @export
  * @interface VCUMetadata
  */
 export interface VCUMetadata {
@@ -330,10 +465,41 @@ export interface VCUMetadata {
     'totalSupply': number;
     /**
      * 
-     * @type {Array<string>}
+     * @type {VCUMetadataAttributes}
      * @memberof VCUMetadata
      */
-    'attributes': Array<string>;
+    'attributes': VCUMetadataAttributes;
+}
+/**
+ * 
+ * @export
+ * @interface VCUMetadataAttributes
+ */
+export interface VCUMetadataAttributes {
+    /**
+     * 
+     * @type {string}
+     * @memberof VCUMetadataAttributes
+     */
+    'region'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof VCUMetadataAttributes
+     */
+    'vintage'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof VCUMetadataAttributes
+     */
+    'methodology'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof VCUMetadataAttributes
+     */
+    'other'?: string;
 }
 
 /**
@@ -343,45 +509,12 @@ export interface VCUMetadata {
 export const DefaultApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * Acquires carbon inventory from a marketplace.
-         * @param {BuyRequest} [buyRequest] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        buyRequest: async (buyRequest?: BuyRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/@hyperledger/cactus-plugin-carbon-credit/buy`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(buyRequest, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
          * Get a list of available VCUs (Verified Carbon Units).
-         * @param {GetAvailableVCUsRequest} [getAvailableVCUsRequest] 
+         * @param {GetAvailableTCO2sRequest} [getAvailableTCO2sRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAvailableVCUsRequest: async (getAvailableVCUsRequest?: GetAvailableVCUsRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getAvailableVCUsRequest: async (getAvailableTCO2sRequest?: GetAvailableTCO2sRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/@hyperledger/cactus-plugin-carbon-credit/get-available-vcus`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -401,7 +534,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(getAvailableVCUsRequest, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(getAvailableTCO2sRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -442,6 +575,39 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * Acquire a random basket of TCO2s from a marketplace.
+         * @param {RandomBuyRequest} [randomBuyRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        randomBuyRequest: async (randomBuyRequest?: RandomBuyRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/@hyperledger/cactus-plugin-carbon-credit/random-buy`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(randomBuyRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Abstract burn operation that finalizes an offset on the underlying registry for a specific beneficiary and message.
          * @param {RetireRequest} [retireRequest] 
          * @param {*} [options] Override http request option.
@@ -474,6 +640,39 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * Acquire a specific basket of TCO2s from a marketplace.
+         * @param {SpecificBuyRequest} [specificBuyRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        specificBuyRequest: async (specificBuyRequest?: SpecificBuyRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/@hyperledger/cactus-plugin-carbon-credit/specific-buy`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(specificBuyRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -485,23 +684,13 @@ export const DefaultApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = DefaultApiAxiosParamCreator(configuration)
     return {
         /**
-         * Acquires carbon inventory from a marketplace.
-         * @param {BuyRequest} [buyRequest] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async buyRequest(buyRequest?: BuyRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BuyResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.buyRequest(buyRequest, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
          * Get a list of available VCUs (Verified Carbon Units).
-         * @param {GetAvailableVCUsRequest} [getAvailableVCUsRequest] 
+         * @param {GetAvailableTCO2sRequest} [getAvailableTCO2sRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getAvailableVCUsRequest(getAvailableVCUsRequest?: GetAvailableVCUsRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetAvailableVCUsResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getAvailableVCUsRequest(getAvailableVCUsRequest, options);
+        async getAvailableVCUsRequest(getAvailableTCO2sRequest?: GetAvailableTCO2sRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetAvailableTCO2sResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getAvailableVCUsRequest(getAvailableTCO2sRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -515,6 +704,16 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * Acquire a random basket of TCO2s from a marketplace.
+         * @param {RandomBuyRequest} [randomBuyRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async randomBuyRequest(randomBuyRequest?: RandomBuyRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RandomBuyResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.randomBuyRequest(randomBuyRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * Abstract burn operation that finalizes an offset on the underlying registry for a specific beneficiary and message.
          * @param {RetireRequest} [retireRequest] 
          * @param {*} [options] Override http request option.
@@ -522,6 +721,16 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          */
         async retireRequest(retireRequest?: RetireRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RetireResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.retireRequest(retireRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Acquire a specific basket of TCO2s from a marketplace.
+         * @param {SpecificBuyRequest} [specificBuyRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async specificBuyRequest(specificBuyRequest?: SpecificBuyRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SpecificBuyResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.specificBuyRequest(specificBuyRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -535,22 +744,13 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
     const localVarFp = DefaultApiFp(configuration)
     return {
         /**
-         * Acquires carbon inventory from a marketplace.
-         * @param {BuyRequest} [buyRequest] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        buyRequest(buyRequest?: BuyRequest, options?: any): AxiosPromise<BuyResponse> {
-            return localVarFp.buyRequest(buyRequest, options).then((request) => request(axios, basePath));
-        },
-        /**
          * Get a list of available VCUs (Verified Carbon Units).
-         * @param {GetAvailableVCUsRequest} [getAvailableVCUsRequest] 
+         * @param {GetAvailableTCO2sRequest} [getAvailableTCO2sRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAvailableVCUsRequest(getAvailableVCUsRequest?: GetAvailableVCUsRequest, options?: any): AxiosPromise<GetAvailableVCUsResponse> {
-            return localVarFp.getAvailableVCUsRequest(getAvailableVCUsRequest, options).then((request) => request(axios, basePath));
+        getAvailableVCUsRequest(getAvailableTCO2sRequest?: GetAvailableTCO2sRequest, options?: any): AxiosPromise<GetAvailableTCO2sResponse> {
+            return localVarFp.getAvailableVCUsRequest(getAvailableTCO2sRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * Get metadata for a specific VCU.
@@ -562,6 +762,15 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.getVCUMetadataRequest(getVCUMetadataRequest, options).then((request) => request(axios, basePath));
         },
         /**
+         * Acquire a random basket of TCO2s from a marketplace.
+         * @param {RandomBuyRequest} [randomBuyRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        randomBuyRequest(randomBuyRequest?: RandomBuyRequest, options?: any): AxiosPromise<RandomBuyResponse> {
+            return localVarFp.randomBuyRequest(randomBuyRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Abstract burn operation that finalizes an offset on the underlying registry for a specific beneficiary and message.
          * @param {RetireRequest} [retireRequest] 
          * @param {*} [options] Override http request option.
@@ -569,6 +778,15 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         retireRequest(retireRequest?: RetireRequest, options?: any): AxiosPromise<RetireResponse> {
             return localVarFp.retireRequest(retireRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Acquire a specific basket of TCO2s from a marketplace.
+         * @param {SpecificBuyRequest} [specificBuyRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        specificBuyRequest(specificBuyRequest?: SpecificBuyRequest, options?: any): AxiosPromise<SpecificBuyResponse> {
+            return localVarFp.specificBuyRequest(specificBuyRequest, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -581,25 +799,14 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
  */
 export class DefaultApi extends BaseAPI {
     /**
-     * Acquires carbon inventory from a marketplace.
-     * @param {BuyRequest} [buyRequest] 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApi
-     */
-    public buyRequest(buyRequest?: BuyRequest, options?: AxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).buyRequest(buyRequest, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
      * Get a list of available VCUs (Verified Carbon Units).
-     * @param {GetAvailableVCUsRequest} [getAvailableVCUsRequest] 
+     * @param {GetAvailableTCO2sRequest} [getAvailableTCO2sRequest] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public getAvailableVCUsRequest(getAvailableVCUsRequest?: GetAvailableVCUsRequest, options?: AxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).getAvailableVCUsRequest(getAvailableVCUsRequest, options).then((request) => request(this.axios, this.basePath));
+    public getAvailableVCUsRequest(getAvailableTCO2sRequest?: GetAvailableTCO2sRequest, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getAvailableVCUsRequest(getAvailableTCO2sRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -614,6 +821,17 @@ export class DefaultApi extends BaseAPI {
     }
 
     /**
+     * Acquire a random basket of TCO2s from a marketplace.
+     * @param {RandomBuyRequest} [randomBuyRequest] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public randomBuyRequest(randomBuyRequest?: RandomBuyRequest, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).randomBuyRequest(randomBuyRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * Abstract burn operation that finalizes an offset on the underlying registry for a specific beneficiary and message.
      * @param {RetireRequest} [retireRequest] 
      * @param {*} [options] Override http request option.
@@ -622,6 +840,17 @@ export class DefaultApi extends BaseAPI {
      */
     public retireRequest(retireRequest?: RetireRequest, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).retireRequest(retireRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Acquire a specific basket of TCO2s from a marketplace.
+     * @param {SpecificBuyRequest} [specificBuyRequest] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public specificBuyRequest(specificBuyRequest?: SpecificBuyRequest, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).specificBuyRequest(specificBuyRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

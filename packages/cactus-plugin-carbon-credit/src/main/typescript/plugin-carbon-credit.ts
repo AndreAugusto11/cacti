@@ -15,21 +15,27 @@ import {
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
 
-import { BuyEndpoint } from "./web-services/buy-endpoint";
+import { SpecificBuyEndpoint } from "./web-services/specific-buy-endpoint";
+import { RandomBuyEndpoint } from "./web-services/radom-buy-endpoints";
 import { RetireEndpoint } from "./web-services/retire-endpoint";
 import { GetAvailableVCUsEndpoint } from "./web-services/get-available-vcus-endpoint";
 import { GetVCUMetadataEndpoint } from "./web-services/get-vcu-metadata-endpoint";
+import { GetPurchasePriceEndpoint } from "./web-services/get-purchase-price";
 import { Web3SigningCredentialPrivateKeyHex } from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
 import {
-  BuyRequest,
-  BuyResponse,
+  SpecificBuyRequest,
+  SpecificBuyResponse,
+  RandomBuyRequest,
+  RandomBuyResponse,
   RetireRequest,
   RetireResponse,
-  GetAvailableVCUsResponse,
+  GetAvailableTCO2sResponse,
   GetVCUMetadataRequest,
   VCUMetadata,
-  GetAvailableVCUsRequest,
-  Platform,
+  GetAvailableTCO2sRequest,
+  GetPurchasePriceRequest,
+  GetPurchasePriceResponse,
+  Marketplace,
   Network,
 } from "./generated/openapi/typescript-axios";
 import { ToucanLeaf } from "./implementations/toucan-leaf";
@@ -92,7 +98,14 @@ export class PluginCarbonCredit implements ICactusPlugin, IPluginWebService {
     }
     const endpoints: IWebServiceEndpoint[] = [];
     {
-      const endpoint = new BuyEndpoint({
+      const endpoint = new SpecificBuyEndpoint({
+        connector: this,
+        logLevel: this.options.logLevel,
+      });
+      endpoints.push(endpoint);
+    }
+    {
+      const endpoint = new RandomBuyEndpoint({
         connector: this,
         logLevel: this.options.logLevel,
       });
@@ -119,6 +132,13 @@ export class PluginCarbonCredit implements ICactusPlugin, IPluginWebService {
       });
       endpoints.push(endpoint);
     }
+    {
+      const endpoint = new GetPurchasePriceEndpoint({
+        connector: this,
+        logLevel: this.options.logLevel,
+      });
+      endpoints.push(endpoint);
+    }
     this.endpoints = endpoints;
     return endpoints;
   }
@@ -128,34 +148,47 @@ export class PluginCarbonCredit implements ICactusPlugin, IPluginWebService {
   }
 
   public getMarketplaceImplementation(
-    platform: string,
+    marketplace: string,
     network: Network,
   ): CarbonMarketplaceAbstract {
-    switch (platform) {
-      case Platform.Toucan:
+    switch (marketplace) {
+      case Marketplace.Toucan:
         return new ToucanLeaf({
           network: network,
           signingCredential: this.options.signingCredential,
         });
       default:
-        throw new Error(`Unsupported platform: ${platform}`);
+        throw new Error(`Unsupported marketplace: ${marketplace}`);
     }
   }
 
-  public async buy(request: BuyRequest): Promise<BuyResponse> {
-    this.log.info(`Received buy request for ${request.amount} units.`);
-
+  public async specificBuy(
+    request: SpecificBuyRequest,
+  ): Promise<SpecificBuyResponse> {
     const marketplaceImplementation: CarbonMarketplaceAbstract =
-      this.getMarketplaceImplementation(request.platform, request.network);
+      this.getMarketplaceImplementation(request.marketplace, request.network);
 
-    const response = await marketplaceImplementation.buy(request);
+    const response = await marketplaceImplementation.specificBuy(request);
+
+    return response;
+  }
+
+  public async randomBuy(
+    request: RandomBuyRequest,
+  ): Promise<RandomBuyResponse> {
+    const marketplaceImplementation: CarbonMarketplaceAbstract =
+      this.getMarketplaceImplementation(request.marketplace, request.network);
+
+    const response = await marketplaceImplementation.randomBuy(request);
 
     return response;
   }
 
   public async retire(request: RetireRequest): Promise<RetireResponse> {
     const fnTag = `${this.className}#retire()`;
-    this.log.info(`Received retire request on platform ${request.platform}`);
+    this.log.info(
+      `Received retire request on marketplace ${request.marketplace}`,
+    );
 
     // Step 1: Transfer the tokens to be withdrawn to the contract
     this.log.debug(`${fnTag} Burning ${request.amounts.join(", ")} units...`);
@@ -174,13 +207,13 @@ export class PluginCarbonCredit implements ICactusPlugin, IPluginWebService {
     return response;
   }
 
-  public async getAvailableVCUs(
-    request: GetAvailableVCUsRequest,
-  ): Promise<GetAvailableVCUsResponse> {
+  public async getAvailableTCO2s(
+    request: GetAvailableTCO2sRequest,
+  ): Promise<GetAvailableTCO2sResponse> {
     const marketplaceImplementation: CarbonMarketplaceAbstract =
-      this.getMarketplaceImplementation(request.platform, request.network);
+      this.getMarketplaceImplementation(request.marketplace, request.network);
 
-    const response = await marketplaceImplementation.getAvailableVCUs(request);
+    const response = await marketplaceImplementation.getAvailableTCO2s(request);
 
     return response;
   }
@@ -189,13 +222,24 @@ export class PluginCarbonCredit implements ICactusPlugin, IPluginWebService {
     request: GetVCUMetadataRequest,
   ): Promise<VCUMetadata> {
     const marketplaceImplementation: CarbonMarketplaceAbstract =
-      this.getMarketplaceImplementation(request.platform, request.network);
+      this.getMarketplaceImplementation(request.marketplace, request.network);
 
     const response = await marketplaceImplementation.getVCUMetadata(request);
 
     if (!response) {
       throw new Error(`VCU with ID ${request.vcuIdentifier} not found.`);
     }
+    return response;
+  }
+
+  public async getPurchasePrice(
+    request: GetPurchasePriceRequest,
+  ): Promise<GetPurchasePriceResponse> {
+    const marketplaceImplementation: CarbonMarketplaceAbstract =
+      this.getMarketplaceImplementation(Marketplace.Toucan, request.network);
+
+    const response = await marketplaceImplementation.getPurchasePrice(request);
+
     return response;
   }
 

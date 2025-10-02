@@ -18,9 +18,9 @@ import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 import { PluginCarbonCredit } from "../plugin-carbon-credit";
 
 import {
-  GetAvailableTCO2sRequest,
-  GetAvailableTCO2sResponse,
-} from "./../generated/openapi/typescript-axios";
+  GetPurchasePriceRequest,
+  GetPurchasePriceResponse,
+} from "../generated/openapi/typescript-axios";
 
 import OAS from "../../json/openapi.json";
 
@@ -29,12 +29,12 @@ export interface IGetAvailableVCUsEndpointOptions {
   connector: PluginCarbonCredit;
 }
 
-export class GetAvailableVCUsEndpoint implements IWebServiceEndpoint {
-  public static readonly CLASS_NAME = "GetAvailableVCUsEndpoint";
+export class GetPurchasePriceEndpoint implements IWebServiceEndpoint {
+  public static readonly CLASS_NAME = "GetPurchasePriceEndpoint";
   private readonly log: Logger;
 
   public get className(): string {
-    return GetAvailableVCUsEndpoint.CLASS_NAME;
+    return GetPurchasePriceEndpoint.CLASS_NAME;
   }
 
   constructor(public readonly options: IGetAvailableVCUsEndpointOptions) {
@@ -90,13 +90,13 @@ export class GetAvailableVCUsEndpoint implements IWebServiceEndpoint {
     const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;
     this.log.debug(reqTag);
 
-    const reqBody = req.body as GetAvailableTCO2sRequest;
+    const reqBody = req.body as GetPurchasePriceRequest;
 
     try {
-      this.log.info(`Received a request to get available VCUs.`);
-      const vcuResponse: GetAvailableTCO2sResponse =
-        await this.options.connector.getAvailableTCO2s(reqBody);
-      res.status(200).json(vcuResponse);
+      this.log.info(`Received a request to get purchase price.`);
+      const priceResponse: GetPurchasePriceResponse =
+        await this.options.connector.getPurchasePrice(reqBody);
+      res.status(200).json(priceResponse);
     } catch (ex) {
       this.log.error(`Crash while serving ${reqTag}`, ex);
       res.status(500).json({

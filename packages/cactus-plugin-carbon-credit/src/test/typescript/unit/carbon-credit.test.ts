@@ -3,10 +3,10 @@ import "jest-extended";
 import { PluginCarbonCredit } from "../../../main/typescript/plugin-carbon-credit";
 import { IPluginCarbonCreditOptions } from "../../../main/typescript/plugin-carbon-credit";
 import {
-  GetAvailableVCUsRequest,
+  GetAvailableTCO2sRequest,
   GetVCUMetadataRequest,
   Network,
-  Platform,
+  Marketplace,
 } from "../../../main/typescript/public-api";
 import { Web3SigningCredentialPrivateKeyHex } from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
 import { formatUnits } from "ethers/lib/utils";
@@ -30,8 +30,8 @@ describe("PluginCarbonCredit Functionality", () => {
   // describe("Buy Functionality", () => {
   //   test("Buy function returns the correct placeholder data", async () => {
   //     const request = {
-  //       platform: Platform.Toucan,
-  //       network: Network.Polygon,
+  //       marketplace: Marketplace.Toucan,
+  //       network: Network.Alfajores,
   //       paymentToken: "USDC",
   //       amount: 100,
   //       walletObject: "wallet-address-placeholder",
@@ -49,7 +49,7 @@ describe("PluginCarbonCredit Functionality", () => {
   // describe("Retire Functionality", () => {
   //   test("Retire function returns the correct placeholder data", async () => {
   //     const request = {
-  //       platform: Platform.Toucan,
+  //       marketplace: Marketplace.Toucan,
   //       network: Network.Polygon,
   //       walletObject: "wallet-address-placeholder",
   //       objectsList: ["0xABCD", "0x1234"],
@@ -71,15 +71,15 @@ describe("PluginCarbonCredit Functionality", () => {
 
   describe("GetAvailableVCUs Functionality", () => {
     test("getAvailableVCUs returns a list of VCUs", async () => {
-      const request: GetAvailableVCUsRequest = {
-        platform: Platform.Toucan,
+      const request: GetAvailableTCO2sRequest = {
+        marketplace: Marketplace.Toucan,
         network: Network.Polygon,
       };
 
-      const response = await plugin.getAvailableVCUs(request);
+      const response = await plugin.getAvailableTCO2s(request);
 
       expect(response).toBeDefined();
-      expect(response.objectsList).toBeInstanceOf(Array);
+      expect(response.tco2List).toBeInstanceOf(Array);
       expect(response.totalCount).toBe(33); // Placeholder, adjust as needed
     });
   });
@@ -87,7 +87,7 @@ describe("PluginCarbonCredit Functionality", () => {
   describe("VCU Metadata Functionality", () => {
     test("getVCUMetadata returns the correct data for a valid VCU ID", async () => {
       const request: GetVCUMetadataRequest = {
-        platform: Platform.Toucan,
+        marketplace: Marketplace.Toucan,
         network: Network.Polygon,
         projectIdentifier: "VCS-1529",
         vcuIdentifier: "0x6362364A37F34d39a1f4993fb595dAB4116dAf0d",
@@ -103,7 +103,7 @@ describe("PluginCarbonCredit Functionality", () => {
 
     test("getVCUMetadata throws an error for an invalid VCU ID", async () => {
       const invalidRequest: GetVCUMetadataRequest = {
-        platform: Platform.Toucan,
+        marketplace: Marketplace.Toucan,
         network: Network.Polygon,
         projectIdentifier: "project-1234",
         vcuIdentifier: "VCU-9999",

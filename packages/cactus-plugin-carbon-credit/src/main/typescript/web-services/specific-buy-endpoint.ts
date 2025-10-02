@@ -8,48 +8,78 @@ import {
   IAsyncProvider,
   safeStringifyException,
 } from "@hyperledger/cactus-common";
+
 import {
   IEndpointAuthzOptions,
   IExpressRequestHandler,
   IWebServiceEndpoint,
 } from "@hyperledger/cactus-core-api";
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
 import {
-  RetireRequest,
-  RetireResponse,
-} from "./../generated/openapi/typescript-axios";
+  SpecificBuyRequest,
+  SpecificBuyResponse,
+} from "../generated/openapi/typescript-axios"; // confirmar depois se é necessário esse import
+import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
 import { PluginCarbonCredit } from "../plugin-carbon-credit";
 
 import OAS from "../../json/openapi.json";
 
-export interface IRetireEndpointOptions {
+export interface IBuyEndpointOptions {
   logLevel?: LogLevelDesc;
   connector: PluginCarbonCredit;
 }
 
-export class RetireEndpoint implements IWebServiceEndpoint {
-  public static readonly CLASS_NAME = "RetireEndpoint";
-
+export class SpecificBuyEndpoint implements IWebServiceEndpoint {
+  public static readonly CLASS_NAME = "SpecificBuyEndpoint";
   private readonly log: Logger;
+  // private readonly connector: PluginCarbonCredit;
 
   public get className(): string {
-    return RetireEndpoint.CLASS_NAME;
+    return SpecificBuyEndpoint.CLASS_NAME;
   }
 
-  constructor(public readonly options: IRetireEndpointOptions) {
+  constructor(public readonly options: IBuyEndpointOptions) {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(options, `${fnTag} arg options`);
     Checks.truthy(options.connector, `${fnTag} arg options.connector`);
 
+    // this.connector = options.connector;
     const level = options.logLevel || "INFO";
     const label = this.className;
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public get oasPath(): (typeof OAS.paths)["/api/v1/@hyperledger/cactus-plugin-carbon-credit/retire"] {
-    return OAS.paths["/api/v1/@hyperledger/cactus-plugin-carbon-credit/retire"];
+  public get oasPath(): (typeof OAS.paths)["/api/v1/@hyperledger/cactus-plugin-carbon-credit/specific-buy"] & {
+    post: {
+      "x-hyperledger-cacti": {
+        http: {
+          path: string;
+          verbLowerCase: string;
+        };
+      };
+      operationId: string;
+      description: string;
+      requestBody: any;
+      responses: any;
+    };
+  } {
+    return OAS.paths[
+      "/api/v1/@hyperledger/cactus-plugin-carbon-credit/specific-buy"
+    ] as (typeof OAS.paths)["/api/v1/@hyperledger/cactus-plugin-carbon-credit/specific-buy"] & {
+      post: {
+        "x-hyperledger-cacti": {
+          http: {
+            path: string;
+            verbLowerCase: string;
+          };
+        };
+        operationId: string;
+        description: string;
+        requestBody: any;
+        responses: any;
+      };
+    };
   }
 
   public getPath(): string {
@@ -89,29 +119,12 @@ export class RetireEndpoint implements IWebServiceEndpoint {
     const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;
     this.log.debug(reqTag);
 
-    const reqBody: RetireRequest = req.body;
-    const {
-      marketplace,
-      walletObject,
-      tco2s,
-      amounts,
-      beneficiaryAddress,
-      beneficiaryName,
-      message,
-      retirementReason,
-    } = reqBody;
+    const reqBody: SpecificBuyRequest = req.body;
+    const { marketplace, paymentToken, items, walletObject } = reqBody;
 
-    if (
-      !marketplace ||
-      !walletObject ||
-      !tco2s ||
-      !amounts ||
-      !beneficiaryAddress ||
-      !beneficiaryName ||
-      !message ||
-      !retirementReason
-    ) {
-      const errorMessage = "Missing required parameters for retirement.";
+    if (!marketplace || !paymentToken || !items || !walletObject) {
+      const errorMessage =
+        "Missing required parameters: marketplace, paymentToken, items, or walletObject.";
       this.log.error(errorMessage);
       res.status(400).json({ error: errorMessage });
       return;
@@ -119,11 +132,11 @@ export class RetireEndpoint implements IWebServiceEndpoint {
 
     try {
       this.log.info(
-        `Received a retire request for ${amounts} units on marketplace ${marketplace}`,
+        `Received specific buy request for ${items} units. on marketplace ${marketplace}`,
       );
-      const retireResponse: RetireResponse =
-        await this.options.connector.retire(reqBody);
-      res.status(200).json(retireResponse);
+      const specificBuyResponse: SpecificBuyResponse =
+        await this.options.connector.specificBuy(reqBody);
+      res.status(200).json(specificBuyResponse);
     } catch (ex) {
       this.log.error(`Crash while serving ${reqTag}`, ex);
       res.status(500).json({
