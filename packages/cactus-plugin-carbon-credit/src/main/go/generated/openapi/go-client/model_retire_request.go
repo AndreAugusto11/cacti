@@ -19,12 +19,13 @@ var _ MappedNullable = &RetireRequest{}
 
 // RetireRequest struct for RetireRequest
 type RetireRequest struct {
-	Platform Platform `json:"platform"`
+	Marketplace Marketplace `json:"marketplace"`
 	Network Network `json:"network"`
 	WalletObject string `json:"walletObject"`
-	ObjectsList []string `json:"objectsList"`
+	Tco2s []string `json:"tco2s"`
 	Amounts []float32 `json:"amounts"`
-	Beneficiary string `json:"beneficiary"`
+	BeneficiaryAddress string `json:"beneficiaryAddress"`
+	BeneficiaryName string `json:"beneficiaryName"`
 	Message string `json:"message"`
 	RetirementReason string `json:"retirementReason"`
 }
@@ -33,14 +34,15 @@ type RetireRequest struct {
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewRetireRequest(platform Platform, network Network, walletObject string, objectsList []string, amounts []float32, beneficiary string, message string, retirementReason string) *RetireRequest {
+func NewRetireRequest(marketplace Marketplace, network Network, walletObject string, tco2s []string, amounts []float32, beneficiaryAddress string, beneficiaryName string, message string, retirementReason string) *RetireRequest {
 	this := RetireRequest{}
-	this.Platform = platform
+	this.Marketplace = marketplace
 	this.Network = network
 	this.WalletObject = walletObject
-	this.ObjectsList = objectsList
+	this.Tco2s = tco2s
 	this.Amounts = amounts
-	this.Beneficiary = beneficiary
+	this.BeneficiaryAddress = beneficiaryAddress
+	this.BeneficiaryName = beneficiaryName
 	this.Message = message
 	this.RetirementReason = retirementReason
 	return &this
@@ -54,28 +56,28 @@ func NewRetireRequestWithDefaults() *RetireRequest {
 	return &this
 }
 
-// GetPlatform returns the Platform field value
-func (o *RetireRequest) GetPlatform() Platform {
+// GetMarketplace returns the Marketplace field value
+func (o *RetireRequest) GetMarketplace() Marketplace {
 	if o == nil {
-		var ret Platform
+		var ret Marketplace
 		return ret
 	}
 
-	return o.Platform
+	return o.Marketplace
 }
 
-// GetPlatformOk returns a tuple with the Platform field value
+// GetMarketplaceOk returns a tuple with the Marketplace field value
 // and a boolean to check if the value has been set.
-func (o *RetireRequest) GetPlatformOk() (*Platform, bool) {
+func (o *RetireRequest) GetMarketplaceOk() (*Marketplace, bool) {
 	if o == nil {
 		return nil, false
 	}
-	return &o.Platform, true
+	return &o.Marketplace, true
 }
 
-// SetPlatform sets field value
-func (o *RetireRequest) SetPlatform(v Platform) {
-	o.Platform = v
+// SetMarketplace sets field value
+func (o *RetireRequest) SetMarketplace(v Marketplace) {
+	o.Marketplace = v
 }
 
 // GetNetwork returns the Network field value
@@ -126,28 +128,28 @@ func (o *RetireRequest) SetWalletObject(v string) {
 	o.WalletObject = v
 }
 
-// GetObjectsList returns the ObjectsList field value
-func (o *RetireRequest) GetObjectsList() []string {
+// GetTco2s returns the Tco2s field value
+func (o *RetireRequest) GetTco2s() []string {
 	if o == nil {
 		var ret []string
 		return ret
 	}
 
-	return o.ObjectsList
+	return o.Tco2s
 }
 
-// GetObjectsListOk returns a tuple with the ObjectsList field value
+// GetTco2sOk returns a tuple with the Tco2s field value
 // and a boolean to check if the value has been set.
-func (o *RetireRequest) GetObjectsListOk() ([]string, bool) {
+func (o *RetireRequest) GetTco2sOk() ([]string, bool) {
 	if o == nil {
 		return nil, false
 	}
-	return o.ObjectsList, true
+	return o.Tco2s, true
 }
 
-// SetObjectsList sets field value
-func (o *RetireRequest) SetObjectsList(v []string) {
-	o.ObjectsList = v
+// SetTco2s sets field value
+func (o *RetireRequest) SetTco2s(v []string) {
+	o.Tco2s = v
 }
 
 // GetAmounts returns the Amounts field value
@@ -174,28 +176,52 @@ func (o *RetireRequest) SetAmounts(v []float32) {
 	o.Amounts = v
 }
 
-// GetBeneficiary returns the Beneficiary field value
-func (o *RetireRequest) GetBeneficiary() string {
+// GetBeneficiaryAddress returns the BeneficiaryAddress field value
+func (o *RetireRequest) GetBeneficiaryAddress() string {
 	if o == nil {
 		var ret string
 		return ret
 	}
 
-	return o.Beneficiary
+	return o.BeneficiaryAddress
 }
 
-// GetBeneficiaryOk returns a tuple with the Beneficiary field value
+// GetBeneficiaryAddressOk returns a tuple with the BeneficiaryAddress field value
 // and a boolean to check if the value has been set.
-func (o *RetireRequest) GetBeneficiaryOk() (*string, bool) {
+func (o *RetireRequest) GetBeneficiaryAddressOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
-	return &o.Beneficiary, true
+	return &o.BeneficiaryAddress, true
 }
 
-// SetBeneficiary sets field value
-func (o *RetireRequest) SetBeneficiary(v string) {
-	o.Beneficiary = v
+// SetBeneficiaryAddress sets field value
+func (o *RetireRequest) SetBeneficiaryAddress(v string) {
+	o.BeneficiaryAddress = v
+}
+
+// GetBeneficiaryName returns the BeneficiaryName field value
+func (o *RetireRequest) GetBeneficiaryName() string {
+	if o == nil {
+		var ret string
+		return ret
+	}
+
+	return o.BeneficiaryName
+}
+
+// GetBeneficiaryNameOk returns a tuple with the BeneficiaryName field value
+// and a boolean to check if the value has been set.
+func (o *RetireRequest) GetBeneficiaryNameOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.BeneficiaryName, true
+}
+
+// SetBeneficiaryName sets field value
+func (o *RetireRequest) SetBeneficiaryName(v string) {
+	o.BeneficiaryName = v
 }
 
 // GetMessage returns the Message field value
@@ -256,12 +282,13 @@ func (o RetireRequest) MarshalJSON() ([]byte, error) {
 
 func (o RetireRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	toSerialize["platform"] = o.Platform
+	toSerialize["marketplace"] = o.Marketplace
 	toSerialize["network"] = o.Network
 	toSerialize["walletObject"] = o.WalletObject
-	toSerialize["objectsList"] = o.ObjectsList
+	toSerialize["tco2s"] = o.Tco2s
 	toSerialize["amounts"] = o.Amounts
-	toSerialize["beneficiary"] = o.Beneficiary
+	toSerialize["beneficiaryAddress"] = o.BeneficiaryAddress
+	toSerialize["beneficiaryName"] = o.BeneficiaryName
 	toSerialize["message"] = o.Message
 	toSerialize["retirementReason"] = o.RetirementReason
 	return toSerialize, nil

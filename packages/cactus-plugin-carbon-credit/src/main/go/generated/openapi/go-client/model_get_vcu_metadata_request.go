@@ -19,7 +19,7 @@ var _ MappedNullable = &GetVCUMetadataRequest{}
 
 // GetVCUMetadataRequest struct for GetVCUMetadataRequest
 type GetVCUMetadataRequest struct {
-	Platform Platform `json:"platform"`
+	Marketplace Marketplace `json:"marketplace"`
 	Network Network `json:"network"`
 	ProjectIdentifier string `json:"projectIdentifier"`
 	VcuIdentifier string `json:"vcuIdentifier"`
@@ -29,9 +29,9 @@ type GetVCUMetadataRequest struct {
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewGetVCUMetadataRequest(platform Platform, network Network, projectIdentifier string, vcuIdentifier string) *GetVCUMetadataRequest {
+func NewGetVCUMetadataRequest(marketplace Marketplace, network Network, projectIdentifier string, vcuIdentifier string) *GetVCUMetadataRequest {
 	this := GetVCUMetadataRequest{}
-	this.Platform = platform
+	this.Marketplace = marketplace
 	this.Network = network
 	this.ProjectIdentifier = projectIdentifier
 	this.VcuIdentifier = vcuIdentifier
@@ -46,28 +46,28 @@ func NewGetVCUMetadataRequestWithDefaults() *GetVCUMetadataRequest {
 	return &this
 }
 
-// GetPlatform returns the Platform field value
-func (o *GetVCUMetadataRequest) GetPlatform() Platform {
+// GetMarketplace returns the Marketplace field value
+func (o *GetVCUMetadataRequest) GetMarketplace() Marketplace {
 	if o == nil {
-		var ret Platform
+		var ret Marketplace
 		return ret
 	}
 
-	return o.Platform
+	return o.Marketplace
 }
 
-// GetPlatformOk returns a tuple with the Platform field value
+// GetMarketplaceOk returns a tuple with the Marketplace field value
 // and a boolean to check if the value has been set.
-func (o *GetVCUMetadataRequest) GetPlatformOk() (*Platform, bool) {
+func (o *GetVCUMetadataRequest) GetMarketplaceOk() (*Marketplace, bool) {
 	if o == nil {
 		return nil, false
 	}
-	return &o.Platform, true
+	return &o.Marketplace, true
 }
 
-// SetPlatform sets field value
-func (o *GetVCUMetadataRequest) SetPlatform(v Platform) {
-	o.Platform = v
+// SetMarketplace sets field value
+func (o *GetVCUMetadataRequest) SetMarketplace(v Marketplace) {
+	o.Marketplace = v
 }
 
 // GetNetwork returns the Network field value
@@ -152,7 +152,7 @@ func (o GetVCUMetadataRequest) MarshalJSON() ([]byte, error) {
 
 func (o GetVCUMetadataRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	toSerialize["platform"] = o.Platform
+	toSerialize["marketplace"] = o.Marketplace
 	toSerialize["network"] = o.Network
 	toSerialize["projectIdentifier"] = o.ProjectIdentifier
 	toSerialize["vcuIdentifier"] = o.VcuIdentifier

@@ -9,26 +9,38 @@ info:
 servers:
 - url: /
 paths:
-  /api/v1/@hyperledger/cactus-plugin-carbon-credit/buy:
+  /api/v1/@hyperledger/cactus-plugin-carbon-credit/specific-buy:
     post:
-      description: Acquires carbon inventory from a marketplace.
-      operationId: buyRequest
+      description: Acquire a specific basket of TCO2s from a marketplace.
+      operationId: specificBuyRequest
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BuyRequest'
+              $ref: '#/components/schemas/SpecificBuyRequest'
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BuyResponse'
+                $ref: '#/components/schemas/SpecificBuyResponse'
           description: Successful response
-      x-hyperledger-cacti:
-        http:
-          verbLowerCase: post
-          path: /api/v1/@hyperledger/cactus-plugin-carbon-credit/buy
+  /api/v1/@hyperledger/cactus-plugin-carbon-credit/random-buy:
+    post:
+      description: Acquire a random basket of TCO2s from a marketplace.
+      operationId: randomBuyRequest
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RandomBuyRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RandomBuyResponse'
+          description: Successful response
   /api/v1/@hyperledger/cactus-plugin-carbon-credit/retire:
     post:
       description: Abstract burn operation that finalizes an offset on the underlying
@@ -58,13 +70,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GetAvailableVCUsRequest'
+              $ref: '#/components/schemas/GetAvailableTCO2sRequest'
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetAvailableVCUsResponse'
+                $ref: '#/components/schemas/GetAvailableTCO2sResponse'
           description: Successful response with a list of available VCUs.
       x-hyperledger-cacti:
         http:
@@ -92,7 +104,7 @@ paths:
           path: /api/v1/@hyperledger/cactus-plugin-carbon-credit/get-vcu-metadata
 components:
   schemas:
-    Platform:
+    Marketplace:
       enum:
       - Toucan
       type: string
@@ -105,32 +117,38 @@ components:
       - base
       - base-sepolia
       type: string
-    BuyRequest:
+    SpecificBuyRequest:
       example:
         paymentToken: paymentToken
-        amount: 0.8008281904610115
+        marketplace: null
+        items:
+        - amount: 0.8008281904610115
+          address: address
+        - amount: 0.8008281904610115
+          address: address
         walletObject: walletObject
-        platform: null
         network: null
       properties:
-        platform:
-          $ref: '#/components/schemas/Platform'
+        marketplace:
+          $ref: '#/components/schemas/Marketplace'
         network:
           $ref: '#/components/schemas/Network'
         paymentToken:
           type: string
-        amount:
-          type: number
+        items:
+          items:
+            $ref: '#/components/schemas/SpecificBuyRequest_items_inner'
+          type: array
         walletObject:
           type: string
       required:
-      - amount
+      - items
+      - marketplace
       - network
       - paymentToken
-      - platform
       - walletObject
       type: object
-    BuyResponse:
+    SpecificBuyResponse:
       example:
         assetAmount: assetAmount
         txHashSwap: txHashSwap
@@ -146,7 +164,53 @@ components:
           type: string
         tco2List:
           items:
-            $ref: '#/components/schemas/BuyResponse_tco2List_inner'
+            $ref: '#/components/schemas/SpecificBuyResponse_tco2List_inner'
+          type: array
+      required:
+      - assetAmount
+      - txHashSwap
+      type: object
+    RandomBuyRequest:
+      example:
+        paymentToken: paymentToken
+        amount: 0.8008281904610115
+        marketplace: null
+        walletObject: walletObject
+        network: null
+      properties:
+        marketplace:
+          $ref: '#/components/schemas/Marketplace'
+        network:
+          $ref: '#/components/schemas/Network'
+        paymentToken:
+          type: string
+        amount:
+          type: number
+        walletObject:
+          type: string
+      required:
+      - amount
+      - marketplace
+      - network
+      - walletObject
+      type: object
+    RandomBuyResponse:
+      example:
+        assetAmount: assetAmount
+        txHashSwap: txHashSwap
+        tco2List:
+        - amount: amount
+          address: address
+        - amount: amount
+          address: address
+      properties:
+        txHashSwap:
+          type: string
+        assetAmount:
+          type: string
+        tco2List:
+          items:
+            $ref: '#/components/schemas/SpecificBuyResponse_tco2List_inner'
           type: array
       required:
       - assetAmount
@@ -154,26 +218,27 @@ components:
       type: object
     RetireRequest:
       example:
+        tco2s:
+        - tco2s
+        - tco2s
         retirementReason: retirementReason
+        marketplace: null
         amounts:
         - 0.8008281904610115
         - 0.8008281904610115
-        beneficiary: beneficiary
-        objectsList:
-        - objectsList
-        - objectsList
+        beneficiaryName: beneficiaryName
+        beneficiaryAddress: beneficiaryAddress
         message: message
         walletObject: walletObject
-        platform: null
         network: null
       properties:
-        platform:
-          $ref: '#/components/schemas/Platform'
+        marketplace:
+          $ref: '#/components/schemas/Marketplace'
         network:
           $ref: '#/components/schemas/Network'
         walletObject:
           type: string
-        objectsList:
+        tco2s:
           items:
             type: string
           type: array
@@ -181,7 +246,9 @@ components:
           items:
             type: number
           type: array
-        beneficiary:
+        beneficiaryAddress:
+          type: string
+        beneficiaryName:
           type: string
         message:
           type: string
@@ -189,12 +256,13 @@ components:
           type: string
       required:
       - amounts
-      - beneficiary
+      - beneficiaryAddress
+      - beneficiaryName
+      - marketplace
       - message
       - network
-      - objectsList
-      - platform
       - retirementReason
+      - tco2s
       - walletObject
       type: object
     RetireResponse:
@@ -210,41 +278,16 @@ components:
       - retirementCertificate
       - txHashRetire
       type: object
-    VCUMetadata:
-      example:
-        symbol: symbol
-        totalSupply: 0.8008281904610115
-        name: name
-        attributes:
-        - attributes
-        - attributes
-      properties:
-        name:
-          type: string
-        symbol:
-          type: string
-        totalSupply:
-          type: number
-        attributes:
-          items:
-            type: string
-          type: array
-      required:
-      - attributes
-      - name
-      - symbol
-      - totalSupply
-      type: object
-    GetAvailableVCUsRequest:
+    GetAvailableTCO2sRequest:
       example:
         filterCriteria: filterCriteria
+        marketplace: null
         limit: limit
         orderBy: orderBy
-        platform: null
         network: null
       properties:
-        platform:
-          $ref: '#/components/schemas/Platform'
+        marketplace:
+          $ref: '#/components/schemas/Marketplace'
         network:
           $ref: '#/components/schemas/Network'
         filterCriteria:
@@ -254,35 +297,35 @@ components:
         limit:
           type: string
       required:
+      - marketplace
       - network
-      - platform
       type: object
-    GetAvailableVCUsResponse:
+    GetAvailableTCO2sResponse:
       example:
-        objectsList:
-        - objectsList
-        - objectsList
         totalCount: 0.8008281904610115
+        tco2List:
+        - tco2List
+        - tco2List
       properties:
-        objectsList:
+        tco2List:
           items:
             type: string
           type: array
         totalCount:
           type: number
       required:
-      - objectsList
+      - tco2List
       - totalCount
       type: object
     GetVCUMetadataRequest:
       example:
+        marketplace: null
         vcuIdentifier: vcuIdentifier
         projectIdentifier: projectIdentifier
-        platform: null
         network: null
       properties:
-        platform:
-          $ref: '#/components/schemas/Platform'
+        marketplace:
+          $ref: '#/components/schemas/Marketplace'
         network:
           $ref: '#/components/schemas/Network'
         projectIdentifier:
@@ -290,12 +333,76 @@ components:
         vcuIdentifier:
           type: string
       required:
+      - marketplace
       - network
-      - platform
       - projectIdentifier
       - vcuIdentifier
       type: object
-    BuyResponse_tco2List_inner:
+    VCUMetadata:
+      example:
+        symbol: symbol
+        totalSupply: 0.8008281904610115
+        name: name
+        attributes:
+          other: other
+          vintage: vintage
+          region: region
+          methodology: methodology
+      properties:
+        name:
+          type: string
+        symbol:
+          type: string
+        totalSupply:
+          type: number
+        attributes:
+          $ref: '#/components/schemas/VCUMetadata_attributes'
+      required:
+      - attributes
+      - name
+      - symbol
+      - totalSupply
+      type: object
+    GetPurchasePriceRequest:
+      properties:
+        platform:
+          $ref: '#/components/schemas/Marketplace'
+        network:
+          $ref: '#/components/schemas/Network'
+        unit:
+          description: The token address to retrieve the price for.
+          type: string
+        amount:
+          description: The amount of Units to price.
+          type: number
+      required:
+      - amount
+      - network
+      - platform
+      - unit
+      type: object
+    GetPurchasePriceResponse:
+      properties:
+        price:
+          description: The current price in USDC for the requested amount.
+          type: string
+      required:
+      - price
+      type: object
+    SpecificBuyRequest_items_inner:
+      example:
+        amount: 0.8008281904610115
+        address: address
+      properties:
+        address:
+          type: string
+        amount:
+          type: number
+      required:
+      - address
+      - amount
+      type: object
+    SpecificBuyResponse_tco2List_inner:
       example:
         amount: amount
         address: address
@@ -307,4 +414,20 @@ components:
       required:
       - address
       - amount
+      type: object
+    VCUMetadata_attributes:
+      example:
+        other: other
+        vintage: vintage
+        region: region
+        methodology: methodology
+      properties:
+        region:
+          type: string
+        vintage:
+          type: string
+        methodology:
+          type: string
+        other:
+          type: string
       type: object

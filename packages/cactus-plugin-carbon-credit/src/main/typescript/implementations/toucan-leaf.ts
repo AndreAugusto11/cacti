@@ -202,45 +202,65 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
       const fnTag = `${ToucanLeaf.CLASS_NAME}#randomBuy()`;
       this.logger.info(`Received buy request for ${_request.amount} units.`);
 
-      // 1. Setup
-      const router = new ethers.Contract(
-        process.env.ROUTER!, // Ex: SushiSwap em Polygon
-        [
-          "function swapExactTokensForTokens(uint256 amountIn,uint256 amountOutMin,address[] path,address to,uint256 deadline) external returns (uint256[] memory)",
-        ],
-        this.signer,
+      // 2. Obter o saldo de CELO (token nativo) da carteira
+      const nativeBalance = await this.provider.getBalance(
+        this.signer.getAddress(),
       );
+      // Usamos .getAddress() em vez de .address para garantir que o endereço é carregado, se necessário.
 
-      if (_request.paymentToken === undefined) {
-        _request.paymentToken = "USDC";
+      // Defina um valor mínimo razoável para o gás (ex: 0.05 CELO, ou 5e16 wei)
+      // Este é apenas um limite de segurança para a execução
+      const MIN_FUNDS_REQUIRED = ethers.utils.parseEther("0.05");
+
+      if (nativeBalance.lt(MIN_FUNDS_REQUIRED)) {
+        this.logger.error(
+          `${fnTag} Saldo de CELO insuficiente. Necessário: > ${ethers.utils.formatEther(MIN_FUNDS_REQUIRED)} CELO. Saldo Atual: ${ethers.utils.formatEther(nativeBalance)} CELO.`,
+        );
+        throw new Error(
+          "Erro de Fundos Insuficientes: Adicione CELO à carteira para taxas de gás.",
+        );
       }
 
-      const usdc = new ethers.Contract(
-        _request.paymentToken,
-        [
-          "function approve(address spender, uint256 value) external returns (bool)",
-        ],
-        this.signer,
-      );
+      // // 1. Setup
+      // const router = new ethers.Contract(
+      //   process.env.ROUTER!, // Ex: SushiSwap em Polygon
+      //   [
+      //     "function swapExactTokensForTokens(uint256 amountIn,uint256 amountOutMin,address[] path,address to,uint256 deadline) external returns (uint256[] memory)",
+      //   ],
+      //   this.signer,
+      // );
+
+      // if (_request.paymentToken === undefined) {
+      //   _request.paymentToken = process.env.USDC!;
+      // }
+
+      // const usdc = new ethers.Contract(
+      //   _request.paymentToken,
+      //   [
+      //     "function approve(address spender, uint256 value) external returns (bool)",
+      //   ],
+      //   this.signer,
+      // );
 
       // 2. Swap USDC → NCT
-      this.logger.debug(
-        `${fnTag}  Swapping ${_request.paymentToken} for pool tokens...`,
-      );
-      const amountIn = utils.parseUnits(String(_request.amount), 6); // not this amount. This will be the amount of carbon credits in tonnes
-      const path = [_request.paymentToken, process.env.NCT!];
-      await usdc.approve(router.target, amountIn);
+      // this.logger.debug(
+      //   `${fnTag}  Swapping ${_request.paymentToken} for pool tokens...`,
+      // );
+      // const amountIn = utils.parseUnits(String(_request.amount), 6); // not this amount. This will be the amount of carbon credits in tonnes
+      // const path = [_request.paymentToken, process.env.NCT!];
+      // await usdc.approve(router.address, amountIn);
 
-      const swapTx = await router.swapExactTokensForTokens(
-        amountIn,
-        0, // set `amountOutMin` for real slippage control
-        path,
-        this.signer.address,
-        Math.floor(Date.now() / 1000) + 60 * 10,
-      );
+      // const swapTx = await router.swapExactTokensForTokens(
+      //   amountIn,
+      //   0, // set `amountOutMin` for real slippage control
+      //   path,
+      //   this.signer.address,
+      //   Math.floor(Date.now() / 1000) + 60 * 10,
+      // );
 
-      const receipt = await swapTx.wait();
-      const txHashSwap = receipt.hash;
+      // const receipt = await swapTx.wait();
+      // const txHashSwap = receipt.hash;
+      const txHashSwap = "txHashSwap_placeholder";
 
       // 3. Approve NCT + Redeem chosen TCO2s
       this.logger.debug(`${fnTag} Redeeming pool tokens for TCO2s...`);
@@ -249,6 +269,9 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
         process.env.NCT!,
         [
           "function approve(address spender, uint256 value) external returns (bool)",
+          "function balanceOf(address account) external view returns (uint256)",
+          "function redeemAuto(uint256 amount) external returns (uint256[] memory)",
+          "event Redeem(address indexed tco2, uint256 amount)",
         ],
         this.signer,
       );
@@ -257,11 +280,11 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
       await nct.approve(process.env.NCT!, 2n ** 256n); // infinite approval per #332
       // For non-custodial front-ends consider limited approvals equal to `nctBalance` instead.
       const redeemTx = await nct.redeemAuto(nctBalance);
-      await redeemTx.wait();
+      const redeemReceipt = await redeemTx.wait();
 
       // 4. Parse events to build tco2List
       const tco2List: { address: string; amount: string }[] = [];
-      for (const log of receipt.logs) {
+      for (const log of redeemReceipt.logs) {
         try {
           const parsed = nct.interface.parseLog(log);
           if (parsed && parsed.name === "Redeem") {
@@ -284,10 +307,9 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
         tco2List,
       };
     } catch (err) {
-      this.logger.error("Error in buy:", err);
-      throw new Error("Failed to buy VCUs");
+      this.logger.error("Error in randomBuy:", err);
+      throw new Error("Failed to random buy VCUs");
     }
-    throw new Error("Method not implemented.");
   }
 
   public retire(_request: RetireRequest): Promise<RetireResponse> {

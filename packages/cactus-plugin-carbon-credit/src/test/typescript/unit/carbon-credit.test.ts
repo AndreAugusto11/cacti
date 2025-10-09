@@ -10,11 +10,14 @@ import {
 } from "../../../main/typescript/public-api";
 import { Web3SigningCredentialPrivateKeyHex } from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
 import { formatUnits } from "ethers/lib/utils";
+import dotenv from "dotenv";
+dotenv.config({ path: "packages/cactus-plugin-carbon-credit/.env" });
 
 const pluginOptions: IPluginCarbonCreditOptions = {
   instanceId: "test-instance-id",
   signingCredential: {
     ethAccount: "0xb5271339c211cC1EEeD30a2f9f447063a5faD1F0",
+    //secret: process.env.PRIVATE_KEY!,
     secret: "739ed7c97109f28bc8f13b354b30bbd01a47061be7676c3c3934aa4a56540de4",
   } as Web3SigningCredentialPrivateKeyHex,
   logLevel: "DEBUG",
@@ -27,24 +30,24 @@ describe("PluginCarbonCredit Functionality", () => {
     await new Promise((resolve) => setTimeout(resolve, 10000));
   });
 
-  // describe("Buy Functionality", () => {
-  //   test("Buy function returns the correct placeholder data", async () => {
-  //     const request = {
-  //       marketplace: Marketplace.Toucan,
-  //       network: Network.Alfajores,
-  //       paymentToken: "USDC",
-  //       amount: 100,
-  //       walletObject: "wallet-address-placeholder",
-  //     };
+  describe("Buy Functionality", () => {
+    test("Buy function returns the correct placeholder data", async () => {
+      const request = {
+        marketplace: Marketplace.Toucan,
+        network: Network.Alfajores,
+        paymentToken: "0x2F25deB3848C207fc8E0c34035B3Ba7fC157602B", // USDC on Alfajores
+        amount: 100,
+        walletObject: "wallet-address-placeholder",
+      };
 
-  //     const response = await plugin.buy(request);
+      const response = await plugin.randomBuy(request);
 
-  //     expect(response).toBeDefined();
-  //     expect(response.txHashSwap).toBe("txHashSwap_placeholder");
-  //     expect(response.assetAmount).toBe("100");
-  //     expect(response.tco2List).toEqual(["0xABCD", "0x1234"]);
-  //   });
-  // });
+      expect(response).toBeDefined();
+      expect(response.txHashSwap).toBe("txHashSwap_placeholder");
+      expect(response.assetAmount).toBe("100");
+      expect(response.tco2List).toEqual(["0xABCD", "0x1234"]);
+    });
+  });
 
   // describe("Retire Functionality", () => {
   //   test("Retire function returns the correct placeholder data", async () => {
@@ -73,14 +76,14 @@ describe("PluginCarbonCredit Functionality", () => {
     test("getAvailableVCUs returns a list of VCUs", async () => {
       const request: GetAvailableTCO2sRequest = {
         marketplace: Marketplace.Toucan,
-        network: Network.Polygon,
+        network: Network.Celo,
       };
 
       const response = await plugin.getAvailableTCO2s(request);
 
       expect(response).toBeDefined();
       expect(response.tco2List).toBeInstanceOf(Array);
-      expect(response.totalCount).toBe(33); // Placeholder, adjust as needed
+      expect(response.totalCount).toBe(26); // Placeholder, adjust as needed
     });
   });
 

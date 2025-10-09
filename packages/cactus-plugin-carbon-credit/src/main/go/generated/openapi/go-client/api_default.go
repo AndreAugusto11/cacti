@@ -22,125 +22,18 @@ import (
 // DefaultApiService DefaultApi service
 type DefaultApiService service
 
-type ApiBuyRequestRequest struct {
-	ctx context.Context
-	ApiService *DefaultApiService
-	buyRequest *BuyRequest
-}
-
-func (r ApiBuyRequestRequest) BuyRequest(buyRequest BuyRequest) ApiBuyRequestRequest {
-	r.buyRequest = &buyRequest
-	return r
-}
-
-func (r ApiBuyRequestRequest) Execute() (*BuyResponse, *http.Response, error) {
-	return r.ApiService.BuyRequestExecute(r)
-}
-
-/*
-BuyRequest Method for BuyRequest
-
-Acquires carbon inventory from a marketplace.
-
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiBuyRequestRequest
-*/
-func (a *DefaultApiService) BuyRequest(ctx context.Context) ApiBuyRequestRequest {
-	return ApiBuyRequestRequest{
-		ApiService: a,
-		ctx: ctx,
-	}
-}
-
-// Execute executes the request
-//  @return BuyResponse
-func (a *DefaultApiService) BuyRequestExecute(r ApiBuyRequestRequest) (*BuyResponse, *http.Response, error) {
-	var (
-		localVarHTTPMethod   = http.MethodPost
-		localVarPostBody     interface{}
-		formFiles            []formFile
-		localVarReturnValue  *BuyResponse
-	)
-
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.BuyRequest")
-	if err != nil {
-		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
-	}
-
-	localVarPath := localBasePath + "/api/v1/@hyperledger/cactus-plugin-carbon-credit/buy"
-
-	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := url.Values{}
-	localVarFormParams := url.Values{}
-
-	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{"application/json"}
-
-	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
-	}
-
-	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"application/json"}
-
-	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
-	}
-	// body params
-	localVarPostBody = r.buyRequest
-	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
-	if err != nil {
-		return localVarReturnValue, nil, err
-	}
-
-	localVarHTTPResponse, err := a.client.callAPI(req)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarReturnValue, localVarHTTPResponse, err
-	}
-
-	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
-	if err != nil {
-		return localVarReturnValue, localVarHTTPResponse, err
-	}
-
-	if localVarHTTPResponse.StatusCode >= 300 {
-		newErr := &GenericOpenAPIError{
-			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
-		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
-	}
-
-	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-	if err != nil {
-		newErr := &GenericOpenAPIError{
-			body:  localVarBody,
-			error: err.Error(),
-		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
-	}
-
-	return localVarReturnValue, localVarHTTPResponse, nil
-}
-
 type ApiGetAvailableVCUsRequestRequest struct {
 	ctx context.Context
 	ApiService *DefaultApiService
-	getAvailableVCUsRequest *GetAvailableVCUsRequest
+	getAvailableTCO2sRequest *GetAvailableTCO2sRequest
 }
 
-func (r ApiGetAvailableVCUsRequestRequest) GetAvailableVCUsRequest(getAvailableVCUsRequest GetAvailableVCUsRequest) ApiGetAvailableVCUsRequestRequest {
-	r.getAvailableVCUsRequest = &getAvailableVCUsRequest
+func (r ApiGetAvailableVCUsRequestRequest) GetAvailableTCO2sRequest(getAvailableTCO2sRequest GetAvailableTCO2sRequest) ApiGetAvailableVCUsRequestRequest {
+	r.getAvailableTCO2sRequest = &getAvailableTCO2sRequest
 	return r
 }
 
-func (r ApiGetAvailableVCUsRequestRequest) Execute() (*GetAvailableVCUsResponse, *http.Response, error) {
+func (r ApiGetAvailableVCUsRequestRequest) Execute() (*GetAvailableTCO2sResponse, *http.Response, error) {
 	return r.ApiService.GetAvailableVCUsRequestExecute(r)
 }
 
@@ -160,13 +53,13 @@ func (a *DefaultApiService) GetAvailableVCUsRequest(ctx context.Context) ApiGetA
 }
 
 // Execute executes the request
-//  @return GetAvailableVCUsResponse
-func (a *DefaultApiService) GetAvailableVCUsRequestExecute(r ApiGetAvailableVCUsRequestRequest) (*GetAvailableVCUsResponse, *http.Response, error) {
+//  @return GetAvailableTCO2sResponse
+func (a *DefaultApiService) GetAvailableVCUsRequestExecute(r ApiGetAvailableVCUsRequestRequest) (*GetAvailableTCO2sResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodGet
 		localVarPostBody     interface{}
 		formFiles            []formFile
-		localVarReturnValue  *GetAvailableVCUsResponse
+		localVarReturnValue  *GetAvailableTCO2sResponse
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.GetAvailableVCUsRequest")
@@ -198,7 +91,7 @@ func (a *DefaultApiService) GetAvailableVCUsRequestExecute(r ApiGetAvailableVCUs
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	// body params
-	localVarPostBody = r.getAvailableVCUsRequest
+	localVarPostBody = r.getAvailableTCO2sRequest
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -343,6 +236,113 @@ func (a *DefaultApiService) GetVCUMetadataRequestExecute(r ApiGetVCUMetadataRequ
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
+type ApiRandomBuyRequestRequest struct {
+	ctx context.Context
+	ApiService *DefaultApiService
+	randomBuyRequest *RandomBuyRequest
+}
+
+func (r ApiRandomBuyRequestRequest) RandomBuyRequest(randomBuyRequest RandomBuyRequest) ApiRandomBuyRequestRequest {
+	r.randomBuyRequest = &randomBuyRequest
+	return r
+}
+
+func (r ApiRandomBuyRequestRequest) Execute() (*RandomBuyResponse, *http.Response, error) {
+	return r.ApiService.RandomBuyRequestExecute(r)
+}
+
+/*
+RandomBuyRequest Method for RandomBuyRequest
+
+Acquire a random basket of TCO2s from a marketplace.
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiRandomBuyRequestRequest
+*/
+func (a *DefaultApiService) RandomBuyRequest(ctx context.Context) ApiRandomBuyRequestRequest {
+	return ApiRandomBuyRequestRequest{
+		ApiService: a,
+		ctx: ctx,
+	}
+}
+
+// Execute executes the request
+//  @return RandomBuyResponse
+func (a *DefaultApiService) RandomBuyRequestExecute(r ApiRandomBuyRequestRequest) (*RandomBuyResponse, *http.Response, error) {
+	var (
+		localVarHTTPMethod   = http.MethodPost
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *RandomBuyResponse
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.RandomBuyRequest")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/api/v1/@hyperledger/cactus-plugin-carbon-credit/random-buy"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.randomBuyRequest
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
 type ApiRetireRequestRequest struct {
 	ctx context.Context
 	ApiService *DefaultApiService
@@ -413,6 +413,113 @@ func (a *DefaultApiService) RetireRequestExecute(r ApiRetireRequestRequest) (*Re
 	}
 	// body params
 	localVarPostBody = r.retireRequest
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiSpecificBuyRequestRequest struct {
+	ctx context.Context
+	ApiService *DefaultApiService
+	specificBuyRequest *SpecificBuyRequest
+}
+
+func (r ApiSpecificBuyRequestRequest) SpecificBuyRequest(specificBuyRequest SpecificBuyRequest) ApiSpecificBuyRequestRequest {
+	r.specificBuyRequest = &specificBuyRequest
+	return r
+}
+
+func (r ApiSpecificBuyRequestRequest) Execute() (*SpecificBuyResponse, *http.Response, error) {
+	return r.ApiService.SpecificBuyRequestExecute(r)
+}
+
+/*
+SpecificBuyRequest Method for SpecificBuyRequest
+
+Acquire a specific basket of TCO2s from a marketplace.
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiSpecificBuyRequestRequest
+*/
+func (a *DefaultApiService) SpecificBuyRequest(ctx context.Context) ApiSpecificBuyRequestRequest {
+	return ApiSpecificBuyRequestRequest{
+		ApiService: a,
+		ctx: ctx,
+	}
+}
+
+// Execute executes the request
+//  @return SpecificBuyResponse
+func (a *DefaultApiService) SpecificBuyRequestExecute(r ApiSpecificBuyRequestRequest) (*SpecificBuyResponse, *http.Response, error) {
+	var (
+		localVarHTTPMethod   = http.MethodPost
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *SpecificBuyResponse
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.SpecificBuyRequest")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/api/v1/@hyperledger/cactus-plugin-carbon-credit/specific-buy"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.specificBuyRequest
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return localVarReturnValue, nil, err

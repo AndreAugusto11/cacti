@@ -22,14 +22,14 @@ type VCUMetadata struct {
 	Name string `json:"name"`
 	Symbol string `json:"symbol"`
 	TotalSupply float32 `json:"totalSupply"`
-	Attributes []string `json:"attributes"`
+	Attributes VCUMetadataAttributes `json:"attributes"`
 }
 
 // NewVCUMetadata instantiates a new VCUMetadata object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewVCUMetadata(name string, symbol string, totalSupply float32, attributes []string) *VCUMetadata {
+func NewVCUMetadata(name string, symbol string, totalSupply float32, attributes VCUMetadataAttributes) *VCUMetadata {
 	this := VCUMetadata{}
 	this.Name = name
 	this.Symbol = symbol
@@ -119,9 +119,9 @@ func (o *VCUMetadata) SetTotalSupply(v float32) {
 }
 
 // GetAttributes returns the Attributes field value
-func (o *VCUMetadata) GetAttributes() []string {
+func (o *VCUMetadata) GetAttributes() VCUMetadataAttributes {
 	if o == nil {
-		var ret []string
+		var ret VCUMetadataAttributes
 		return ret
 	}
 
@@ -130,15 +130,15 @@ func (o *VCUMetadata) GetAttributes() []string {
 
 // GetAttributesOk returns a tuple with the Attributes field value
 // and a boolean to check if the value has been set.
-func (o *VCUMetadata) GetAttributesOk() ([]string, bool) {
+func (o *VCUMetadata) GetAttributesOk() (*VCUMetadataAttributes, bool) {
 	if o == nil {
 		return nil, false
 	}
-	return o.Attributes, true
+	return &o.Attributes, true
 }
 
 // SetAttributes sets field value
-func (o *VCUMetadata) SetAttributes(v []string) {
+func (o *VCUMetadata) SetAttributes(v VCUMetadataAttributes) {
 	o.Attributes = v
 }
 

@@ -77,25 +77,32 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*DefaultApi* | [**BuyRequest**](docs/DefaultApi.md#buyrequest) | **Post** /api/v1/@hyperledger/cactus-plugin-carbon-credit/buy | 
 *DefaultApi* | [**GetAvailableVCUsRequest**](docs/DefaultApi.md#getavailablevcusrequest) | **Get** /api/v1/@hyperledger/cactus-plugin-carbon-credit/get-available-vcus | 
 *DefaultApi* | [**GetVCUMetadataRequest**](docs/DefaultApi.md#getvcumetadatarequest) | **Post** /api/v1/@hyperledger/cactus-plugin-carbon-credit/get-vcu-metadata | 
+*DefaultApi* | [**RandomBuyRequest**](docs/DefaultApi.md#randombuyrequest) | **Post** /api/v1/@hyperledger/cactus-plugin-carbon-credit/random-buy | 
 *DefaultApi* | [**RetireRequest**](docs/DefaultApi.md#retirerequest) | **Post** /api/v1/@hyperledger/cactus-plugin-carbon-credit/retire | 
+*DefaultApi* | [**SpecificBuyRequest**](docs/DefaultApi.md#specificbuyrequest) | **Post** /api/v1/@hyperledger/cactus-plugin-carbon-credit/specific-buy | 
 
 
 ## Documentation For Models
 
- - [BuyRequest](docs/BuyRequest.md)
- - [BuyResponse](docs/BuyResponse.md)
- - [BuyResponseTco2ListInner](docs/BuyResponseTco2ListInner.md)
- - [GetAvailableVCUsRequest](docs/GetAvailableVCUsRequest.md)
- - [GetAvailableVCUsResponse](docs/GetAvailableVCUsResponse.md)
+ - [GetAvailableTCO2sRequest](docs/GetAvailableTCO2sRequest.md)
+ - [GetAvailableTCO2sResponse](docs/GetAvailableTCO2sResponse.md)
+ - [GetPurchasePriceRequest](docs/GetPurchasePriceRequest.md)
+ - [GetPurchasePriceResponse](docs/GetPurchasePriceResponse.md)
  - [GetVCUMetadataRequest](docs/GetVCUMetadataRequest.md)
+ - [Marketplace](docs/Marketplace.md)
  - [Network](docs/Network.md)
- - [Platform](docs/Platform.md)
+ - [RandomBuyRequest](docs/RandomBuyRequest.md)
+ - [RandomBuyResponse](docs/RandomBuyResponse.md)
  - [RetireRequest](docs/RetireRequest.md)
  - [RetireResponse](docs/RetireResponse.md)
+ - [SpecificBuyRequest](docs/SpecificBuyRequest.md)
+ - [SpecificBuyRequestItemsInner](docs/SpecificBuyRequestItemsInner.md)
+ - [SpecificBuyResponse](docs/SpecificBuyResponse.md)
+ - [SpecificBuyResponseTco2ListInner](docs/SpecificBuyResponseTco2ListInner.md)
  - [VCUMetadata](docs/VCUMetadata.md)
+ - [VCUMetadataAttributes](docs/VCUMetadataAttributes.md)
 
 
 ## Documentation For Authorization
