@@ -41,6 +41,8 @@ import {
 } from "./generated/openapi/typescript-axios";
 import { ToucanLeaf } from "./implementations/toucan-leaf";
 import { CarbonMarketplaceAbstract } from "./carbon-marketplace-abstract";
+import { getDefaultDex, getTokenAddress } from "./utils";
+import { ethers } from "ethers";
 
 export interface IPluginCarbonCreditOptions extends ICactusPluginOptions {
   instanceId: string;
@@ -56,6 +58,8 @@ export class PluginCarbonCredit implements ICactusPlugin, IPluginWebService {
   private readonly log: Logger;
   private endpoints: IWebServiceEndpoint[] | undefined;
 
+  private providers: Map<string, ethers.providers.JsonRpcProvider> = new Map();
+
   public get className(): string {
     return PluginCarbonCredit.CLASS_NAME;
   }
@@ -70,6 +74,22 @@ export class PluginCarbonCredit implements ICactusPlugin, IPluginWebService {
     const level = this.options.logLevel || "INFO";
     const label = this.className;
     this.log = LoggerProvider.getOrCreate({ level, label });
+
+    if (
+      this.options.networkConfig &&
+      Array.isArray(this.options.networkConfig)
+    ) {
+      for (const cfg of this.options.networkConfig) {
+        this.providers.set(
+          cfg.network,
+          new ethers.providers.JsonRpcProvider(cfg.rpcUrl),
+        );
+      }
+    } else {
+      throw new Error(
+        `${this.className}#constructor: networkConfig is required to initialize providers.`,
+      );
+    }
   }
 
   public getOpenApiSpec(): unknown {
@@ -149,6 +169,18 @@ export class PluginCarbonCredit implements ICactusPlugin, IPluginWebService {
     return `@hyperledger/cactus-plugin-carbon-credit`;
   }
 
+  public getRPCProvider(network: string): ethers.providers.JsonRpcProvider {
+    const provider = this.providers.get(network);
+
+    if (!provider) {
+      throw new Error(
+        `No provider found for network ${network}. Please check the plugin options and ensure the network configuration is correct.`,
+      );
+    }
+
+    return provider;
+  }
+
   public getMarketplaceImplementation(
     marketplace: string,
     network: Network,
@@ -178,6 +210,7 @@ export class PluginCarbonCredit implements ICactusPlugin, IPluginWebService {
       case Marketplace.Toucan:
         return new ToucanLeaf({
           networkConfig: networkConfig,
+          provider: this.getRPCProvider(network),
           signingCredential: this.options.signingCredential,
         });
       default:
@@ -258,12 +291,52 @@ export class PluginCarbonCredit implements ICactusPlugin, IPluginWebService {
   public async getPurchasePrice(
     request: GetPurchasePriceRequest,
   ): Promise<GetPurchasePriceResponse> {
-    const marketplaceImplementation: CarbonMarketplaceAbstract =
-      this.getMarketplaceImplementation(Marketplace.Toucan, request.network);
+    const defaultDex = getDefaultDex(request.network);
 
-    const response = await marketplaceImplementation.getPurchasePrice(request);
+    const factory = new ethers.Contract(
+      defaultDex.factory,
+      [
+        "function getPair(address tokenA, address tokenB) external view returns (address pair)",
+      ],
+      this.getRPCProvider(request.network),
+    );
+    const pairAddress = await factory.getPair(
+      request.unit,
+      getTokenAddress(request.network, "USDC"),
+    );
 
-    return response;
+    if (pairAddress === ethers.constants.AddressZero) {
+      throw new Error("No pool found for this pair");
+    }
+
+    const pair = new ethers.Contract(
+      pairAddress,
+      [
+        "function getReserves() external view returns (uint112 reserve0, uint112 reserve1, uint32 blockTimestampLast)",
+        "function token0() external view returns (address)",
+        "function token1() external view returns (address)",
+      ],
+      this.getRPCProvider(request.network),
+    );
+
+    const [reserve0, reserve1] = await pair.getReserves();
+    const token0 = await pair.token0();
+
+    // Convert to BigInt explicitly
+    const r0 = BigInt(reserve0);
+    const r1 = BigInt(reserve1);
+    const [reserveIn, reserveOut] =
+      request.unit.toLowerCase() === token0.toLowerCase() ? [r0, r1] : [r1, r0];
+
+    // Apply fee and constant-product formula
+    const amountInWithFee = BigInt(request.amount) * 997n;
+    const numerator = amountInWithFee * reserveOut;
+    const denominator = reserveIn * 1000n + amountInWithFee;
+    const amountOut = numerator / denominator;
+
+    return {
+      price: Number(amountOut),
+    };
   }
 
   public async sell(): Promise<void> {

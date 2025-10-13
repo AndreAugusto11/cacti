@@ -11,6 +11,8 @@ import {
 } from "../../../main/typescript/public-api";
 import { Web3SigningCredentialPrivateKeyHex } from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
 import dotenv from "dotenv";
+import { getTokenAddress } from "../../../main/typescript/utils";
+import { parseUnits } from "ethers/lib/utils";
 dotenv.config({ path: "packages/cactus-plugin-carbon-credit/.env" });
 
 const ALCHEMY_API_KEY = process.env.ALCHEMY_API_KEY;
@@ -137,6 +139,22 @@ describe("PluginCarbonCredit Functionality", () => {
       await expect(plugin.getVCUMetadata(invalidRequest)).rejects.toThrow(
         "VCU with ID VCU-9999 not found.",
       );
+    });
+  });
+
+  describe("getPurchasePrice Functionality (Polygon)", () => {
+    test("getPurchasePrice returns the correct price for a valid request", async () => {
+      const request = {
+        marketplace: Marketplace.Toucan,
+        network: Network.Polygon,
+        unit: getTokenAddress(Network.Polygon, "NCT"),
+        amount: parseUnits("1", 18).toString(), // 1 NCT
+      };
+
+      const response = await plugin.getPurchasePrice(request);
+
+      expect(response).toBeDefined();
+      expect(response.price).toBeGreaterThan(parseUnits("0.3", 6).toBigInt()); // Flaky test. Currently 1 NCT = 0.48 USDC
     });
   });
 

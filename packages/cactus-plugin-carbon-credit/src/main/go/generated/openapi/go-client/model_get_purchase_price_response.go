@@ -20,14 +20,14 @@ var _ MappedNullable = &GetPurchasePriceResponse{}
 // GetPurchasePriceResponse struct for GetPurchasePriceResponse
 type GetPurchasePriceResponse struct {
 	// The current price in USDC for the requested amount.
-	Price string `json:"price"`
+	Price int32 `json:"price"`
 }
 
 // NewGetPurchasePriceResponse instantiates a new GetPurchasePriceResponse object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewGetPurchasePriceResponse(price string) *GetPurchasePriceResponse {
+func NewGetPurchasePriceResponse(price int32) *GetPurchasePriceResponse {
 	this := GetPurchasePriceResponse{}
 	this.Price = price
 	return &this
@@ -42,9 +42,9 @@ func NewGetPurchasePriceResponseWithDefaults() *GetPurchasePriceResponse {
 }
 
 // GetPrice returns the Price field value
-func (o *GetPurchasePriceResponse) GetPrice() string {
+func (o *GetPurchasePriceResponse) GetPrice() int32 {
 	if o == nil {
-		var ret string
+		var ret int32
 		return ret
 	}
 
@@ -53,7 +53,7 @@ func (o *GetPurchasePriceResponse) GetPrice() string {
 
 // GetPriceOk returns a tuple with the Price field value
 // and a boolean to check if the value has been set.
-func (o *GetPurchasePriceResponse) GetPriceOk() (*string, bool) {
+func (o *GetPurchasePriceResponse) GetPriceOk() (*int32, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -61,7 +61,7 @@ func (o *GetPurchasePriceResponse) GetPriceOk() (*string, bool) {
 }
 
 // SetPrice sets field value
-func (o *GetPurchasePriceResponse) SetPrice(v string) {
+func (o *GetPurchasePriceResponse) SetPrice(v int32) {
 	o.Price = v
 }
 

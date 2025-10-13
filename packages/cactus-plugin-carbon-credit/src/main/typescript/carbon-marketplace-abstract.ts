@@ -10,14 +10,13 @@ import {
   RetireRequest,
   RetireResponse,
   VCUMetadata,
-  GetPurchasePriceRequest,
-  GetPurchasePriceResponse,
   NetworkConfig,
 } from "./public-api";
 import {
   GasTransactionConfig,
   Web3SigningCredentialPrivateKeyHex,
 } from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
+import { ethers } from "ethers";
 
 /**
  * Common interface options for all Carbon Credit Marketplaces.
@@ -26,6 +25,7 @@ export interface CarbonMarketplaceAbstractOptions {
   logLevel?: LogLevelDesc;
   signingCredential: Web3SigningCredentialPrivateKeyHex;
   networkConfig: NetworkConfig;
+  provider: ethers.providers.JsonRpcProvider;
   gasConfig?: GasTransactionConfig;
 }
 
@@ -90,15 +90,4 @@ export abstract class CarbonMarketplaceAbstract {
   public abstract getVCUMetadata(
     req: GetVCUMetadataRequest,
   ): Promise<VCUMetadata>;
-
-  /**
-   * Abstract operation that retrieves the current price (in USDC) of a Unit token from a marketplace.
-   * @param {GetPurchasePriceRequest} request - The request object containing details for the purchase.
-   * @returns {Promise<GetPurchasePriceResponse>} The current price for the amount of Unit tokens in USDC.
-   * @throws Will throw an error if the retrieval fails.
-   * @abstract
-   */
-  public abstract getPurchasePrice(
-    request: GetPurchasePriceRequest,
-  ): Promise<GetPurchasePriceResponse>;
 }

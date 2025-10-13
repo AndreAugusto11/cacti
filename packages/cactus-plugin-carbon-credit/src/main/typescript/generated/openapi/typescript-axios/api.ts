@@ -92,7 +92,7 @@ export interface GetPurchasePriceRequest {
      * @type {Marketplace}
      * @memberof GetPurchasePriceRequest
      */
-    'platform': Marketplace;
+    'marketplace': Marketplace;
     /**
      * 
      * @type {Network}
@@ -107,10 +107,10 @@ export interface GetPurchasePriceRequest {
     'unit': string;
     /**
      * The amount of Units to price.
-     * @type {number}
+     * @type {string}
      * @memberof GetPurchasePriceRequest
      */
-    'amount': number;
+    'amount': string;
 }
 
 
@@ -122,10 +122,10 @@ export interface GetPurchasePriceRequest {
 export interface GetPurchasePriceResponse {
     /**
      * The current price in USDC for the requested amount.
-     * @type {string}
+     * @type {number}
      * @memberof GetPurchasePriceResponse
      */
-    'price': string;
+    'price': number;
 }
 /**
  * 

@@ -1,25 +1,64 @@
 import { Network } from "./public-api";
 
-export const TOKEN_ADDRESSES = {
+interface TokenInfo {
+  address: string;
+  decimals: number;
+  symbol: string;
+  name: string;
+}
+
+interface DexInfo {
+  factory: string;
+  router: string;
+}
+
+export const TOKEN_ADDRESSES: Record<string, Record<string, TokenInfo>> = {
   polygon: {
-    NCT: "0xD838290e877E0188a4A44700463419ED96c16107",
-    USDC: "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
+    NCT: {
+      address: "0xD838290e877E0188a4A44700463419ED96c16107",
+      decimals: 18,
+      symbol: "NCT",
+      name: "Toucan Protocol: Nature Carbon Tonne",
+    },
+    USDC: {
+      address: "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
+      decimals: 6,
+      symbol: "USDC",
+      name: "USD Coin (PoS)",
+    },
   },
   celo: {
-    NCT: "0xD838290e877E0188a4A44700463419ED96c16107",
-    USDC: "0x765DE816845861e75A25fCA122bb6898B8B1282a",
+    NCT: {
+      address: "0x02De4766C272abc10Bc88c220D214A26960a7e92",
+      decimals: 18,
+      symbol: "NCT",
+      name: "Toucan Protocol: Nature Carbon Tonne",
+    },
+    USDC: {
+      address: "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
+      decimals: 6,
+      symbol: "USDC",
+      name: "USD Coin (PoS)",
+    },
   },
 };
 
 export const DEFAULT_DEX = {
-  polygon: "0x",
-  celo: "0x",
+  polygon: {
+    factory: "0xc35DADB65012eC5796536bD9864eD8773aBc74C4", // SushiSwap V2
+    router: "0x1b02da8cb0d097eb8d57a175b88c7d8b47997506", // SushiSwap V2
+  },
+  celo: {
+    factory: "", // TODO
+    router: "", // TODO
+  },
 };
 
-export async function getTokenAddress(
-  network: Network,
-  tokenSymbol: string,
-): Promise<string> {
+export function getTokenAddress(network: Network, tokenSymbol: string): string {
+  return getToken(network, tokenSymbol).address;
+}
+
+export function getToken(network: Network, tokenSymbol: string): TokenInfo {
   switch (network) {
     case Network.Polygon:
       if (tokenSymbol === "NCT") {
@@ -42,7 +81,7 @@ export async function getTokenAddress(
   }
 }
 
-export async function getDefaultDex(network: Network): Promise<string> {
+export function getDefaultDex(network: Network): DexInfo {
   switch (network) {
     case Network.Polygon:
       return DEFAULT_DEX.polygon;

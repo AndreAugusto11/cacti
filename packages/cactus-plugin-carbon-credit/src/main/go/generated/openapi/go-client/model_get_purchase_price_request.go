@@ -19,21 +19,21 @@ var _ MappedNullable = &GetPurchasePriceRequest{}
 
 // GetPurchasePriceRequest struct for GetPurchasePriceRequest
 type GetPurchasePriceRequest struct {
-	Platform Marketplace `json:"platform"`
+	Marketplace Marketplace `json:"marketplace"`
 	Network Network `json:"network"`
 	// The token address to retrieve the price for.
 	Unit string `json:"unit"`
 	// The amount of Units to price.
-	Amount float32 `json:"amount"`
+	Amount string `json:"amount"`
 }
 
 // NewGetPurchasePriceRequest instantiates a new GetPurchasePriceRequest object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewGetPurchasePriceRequest(platform Marketplace, network Network, unit string, amount float32) *GetPurchasePriceRequest {
+func NewGetPurchasePriceRequest(marketplace Marketplace, network Network, unit string, amount string) *GetPurchasePriceRequest {
 	this := GetPurchasePriceRequest{}
-	this.Platform = platform
+	this.Marketplace = marketplace
 	this.Network = network
 	this.Unit = unit
 	this.Amount = amount
@@ -48,28 +48,28 @@ func NewGetPurchasePriceRequestWithDefaults() *GetPurchasePriceRequest {
 	return &this
 }
 
-// GetPlatform returns the Platform field value
-func (o *GetPurchasePriceRequest) GetPlatform() Marketplace {
+// GetMarketplace returns the Marketplace field value
+func (o *GetPurchasePriceRequest) GetMarketplace() Marketplace {
 	if o == nil {
 		var ret Marketplace
 		return ret
 	}
 
-	return o.Platform
+	return o.Marketplace
 }
 
-// GetPlatformOk returns a tuple with the Platform field value
+// GetMarketplaceOk returns a tuple with the Marketplace field value
 // and a boolean to check if the value has been set.
-func (o *GetPurchasePriceRequest) GetPlatformOk() (*Marketplace, bool) {
+func (o *GetPurchasePriceRequest) GetMarketplaceOk() (*Marketplace, bool) {
 	if o == nil {
 		return nil, false
 	}
-	return &o.Platform, true
+	return &o.Marketplace, true
 }
 
-// SetPlatform sets field value
-func (o *GetPurchasePriceRequest) SetPlatform(v Marketplace) {
-	o.Platform = v
+// SetMarketplace sets field value
+func (o *GetPurchasePriceRequest) SetMarketplace(v Marketplace) {
+	o.Marketplace = v
 }
 
 // GetNetwork returns the Network field value
@@ -121,9 +121,9 @@ func (o *GetPurchasePriceRequest) SetUnit(v string) {
 }
 
 // GetAmount returns the Amount field value
-func (o *GetPurchasePriceRequest) GetAmount() float32 {
+func (o *GetPurchasePriceRequest) GetAmount() string {
 	if o == nil {
-		var ret float32
+		var ret string
 		return ret
 	}
 
@@ -132,7 +132,7 @@ func (o *GetPurchasePriceRequest) GetAmount() float32 {
 
 // GetAmountOk returns a tuple with the Amount field value
 // and a boolean to check if the value has been set.
-func (o *GetPurchasePriceRequest) GetAmountOk() (*float32, bool) {
+func (o *GetPurchasePriceRequest) GetAmountOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -140,7 +140,7 @@ func (o *GetPurchasePriceRequest) GetAmountOk() (*float32, bool) {
 }
 
 // SetAmount sets field value
-func (o *GetPurchasePriceRequest) SetAmount(v float32) {
+func (o *GetPurchasePriceRequest) SetAmount(v string) {
 	o.Amount = v
 }
 
@@ -154,7 +154,7 @@ func (o GetPurchasePriceRequest) MarshalJSON() ([]byte, error) {
 
 func (o GetPurchasePriceRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	toSerialize["platform"] = o.Platform
+	toSerialize["marketplace"] = o.Marketplace
 	toSerialize["network"] = o.Network
 	toSerialize["unit"] = o.Unit
 	toSerialize["amount"] = o.Amount

@@ -23,8 +23,6 @@ import {
   GetAvailableTCO2sRequest,
   GetAvailableTCO2sResponse,
   GetVCUMetadataRequest,
-  GetPurchasePriceRequest,
-  GetPurchasePriceResponse,
   VCUMetadata,
   Network,
 } from "../public-api";
@@ -34,6 +32,7 @@ import { utils } from "ethers";
 import { Network as ToucanNetwork } from "toucan-sdk/dist/types";
 import dotenv from "dotenv";
 import { getDefaultDex, getTokenAddress } from "../utils";
+
 dotenv.config({ path: "packages/cactus-plugin-carbon-credit/.env" });
 
 export interface IToucanLeafOptions extends CarbonMarketplaceAbstractOptions {}
@@ -70,9 +69,7 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
     }
     this.signingCredential = options.signingCredential;
 
-    this.provider = new ethers.providers.JsonRpcProvider(
-      options.networkConfig.rpcUrl,
-    );
+    this.provider = options.provider;
 
     this.signer = new ethers.Wallet(
       this.signingCredential.secret,
@@ -116,7 +113,7 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
 
       // 1. Setup
       const router = new ethers.Contract(
-        await getDefaultDex(request.network),
+        await getDefaultDex(request.network).router,
         [
           "function swapExactTokensForTokens(uint256 amountIn,uint256 amountOutMin,address[] path,address to,uint256 deadline) external returns (uint256[] memory)",
         ],
@@ -415,40 +412,5 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
       this.logger.error("Error in getVCUMetadata:", err);
       throw new Error(`VCU with ID ${_req.vcuIdentifier} not found.`);
     }
-  }
-
-  public async getPurchasePrice(
-    request: GetPurchasePriceRequest,
-  ): Promise<GetPurchasePriceResponse> {
-    // Placeholder logic for price retrieval
-    this.logger.info(
-      `Fetching purchase price for ${request.amount} units of carbon credits.`,
-    );
-
-    // Sushi/Uniswap-v2-compatible router on Polygon
-    const router = new ethers.Contract(
-      await getDefaultDex(request.network),
-      [
-        "function getAmountsIn(uint256 amountOut, address[] calldata path) external view returns (uint256[] memory)",
-      ],
-      this.provider,
-    );
-    // Inputs
-    const USDC = await getTokenAddress(request.network, "USDC"); // e.g. 6 decimals
-    const UNIT = request.unit; // Unit token to price (e.g. NCT, 18 decimals)
-    const unitAmount = utils.parseUnits(request.amount.toString(), 18); // price 10 Units
-    // USDC -> UNIT path
-    const path = [USDC, UNIT];
-    // amounts[0] = USDC required, amounts[1] = UNIT out
-    const amounts = await router.getAmountsIn(unitAmount, path);
-    const usdcRequired = amounts[0];
-
-    this.logger.info(
-      `The total purchase price for ${request.amount} units is ${usdcRequired} USDC.`,
-    );
-
-    return {
-      price: usdcRequired.toString(),
-    };
   }
 }

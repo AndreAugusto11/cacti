@@ -315,24 +315,24 @@
       "GetPurchasePriceRequest": {
         "type": "object",
         "properties": {
-          "platform": { "$ref": "#/components/schemas/Marketplace" },
+          "marketplace": { "$ref": "#/components/schemas/Marketplace" },
           "network": { "$ref": "#/components/schemas/Network" },
           "unit": {
             "type": "string",
             "description": "The token address to retrieve the price for."
           },
           "amount": {
-            "type": "number",
+            "type": "string",
             "description": "The amount of Units to price."
           }
         },
-        "required": ["platform", "network", "unit", "amount"]
+        "required": ["marketplace", "network", "unit", "amount"]
       },
       "GetPurchasePriceResponse": {
         "type": "object",
         "properties": {
           "price": {
-            "type": "string",
+            "type": "integer",
             "description": "The current price in USDC for the requested amount."
           }
         },

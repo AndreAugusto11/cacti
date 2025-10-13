@@ -401,11 +401,11 @@ components:
     GetPurchasePriceRequest:
       example:
         unit: unit
-        amount: 0.8008281904610115
-        platform: null
+        amount: amount
+        marketplace: null
         network: null
       properties:
-        platform:
+        marketplace:
           $ref: '#/components/schemas/Marketplace'
         network:
           $ref: '#/components/schemas/Network'
@@ -414,20 +414,20 @@ components:
           type: string
         amount:
           description: The amount of Units to price.
-          type: number
+          type: string
       required:
       - amount
+      - marketplace
       - network
-      - platform
       - unit
       type: object
     GetPurchasePriceResponse:
       example:
-        price: price
+        price: 0
       properties:
         price:
           description: The current price in USDC for the requested amount.
-          type: string
+          type: integer
       required:
       - price
       type: object
