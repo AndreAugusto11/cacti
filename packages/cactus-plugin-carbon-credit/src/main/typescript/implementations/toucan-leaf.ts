@@ -111,7 +111,6 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async specificBuy(
     _request: SpecificBuyRequest,
   ): Promise<SpecificBuyResponse> {
@@ -169,14 +168,16 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
       );
 
       const tco2s = receipt.items.addresses; // TCO2 token addresses
-      const tonnes = _request.items.map((item) =>
-        utils.parseUnits(item.amount.toString(), 18),
-      );
-      const amount = tonnes.reduce((a, b) => a + b.toBigInt(), 0n).toString();
+      const tonnes = Object.values(_request.items);
+
+      // Convert tonnes to BigNumber[]
+      const tonnesBigNumber = tonnes.map((t) => ethers.BigNumber.from(t));
+
+      const amount = tonnes.reduce((a, b) => a + BigInt(b), 0n).toString();
 
       await nct.approve(nct.target, 2n ** 256n); // infinite approval per #332
-      await this.toucanClient.redeemMany("NCT", tco2s, tonnes);
-      const tco2ListString = tco2s.map((addr: any, i: number) => ({
+      await this.toucanClient.redeemMany("NCT", tco2s, tonnesBigNumber);
+      const tco2ListString = tco2s.map((addr: string, i: number) => ({
         address: addr,
         amount: tonnes[i],
       }));
@@ -201,25 +202,6 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
     try {
       const fnTag = `${ToucanLeaf.CLASS_NAME}#randomBuy()`;
       this.logger.info(`Received buy request for ${_request.amount} units.`);
-
-      // 2. Obter o saldo de CELO (token nativo) da carteira
-      const nativeBalance = await this.provider.getBalance(
-        this.signer.getAddress(),
-      );
-      // Usamos .getAddress() em vez de .address para garantir que o endereço é carregado, se necessário.
-
-      // Defina um valor mínimo razoável para o gás (ex: 0.05 CELO, ou 5e16 wei)
-      // Este é apenas um limite de segurança para a execução
-      const MIN_FUNDS_REQUIRED = ethers.utils.parseEther("0.05");
-
-      if (nativeBalance.lt(MIN_FUNDS_REQUIRED)) {
-        this.logger.error(
-          `${fnTag} Saldo de CELO insuficiente. Necessário: > ${ethers.utils.formatEther(MIN_FUNDS_REQUIRED)} CELO. Saldo Atual: ${ethers.utils.formatEther(nativeBalance)} CELO.`,
-        );
-        throw new Error(
-          "Erro de Fundos Insuficientes: Adicione CELO à carteira para taxas de gás.",
-        );
-      }
 
       // // 1. Setup
       // const router = new ethers.Contract(
@@ -312,6 +294,7 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public retire(_request: RetireRequest): Promise<RetireResponse> {
     throw new Error("Method not implemented.");
   }

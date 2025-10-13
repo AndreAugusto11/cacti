@@ -25,6 +25,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/SpecificBuyResponse'
           description: Successful response
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/@hyperledger/cactus-plugin-carbon-credit/specific-buy
   /api/v1/@hyperledger/cactus-plugin-carbon-credit/random-buy:
     post:
       description: Acquire a random basket of TCO2s from a marketplace.
@@ -41,10 +45,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/RandomBuyResponse'
           description: Successful response
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/@hyperledger/cactus-plugin-carbon-credit/random-buy
   /api/v1/@hyperledger/cactus-plugin-carbon-credit/retire:
     post:
-      description: Abstract burn operation that finalizes an offset on the underlying
-        registry for a specific beneficiary and message.
+      description: Retire a specific basket of TCO2s on a marketplace.
       operationId: retireRequest
       requestBody:
         content:
@@ -62,10 +69,10 @@ paths:
         http:
           verbLowerCase: post
           path: /api/v1/@hyperledger/cactus-plugin-carbon-credit/retire
-  /api/v1/@hyperledger/cactus-plugin-carbon-credit/get-available-vcus:
-    get:
-      description: Get a list of available VCUs (Verified Carbon Units).
-      operationId: getAvailableVCUsRequest
+  /api/v1/@hyperledger/cactus-plugin-carbon-credit/get-available-tco2s:
+    post:
+      description: Get a list of available TCO2s (Tokenized Carbon Offset Units).
+      operationId: getAvailableTCO2sRequest
       requestBody:
         content:
           application/json:
@@ -80,8 +87,8 @@ paths:
           description: Successful response with a list of available VCUs.
       x-hyperledger-cacti:
         http:
-          verbLowerCase: get
-          path: /api/v1/@hyperledger/cactus-plugin-carbon-credit/get-available-vcus
+          verbLowerCase: post
+          path: /api/v1/@hyperledger/cactus-plugin-carbon-credit/get-available-tco2s
   /api/v1/@hyperledger/cactus-plugin-carbon-credit/get-vcu-metadata:
     post:
       description: Get metadata for a specific VCU.
@@ -102,6 +109,26 @@ paths:
         http:
           verbLowerCase: post
           path: /api/v1/@hyperledger/cactus-plugin-carbon-credit/get-vcu-metadata
+  /api/v1/@hyperledger/cactus-plugin-carbon-credit/get-purchase-price:
+    get:
+      description: Get the purchase price for a specific VCU.
+      operationId: getPurchasePriceRequest
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetPurchasePriceRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPurchasePriceResponse'
+          description: Successful response with VCU metadata.
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: get
+          path: /api/v1/@hyperledger/cactus-plugin-carbon-credit/get-purchase-price
 components:
   schemas:
     Marketplace:
@@ -122,10 +149,7 @@ components:
         paymentToken: paymentToken
         marketplace: null
         items:
-        - amount: 0.8008281904610115
-          address: address
-        - amount: 0.8008281904610115
-          address: address
+          key: 0.8008281904610115
         walletObject: walletObject
         network: null
       properties:
@@ -136,9 +160,10 @@ components:
         paymentToken:
           type: string
         items:
-          items:
-            $ref: '#/components/schemas/SpecificBuyRequest_items_inner'
-          type: array
+          additionalProperties:
+            type: number
+          description: A mapping from address (string) to amount (number).
+          type: object
         walletObject:
           type: string
       required:
@@ -364,6 +389,11 @@ components:
       - totalSupply
       type: object
     GetPurchasePriceRequest:
+      example:
+        unit: unit
+        amount: 0.8008281904610115
+        platform: null
+        network: null
       properties:
         platform:
           $ref: '#/components/schemas/Marketplace'
@@ -382,25 +412,14 @@ components:
       - unit
       type: object
     GetPurchasePriceResponse:
+      example:
+        price: price
       properties:
         price:
           description: The current price in USDC for the requested amount.
           type: string
       required:
       - price
-      type: object
-    SpecificBuyRequest_items_inner:
-      example:
-        amount: 0.8008281904610115
-        address: address
-      properties:
-        address:
-          type: string
-        amount:
-          type: number
-      required:
-      - address
-      - amount
       type: object
     SpecificBuyResponse_tco2List_inner:
       example:

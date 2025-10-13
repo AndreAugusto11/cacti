@@ -77,7 +77,8 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*DefaultApi* | [**GetAvailableVCUsRequest**](docs/DefaultApi.md#getavailablevcusrequest) | **Get** /api/v1/@hyperledger/cactus-plugin-carbon-credit/get-available-vcus | 
+*DefaultApi* | [**GetAvailableTCO2sRequest**](docs/DefaultApi.md#getavailabletco2srequest) | **Post** /api/v1/@hyperledger/cactus-plugin-carbon-credit/get-available-tco2s | 
+*DefaultApi* | [**GetPurchasePriceRequest**](docs/DefaultApi.md#getpurchasepricerequest) | **Get** /api/v1/@hyperledger/cactus-plugin-carbon-credit/get-purchase-price | 
 *DefaultApi* | [**GetVCUMetadataRequest**](docs/DefaultApi.md#getvcumetadatarequest) | **Post** /api/v1/@hyperledger/cactus-plugin-carbon-credit/get-vcu-metadata | 
 *DefaultApi* | [**RandomBuyRequest**](docs/DefaultApi.md#randombuyrequest) | **Post** /api/v1/@hyperledger/cactus-plugin-carbon-credit/random-buy | 
 *DefaultApi* | [**RetireRequest**](docs/DefaultApi.md#retirerequest) | **Post** /api/v1/@hyperledger/cactus-plugin-carbon-credit/retire | 
@@ -98,7 +99,6 @@ Class | Method | HTTP request | Description
  - [RetireRequest](docs/RetireRequest.md)
  - [RetireResponse](docs/RetireResponse.md)
  - [SpecificBuyRequest](docs/SpecificBuyRequest.md)
- - [SpecificBuyRequestItemsInner](docs/SpecificBuyRequestItemsInner.md)
  - [SpecificBuyResponse](docs/SpecificBuyResponse.md)
  - [SpecificBuyResponseTco2ListInner](docs/SpecificBuyResponseTco2ListInner.md)
  - [VCUMetadata](docs/VCUMetadata.md)

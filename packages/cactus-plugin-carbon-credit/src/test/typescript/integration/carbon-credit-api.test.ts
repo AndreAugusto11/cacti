@@ -15,10 +15,10 @@ import { Configuration } from "@hyperledger/cactus-core-api";
 import {
   DefaultApi as CarbonCreditApi,
   PluginCarbonCredit,
-  BuyRequest,
+  RandomBuyRequest,
   RetireRequest,
   GetVCUMetadataRequest,
-  GetAvailableVCUsRequest,
+  GetAvailableTCO2sRequest,
   Network,
 } from "../../../main/typescript/public-api";
 import { Web3SigningCredentialPrivateKeyHex } from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
@@ -66,16 +66,16 @@ describe("Carbon Credit API Integration Tests", () => {
     await Servers.shutdown(server);
   });
 
-  test("buy endpoint returns placeholder data", async () => {
-    const request: BuyRequest = {
-      platform: "Toucan",
+  test("random buy endpoint returns placeholder data", async () => {
+    const request: RandomBuyRequest = {
+      marketplace: "Toucan",
       network: Network.Polygon,
       paymentToken: "USDC",
       amount: 100,
       walletObject: "test-wallet",
     };
 
-    const response = await apiClient.buyRequest(request);
+    const response = await apiClient.randomBuyRequest(request);
 
     expect(response).toBeDefined();
     expect(response.status).toEqual(200);
@@ -84,12 +84,13 @@ describe("Carbon Credit API Integration Tests", () => {
 
   test("retire endpoint returns placeholder data", async () => {
     const request: RetireRequest = {
-      platform: "Toucan",
+      marketplace: "Toucan",
       network: Network.Polygon,
       walletObject: "test-wallet",
-      objectsList: ["0xABCD"],
+      tco2s: ["0xABCD"],
       amounts: [100],
-      beneficiary: "test-beneficiary",
+      beneficiaryAddress: "test-beneficiary",
+      beneficiaryName: "Test Beneficiary",
       message: "Test retirement",
       retirementReason: "Testing",
     };
@@ -101,13 +102,13 @@ describe("Carbon Credit API Integration Tests", () => {
     expect(response.data).toBeDefined();
   });
 
-  test("getAvailableVCUs endpoint returns a list of VCUs", async () => {
-    const request: GetAvailableVCUsRequest = {
-      platform: "Toucan",
+  test("getAvailableTCO2s endpoint returns a list of TCO2s", async () => {
+    const request: GetAvailableTCO2sRequest = {
+      marketplace: "Toucan",
       network: Network.Polygon,
     };
 
-    const response = await apiClient.getAvailableVCUsRequest(request);
+    const response = await apiClient.getAvailableTCO2sRequest(request);
 
     expect(response).toBeDefined();
     expect(response.status).toEqual(200);
@@ -116,7 +117,7 @@ describe("Carbon Credit API Integration Tests", () => {
 
   test("getVCUMetadata endpoint returns metadata for a valid VCU ID", async () => {
     const request: GetVCUMetadataRequest = {
-      platform: "Toucan",
+      marketplace: "Toucan",
       network: Network.Polygon,
       projectIdentifier: "project-1234",
       vcuIdentifier: "VCU-1234",

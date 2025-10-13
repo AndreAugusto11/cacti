@@ -18,7 +18,7 @@ import {
 import { SpecificBuyEndpoint } from "./web-services/specific-buy-endpoint";
 import { RandomBuyEndpoint } from "./web-services/radom-buy-endpoints";
 import { RetireEndpoint } from "./web-services/retire-endpoint";
-import { GetAvailableVCUsEndpoint } from "./web-services/get-available-vcus-endpoint";
+import { GetAvailableTCO2sEndpoint } from "./web-services/get-available-tco2s-endpoint";
 import { GetVCUMetadataEndpoint } from "./web-services/get-vcu-metadata-endpoint";
 import { GetPurchasePriceEndpoint } from "./web-services/get-purchase-price";
 import { Web3SigningCredentialPrivateKeyHex } from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
@@ -119,7 +119,7 @@ export class PluginCarbonCredit implements ICactusPlugin, IPluginWebService {
       endpoints.push(endpoint);
     }
     {
-      const endpoint = new GetAvailableVCUsEndpoint({
+      const endpoint = new GetAvailableTCO2sEndpoint({
         connector: this,
         logLevel: this.options.logLevel,
       });

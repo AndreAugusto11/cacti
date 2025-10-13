@@ -22,7 +22,8 @@ type SpecificBuyRequest struct {
 	Marketplace Marketplace `json:"marketplace"`
 	Network Network `json:"network"`
 	PaymentToken string `json:"paymentToken"`
-	Items []SpecificBuyRequestItemsInner `json:"items"`
+	// A mapping from address (string) to amount (number).
+	Items map[string]float32 `json:"items"`
 	WalletObject string `json:"walletObject"`
 }
 
@@ -30,7 +31,7 @@ type SpecificBuyRequest struct {
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewSpecificBuyRequest(marketplace Marketplace, network Network, paymentToken string, items []SpecificBuyRequestItemsInner, walletObject string) *SpecificBuyRequest {
+func NewSpecificBuyRequest(marketplace Marketplace, network Network, paymentToken string, items map[string]float32, walletObject string) *SpecificBuyRequest {
 	this := SpecificBuyRequest{}
 	this.Marketplace = marketplace
 	this.Network = network
@@ -121,9 +122,9 @@ func (o *SpecificBuyRequest) SetPaymentToken(v string) {
 }
 
 // GetItems returns the Items field value
-func (o *SpecificBuyRequest) GetItems() []SpecificBuyRequestItemsInner {
+func (o *SpecificBuyRequest) GetItems() map[string]float32 {
 	if o == nil {
-		var ret []SpecificBuyRequestItemsInner
+		var ret map[string]float32
 		return ret
 	}
 
@@ -132,15 +133,15 @@ func (o *SpecificBuyRequest) GetItems() []SpecificBuyRequestItemsInner {
 
 // GetItemsOk returns a tuple with the Items field value
 // and a boolean to check if the value has been set.
-func (o *SpecificBuyRequest) GetItemsOk() ([]SpecificBuyRequestItemsInner, bool) {
+func (o *SpecificBuyRequest) GetItemsOk() (*map[string]float32, bool) {
 	if o == nil {
 		return nil, false
 	}
-	return o.Items, true
+	return &o.Items, true
 }
 
 // SetItems sets field value
-func (o *SpecificBuyRequest) SetItems(v []SpecificBuyRequestItemsInner) {
+func (o *SpecificBuyRequest) SetItems(v map[string]float32) {
 	o.Items = v
 }
 

@@ -24,20 +24,20 @@ import {
 
 import OAS from "../../json/openapi.json";
 
-export interface IGetAvailableVCUsEndpointOptions {
+export interface IGetAvailableTCO2sEndpointOptions {
   logLevel?: LogLevelDesc;
   connector: PluginCarbonCredit;
 }
 
-export class GetAvailableVCUsEndpoint implements IWebServiceEndpoint {
-  public static readonly CLASS_NAME = "GetAvailableVCUsEndpoint";
+export class GetAvailableTCO2sEndpoint implements IWebServiceEndpoint {
+  public static readonly CLASS_NAME = "GetAvailableTCO2sEndpoint";
   private readonly log: Logger;
 
   public get className(): string {
-    return GetAvailableVCUsEndpoint.CLASS_NAME;
+    return GetAvailableTCO2sEndpoint.CLASS_NAME;
   }
 
-  constructor(public readonly options: IGetAvailableVCUsEndpointOptions) {
+  constructor(public readonly options: IGetAvailableTCO2sEndpointOptions) {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(options, `${fnTag} arg options`);
     Checks.truthy(options.connector, `${fnTag} arg options.connector`);
@@ -47,9 +47,9 @@ export class GetAvailableVCUsEndpoint implements IWebServiceEndpoint {
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public get oasPath(): (typeof OAS.paths)["/api/v1/@hyperledger/cactus-plugin-carbon-credit/get-available-vcus"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/@hyperledger/cactus-plugin-carbon-credit/get-available-tco2s"] {
     return OAS.paths[
-      "/api/v1/@hyperledger/cactus-plugin-carbon-credit/get-available-vcus"
+      "/api/v1/@hyperledger/cactus-plugin-carbon-credit/get-available-tco2s"
     ];
   }
 

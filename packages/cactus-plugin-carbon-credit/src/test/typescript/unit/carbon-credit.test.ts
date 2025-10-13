@@ -17,7 +17,6 @@ const pluginOptions: IPluginCarbonCreditOptions = {
   instanceId: "test-instance-id",
   signingCredential: {
     ethAccount: "0xb5271339c211cC1EEeD30a2f9f447063a5faD1F0",
-    //secret: process.env.PRIVATE_KEY!,
     secret: "739ed7c97109f28bc8f13b354b30bbd01a47061be7676c3c3934aa4a56540de4",
   } as Web3SigningCredentialPrivateKeyHex,
   logLevel: "DEBUG",
@@ -31,7 +30,24 @@ describe("PluginCarbonCredit Functionality", () => {
   });
 
   describe("Buy Functionality", () => {
-    test("Buy function returns the correct placeholder data", async () => {
+    test("Specific buy function returns the correct placeholder data", async () => {
+      const request = {
+        marketplace: Marketplace.Toucan,
+        network: Network.Alfajores,
+        paymentToken: "0x2F25deB3848C207fc8E0c34035B3Ba7fC157602B", // USDC on Alfajores
+        items: { "0xABCD": 10, "0x1234": 199 },
+        walletObject: "wallet-address-placeholder",
+      };
+
+      const response = await plugin.specificBuy(request);
+
+      expect(response).toBeDefined();
+      expect(response.txHashSwap).toBe("txHashSwap_placeholder");
+      expect(response.assetAmount).toBe("100");
+      expect(response.tco2List).toEqual(["0xABCD", "0x1234"]);
+    });
+
+    test("Random buy function returns the correct placeholder data", async () => {
       const request = {
         marketplace: Marketplace.Toucan,
         network: Network.Alfajores,

@@ -50,36 +50,10 @@ export class RandomBuyEndpoint implements IWebServiceEndpoint {
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public get oasPath(): (typeof OAS.paths)["/api/v1/@hyperledger/cactus-plugin-carbon-credit/specific-buy"] & {
-    post: {
-      "x-hyperledger-cacti": {
-        http: {
-          path: string;
-          verbLowerCase: string;
-        };
-      };
-      operationId: string;
-      description: string;
-      requestBody: any;
-      responses: any;
-    };
-  } {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/@hyperledger/cactus-plugin-carbon-credit/random-buy"] {
     return OAS.paths[
-      "/api/v1/@hyperledger/cactus-plugin-carbon-credit/specific-buy"
-    ] as (typeof OAS.paths)["/api/v1/@hyperledger/cactus-plugin-carbon-credit/specific-buy"] & {
-      post: {
-        "x-hyperledger-cacti": {
-          http: {
-            path: string;
-            verbLowerCase: string;
-          };
-        };
-        operationId: string;
-        description: string;
-        requestBody: any;
-        responses: any;
-      };
-    };
+      "/api/v1/@hyperledger/cactus-plugin-carbon-credit/random-buy"
+    ];
   }
 
   public getPath(): string {

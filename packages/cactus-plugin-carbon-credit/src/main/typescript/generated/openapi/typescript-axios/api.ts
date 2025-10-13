@@ -362,11 +362,11 @@ export interface SpecificBuyRequest {
      */
     'paymentToken': string;
     /**
-     * 
-     * @type {Array<SpecificBuyRequestItemsInner>}
+     * A mapping from address (string) to amount (number).
+     * @type {{ [key: string]: number; }}
      * @memberof SpecificBuyRequest
      */
-    'items': Array<SpecificBuyRequestItemsInner>;
+    'items': { [key: string]: number; };
     /**
      * 
      * @type {string}
@@ -376,25 +376,6 @@ export interface SpecificBuyRequest {
 }
 
 
-/**
- * 
- * @export
- * @interface SpecificBuyRequestItemsInner
- */
-export interface SpecificBuyRequestItemsInner {
-    /**
-     * 
-     * @type {string}
-     * @memberof SpecificBuyRequestItemsInner
-     */
-    'address': string;
-    /**
-     * 
-     * @type {number}
-     * @memberof SpecificBuyRequestItemsInner
-     */
-    'amount': number;
-}
 /**
  * 
  * @export
@@ -509,13 +490,46 @@ export interface VCUMetadataAttributes {
 export const DefaultApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * Get a list of available VCUs (Verified Carbon Units).
+         * Get a list of available TCO2s (Tokenized Carbon Offset Units).
          * @param {GetAvailableTCO2sRequest} [getAvailableTCO2sRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAvailableVCUsRequest: async (getAvailableTCO2sRequest?: GetAvailableTCO2sRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/@hyperledger/cactus-plugin-carbon-credit/get-available-vcus`;
+        getAvailableTCO2sRequest: async (getAvailableTCO2sRequest?: GetAvailableTCO2sRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/@hyperledger/cactus-plugin-carbon-credit/get-available-tco2s`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(getAvailableTCO2sRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Get the purchase price for a specific VCU.
+         * @param {GetPurchasePriceRequest} [getPurchasePriceRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getPurchasePriceRequest: async (getPurchasePriceRequest?: GetPurchasePriceRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/@hyperledger/cactus-plugin-carbon-credit/get-purchase-price`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -534,7 +548,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(getAvailableTCO2sRequest, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(getPurchasePriceRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -608,7 +622,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * Abstract burn operation that finalizes an offset on the underlying registry for a specific beneficiary and message.
+         * Retire a specific basket of TCO2s on a marketplace.
          * @param {RetireRequest} [retireRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -684,13 +698,23 @@ export const DefaultApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = DefaultApiAxiosParamCreator(configuration)
     return {
         /**
-         * Get a list of available VCUs (Verified Carbon Units).
+         * Get a list of available TCO2s (Tokenized Carbon Offset Units).
          * @param {GetAvailableTCO2sRequest} [getAvailableTCO2sRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getAvailableVCUsRequest(getAvailableTCO2sRequest?: GetAvailableTCO2sRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetAvailableTCO2sResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getAvailableVCUsRequest(getAvailableTCO2sRequest, options);
+        async getAvailableTCO2sRequest(getAvailableTCO2sRequest?: GetAvailableTCO2sRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetAvailableTCO2sResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getAvailableTCO2sRequest(getAvailableTCO2sRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Get the purchase price for a specific VCU.
+         * @param {GetPurchasePriceRequest} [getPurchasePriceRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getPurchasePriceRequest(getPurchasePriceRequest?: GetPurchasePriceRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetPurchasePriceResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getPurchasePriceRequest(getPurchasePriceRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -714,7 +738,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Abstract burn operation that finalizes an offset on the underlying registry for a specific beneficiary and message.
+         * Retire a specific basket of TCO2s on a marketplace.
          * @param {RetireRequest} [retireRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -744,13 +768,22 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
     const localVarFp = DefaultApiFp(configuration)
     return {
         /**
-         * Get a list of available VCUs (Verified Carbon Units).
+         * Get a list of available TCO2s (Tokenized Carbon Offset Units).
          * @param {GetAvailableTCO2sRequest} [getAvailableTCO2sRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAvailableVCUsRequest(getAvailableTCO2sRequest?: GetAvailableTCO2sRequest, options?: any): AxiosPromise<GetAvailableTCO2sResponse> {
-            return localVarFp.getAvailableVCUsRequest(getAvailableTCO2sRequest, options).then((request) => request(axios, basePath));
+        getAvailableTCO2sRequest(getAvailableTCO2sRequest?: GetAvailableTCO2sRequest, options?: any): AxiosPromise<GetAvailableTCO2sResponse> {
+            return localVarFp.getAvailableTCO2sRequest(getAvailableTCO2sRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Get the purchase price for a specific VCU.
+         * @param {GetPurchasePriceRequest} [getPurchasePriceRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getPurchasePriceRequest(getPurchasePriceRequest?: GetPurchasePriceRequest, options?: any): AxiosPromise<GetPurchasePriceResponse> {
+            return localVarFp.getPurchasePriceRequest(getPurchasePriceRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * Get metadata for a specific VCU.
@@ -771,7 +804,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.randomBuyRequest(randomBuyRequest, options).then((request) => request(axios, basePath));
         },
         /**
-         * Abstract burn operation that finalizes an offset on the underlying registry for a specific beneficiary and message.
+         * Retire a specific basket of TCO2s on a marketplace.
          * @param {RetireRequest} [retireRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -799,14 +832,25 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
  */
 export class DefaultApi extends BaseAPI {
     /**
-     * Get a list of available VCUs (Verified Carbon Units).
+     * Get a list of available TCO2s (Tokenized Carbon Offset Units).
      * @param {GetAvailableTCO2sRequest} [getAvailableTCO2sRequest] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public getAvailableVCUsRequest(getAvailableTCO2sRequest?: GetAvailableTCO2sRequest, options?: AxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).getAvailableVCUsRequest(getAvailableTCO2sRequest, options).then((request) => request(this.axios, this.basePath));
+    public getAvailableTCO2sRequest(getAvailableTCO2sRequest?: GetAvailableTCO2sRequest, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getAvailableTCO2sRequest(getAvailableTCO2sRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Get the purchase price for a specific VCU.
+     * @param {GetPurchasePriceRequest} [getPurchasePriceRequest] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getPurchasePriceRequest(getPurchasePriceRequest?: GetPurchasePriceRequest, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getPurchasePriceRequest(getPurchasePriceRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -832,7 +876,7 @@ export class DefaultApi extends BaseAPI {
     }
 
     /**
-     * Abstract burn operation that finalizes an offset on the underlying registry for a specific beneficiary and message.
+     * Retire a specific basket of TCO2s on a marketplace.
      * @param {RetireRequest} [retireRequest] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}

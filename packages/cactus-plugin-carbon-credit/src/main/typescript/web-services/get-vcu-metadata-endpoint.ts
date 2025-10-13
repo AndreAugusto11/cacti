@@ -54,15 +54,15 @@ export class GetVCUMetadataEndpoint implements IWebServiceEndpoint {
   }
 
   public getPath(): string {
-    return this.oasPath.post["x-hyperledger-cacti"].http.path;
+    return this.oasPath.get["x-hyperledger-cacti"].http.path;
   }
 
   public getVerbLowerCase(): string {
-    return this.oasPath.post["x-hyperledger-cacti"].http.verbLowerCase;
+    return this.oasPath.get["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getOperationId(): string {
-    return this.oasPath.post.operationId;
+    return this.oasPath.get.operationId;
   }
 
   getAuthorizationOptionsProvider(): IAsyncProvider<IEndpointAuthzOptions> {

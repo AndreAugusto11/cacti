@@ -18,7 +18,6 @@ model_random_buy_response.go
 model_retire_request.go
 model_retire_response.go
 model_specific_buy_request.go
-model_specific_buy_request_items_inner.go
 model_specific_buy_response.go
 model_specific_buy_response_tco2_list_inner.go
 model_vcu_metadata.go

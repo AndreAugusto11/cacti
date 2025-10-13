@@ -32,22 +32,11 @@
             "type": "string"
           },
           "items": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "address": {
-                  "type": "string"
-                },
-                "amount": {
-                  "type": "number"
-                }
-              },
-              "required": [
-                "address",
-                "amount"
-              ]
-            }
+            "type": "object",
+            "additionalProperties": {
+              "type": "number"
+            },
+            "description": "A mapping from address (string) to amount (number)."
           },
           "walletObject": {
             "type": "string"
@@ -342,6 +331,12 @@
   "paths": {
     "/api/v1/@hyperledger/cactus-plugin-carbon-credit/specific-buy": {
       "post": {
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/@hyperledger/cactus-plugin-carbon-credit/specific-buy"
+          }
+        },
         "operationId": "specificBuyRequest",
         "description": "Acquire a specific basket of TCO2s from a marketplace.",
         "requestBody": {
@@ -369,6 +364,12 @@
     },
     "/api/v1/@hyperledger/cactus-plugin-carbon-credit/random-buy": {
       "post": {
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/@hyperledger/cactus-plugin-carbon-credit/random-buy"
+          }
+        },
         "operationId": "randomBuyRequest",
         "description": "Acquire a random basket of TCO2s from a marketplace.",
         "requestBody": {
@@ -403,7 +404,7 @@
           }
         },
         "operationId": "retireRequest",
-        "description": "Abstract burn operation that finalizes an offset on the underlying registry for a specific beneficiary and message.",
+        "description": "Retire a specific basket of TCO2s on a marketplace.",
         "requestBody": {
           "content": {
             "application/json": {
@@ -427,16 +428,16 @@
         }
       }
     },
-    "/api/v1/@hyperledger/cactus-plugin-carbon-credit/get-available-vcus": {
-      "get": {
+    "/api/v1/@hyperledger/cactus-plugin-carbon-credit/get-available-tco2s": {
+      "post": {
         "x-hyperledger-cacti": {
           "http": {
-            "verbLowerCase": "get",
-            "path": "/api/v1/@hyperledger/cactus-plugin-carbon-credit/get-available-vcus"
+            "verbLowerCase": "post",
+            "path": "/api/v1/@hyperledger/cactus-plugin-carbon-credit/get-available-tco2s"
           }
         },
-        "operationId": "getAvailableVCUsRequest",
-        "description": "Get a list of available VCUs (Verified Carbon Units).",
+        "operationId": "getAvailableTCO2sRequest",
+        "description": "Get a list of available TCO2s (Tokenized Carbon Offset Units).",
         "requestBody": {
           "content": {
             "application/json": {
@@ -486,6 +487,39 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/VCUMetadata"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/@hyperledger/cactus-plugin-carbon-credit/get-purchase-price": {
+      "get": {
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "get",
+            "path": "/api/v1/@hyperledger/cactus-plugin-carbon-credit/get-purchase-price"
+          }
+        },
+        "operationId": "getPurchasePriceRequest",
+        "description": "Get the purchase price for a specific VCU.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetPurchasePriceRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response with VCU metadata.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetPurchasePriceResponse"
                 }
               }
             }

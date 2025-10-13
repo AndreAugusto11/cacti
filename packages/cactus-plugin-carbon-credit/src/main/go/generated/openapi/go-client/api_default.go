@@ -22,31 +22,31 @@ import (
 // DefaultApiService DefaultApi service
 type DefaultApiService service
 
-type ApiGetAvailableVCUsRequestRequest struct {
+type ApiGetAvailableTCO2sRequestRequest struct {
 	ctx context.Context
 	ApiService *DefaultApiService
 	getAvailableTCO2sRequest *GetAvailableTCO2sRequest
 }
 
-func (r ApiGetAvailableVCUsRequestRequest) GetAvailableTCO2sRequest(getAvailableTCO2sRequest GetAvailableTCO2sRequest) ApiGetAvailableVCUsRequestRequest {
+func (r ApiGetAvailableTCO2sRequestRequest) GetAvailableTCO2sRequest(getAvailableTCO2sRequest GetAvailableTCO2sRequest) ApiGetAvailableTCO2sRequestRequest {
 	r.getAvailableTCO2sRequest = &getAvailableTCO2sRequest
 	return r
 }
 
-func (r ApiGetAvailableVCUsRequestRequest) Execute() (*GetAvailableTCO2sResponse, *http.Response, error) {
-	return r.ApiService.GetAvailableVCUsRequestExecute(r)
+func (r ApiGetAvailableTCO2sRequestRequest) Execute() (*GetAvailableTCO2sResponse, *http.Response, error) {
+	return r.ApiService.GetAvailableTCO2sRequestExecute(r)
 }
 
 /*
-GetAvailableVCUsRequest Method for GetAvailableVCUsRequest
+GetAvailableTCO2sRequest Method for GetAvailableTCO2sRequest
 
-Get a list of available VCUs (Verified Carbon Units).
+Get a list of available TCO2s (Tokenized Carbon Offset Units).
 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiGetAvailableVCUsRequestRequest
+ @return ApiGetAvailableTCO2sRequestRequest
 */
-func (a *DefaultApiService) GetAvailableVCUsRequest(ctx context.Context) ApiGetAvailableVCUsRequestRequest {
-	return ApiGetAvailableVCUsRequestRequest{
+func (a *DefaultApiService) GetAvailableTCO2sRequest(ctx context.Context) ApiGetAvailableTCO2sRequestRequest {
+	return ApiGetAvailableTCO2sRequestRequest{
 		ApiService: a,
 		ctx: ctx,
 	}
@@ -54,20 +54,20 @@ func (a *DefaultApiService) GetAvailableVCUsRequest(ctx context.Context) ApiGetA
 
 // Execute executes the request
 //  @return GetAvailableTCO2sResponse
-func (a *DefaultApiService) GetAvailableVCUsRequestExecute(r ApiGetAvailableVCUsRequestRequest) (*GetAvailableTCO2sResponse, *http.Response, error) {
+func (a *DefaultApiService) GetAvailableTCO2sRequestExecute(r ApiGetAvailableTCO2sRequestRequest) (*GetAvailableTCO2sResponse, *http.Response, error) {
 	var (
-		localVarHTTPMethod   = http.MethodGet
+		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
 		formFiles            []formFile
 		localVarReturnValue  *GetAvailableTCO2sResponse
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.GetAvailableVCUsRequest")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.GetAvailableTCO2sRequest")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/@hyperledger/cactus-plugin-carbon-credit/get-available-vcus"
+	localVarPath := localBasePath + "/api/v1/@hyperledger/cactus-plugin-carbon-credit/get-available-tco2s"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -92,6 +92,113 @@ func (a *DefaultApiService) GetAvailableVCUsRequestExecute(r ApiGetAvailableVCUs
 	}
 	// body params
 	localVarPostBody = r.getAvailableTCO2sRequest
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiGetPurchasePriceRequestRequest struct {
+	ctx context.Context
+	ApiService *DefaultApiService
+	getPurchasePriceRequest *GetPurchasePriceRequest
+}
+
+func (r ApiGetPurchasePriceRequestRequest) GetPurchasePriceRequest(getPurchasePriceRequest GetPurchasePriceRequest) ApiGetPurchasePriceRequestRequest {
+	r.getPurchasePriceRequest = &getPurchasePriceRequest
+	return r
+}
+
+func (r ApiGetPurchasePriceRequestRequest) Execute() (*GetPurchasePriceResponse, *http.Response, error) {
+	return r.ApiService.GetPurchasePriceRequestExecute(r)
+}
+
+/*
+GetPurchasePriceRequest Method for GetPurchasePriceRequest
+
+Get the purchase price for a specific VCU.
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiGetPurchasePriceRequestRequest
+*/
+func (a *DefaultApiService) GetPurchasePriceRequest(ctx context.Context) ApiGetPurchasePriceRequestRequest {
+	return ApiGetPurchasePriceRequestRequest{
+		ApiService: a,
+		ctx: ctx,
+	}
+}
+
+// Execute executes the request
+//  @return GetPurchasePriceResponse
+func (a *DefaultApiService) GetPurchasePriceRequestExecute(r ApiGetPurchasePriceRequestRequest) (*GetPurchasePriceResponse, *http.Response, error) {
+	var (
+		localVarHTTPMethod   = http.MethodGet
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *GetPurchasePriceResponse
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.GetPurchasePriceRequest")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/api/v1/@hyperledger/cactus-plugin-carbon-credit/get-purchase-price"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.getPurchasePriceRequest
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -361,7 +468,7 @@ func (r ApiRetireRequestRequest) Execute() (*RetireResponse, *http.Response, err
 /*
 RetireRequest Method for RetireRequest
 
-Abstract burn operation that finalizes an offset on the underlying registry for a specific beneficiary and message.
+Retire a specific basket of TCO2s on a marketplace.
 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiRetireRequestRequest

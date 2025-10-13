@@ -47,9 +47,9 @@ export class GetPurchasePriceEndpoint implements IWebServiceEndpoint {
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public get oasPath(): (typeof OAS.paths)["/api/v1/@hyperledger/cactus-plugin-carbon-credit/get-available-vcus"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/@hyperledger/cactus-plugin-carbon-credit/get-purchase-price"] {
     return OAS.paths[
-      "/api/v1/@hyperledger/cactus-plugin-carbon-credit/get-available-vcus"
+      "/api/v1/@hyperledger/cactus-plugin-carbon-credit/get-purchase-price"
     ];
   }
 
