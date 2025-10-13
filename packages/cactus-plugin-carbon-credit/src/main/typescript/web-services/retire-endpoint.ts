@@ -26,7 +26,7 @@ import OAS from "../../json/openapi.json";
 
 export interface IRetireEndpointOptions {
   logLevel?: LogLevelDesc;
-  connector: PluginCarbonCredit;
+  plugin: PluginCarbonCredit;
 }
 
 export class RetireEndpoint implements IWebServiceEndpoint {
@@ -41,7 +41,7 @@ export class RetireEndpoint implements IWebServiceEndpoint {
   constructor(public readonly options: IRetireEndpointOptions) {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(options, `${fnTag} arg options`);
-    Checks.truthy(options.connector, `${fnTag} arg options.connector`);
+    Checks.truthy(options.plugin, `${fnTag} arg options.plugin`);
 
     const level = options.logLevel || "INFO";
     const label = this.className;
@@ -122,7 +122,7 @@ export class RetireEndpoint implements IWebServiceEndpoint {
         `Received a retire request for ${amounts} units on marketplace ${marketplace}`,
       );
       const retireResponse: RetireResponse =
-        await this.options.connector.retire(reqBody);
+        await this.options.plugin.retire(reqBody);
       res.status(200).json(retireResponse);
     } catch (ex) {
       this.log.error(`Crash while serving ${reqTag}`, ex);

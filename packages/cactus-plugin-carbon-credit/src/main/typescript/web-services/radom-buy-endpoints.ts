@@ -18,7 +18,7 @@ import {
 import {
   RandomBuyRequest,
   RandomBuyResponse,
-} from "../generated/openapi/typescript-axios"; // confirmar depois se é necessário esse import
+} from "../generated/openapi/typescript-axios";
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
 import { PluginCarbonCredit } from "../plugin-carbon-credit";
@@ -27,13 +27,12 @@ import OAS from "../../json/openapi.json";
 
 export interface IBuyEndpointOptions {
   logLevel?: LogLevelDesc;
-  connector: PluginCarbonCredit;
+  plugin: PluginCarbonCredit;
 }
 
 export class RandomBuyEndpoint implements IWebServiceEndpoint {
   public static readonly CLASS_NAME = "RandomBuyEndpoint";
   private readonly log: Logger;
-  // private readonly connector: PluginCarbonCredit;
 
   public get className(): string {
     return RandomBuyEndpoint.CLASS_NAME;
@@ -42,9 +41,8 @@ export class RandomBuyEndpoint implements IWebServiceEndpoint {
   constructor(public readonly options: IBuyEndpointOptions) {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(options, `${fnTag} arg options`);
-    Checks.truthy(options.connector, `${fnTag} arg options.connector`);
+    Checks.truthy(options.plugin, `${fnTag} arg options.plugin`);
 
-    // this.connector = options.connector;
     const level = options.logLevel || "INFO";
     const label = this.className;
     this.log = LoggerProvider.getOrCreate({ level, label });
@@ -107,7 +105,7 @@ export class RandomBuyEndpoint implements IWebServiceEndpoint {
     try {
       this.log.info(`Received buy request for ${amount} units.`);
       const randomBuyResponse: RandomBuyResponse =
-        await this.options.connector.randomBuy(reqBody);
+        await this.options.plugin.randomBuy(reqBody);
       res.status(200).json(randomBuyResponse);
     } catch (ex) {
       this.log.error(`Crash while serving ${reqTag}`, ex);

@@ -26,7 +26,7 @@ import OAS from "../../json/openapi.json";
 
 export interface IGetAvailableVCUsEndpointOptions {
   logLevel?: LogLevelDesc;
-  connector: PluginCarbonCredit;
+  plugin: PluginCarbonCredit;
 }
 
 export class GetPurchasePriceEndpoint implements IWebServiceEndpoint {
@@ -40,7 +40,7 @@ export class GetPurchasePriceEndpoint implements IWebServiceEndpoint {
   constructor(public readonly options: IGetAvailableVCUsEndpointOptions) {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(options, `${fnTag} arg options`);
-    Checks.truthy(options.connector, `${fnTag} arg options.connector`);
+    Checks.truthy(options.plugin, `${fnTag} arg options.plugin`);
 
     const level = options.logLevel || "INFO";
     const label = this.className;
@@ -54,15 +54,15 @@ export class GetPurchasePriceEndpoint implements IWebServiceEndpoint {
   }
 
   public getPath(): string {
-    return this.oasPath.get["x-hyperledger-cacti"].http.path;
+    return this.oasPath.post["x-hyperledger-cacti"].http.path;
   }
 
   public getVerbLowerCase(): string {
-    return this.oasPath.get["x-hyperledger-cacti"].http.verbLowerCase;
+    return this.oasPath.post["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getOperationId(): string {
-    return this.oasPath.get.operationId;
+    return this.oasPath.post.operationId;
   }
 
   getAuthorizationOptionsProvider(): IAsyncProvider<IEndpointAuthzOptions> {
@@ -95,7 +95,7 @@ export class GetPurchasePriceEndpoint implements IWebServiceEndpoint {
     try {
       this.log.info(`Received a request to get purchase price.`);
       const priceResponse: GetPurchasePriceResponse =
-        await this.options.connector.getPurchasePrice(reqBody);
+        await this.options.plugin.getPurchasePrice(reqBody);
       res.status(200).json(priceResponse);
     } catch (ex) {
       this.log.error(`Crash while serving ${reqTag}`, ex);

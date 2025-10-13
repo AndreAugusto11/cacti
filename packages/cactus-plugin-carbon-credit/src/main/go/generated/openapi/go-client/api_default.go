@@ -163,7 +163,7 @@ func (a *DefaultApiService) GetPurchasePriceRequest(ctx context.Context) ApiGetP
 //  @return GetPurchasePriceResponse
 func (a *DefaultApiService) GetPurchasePriceRequestExecute(r ApiGetPurchasePriceRequestRequest) (*GetPurchasePriceResponse, *http.Response, error) {
 	var (
-		localVarHTTPMethod   = http.MethodGet
+		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
 		formFiles            []formFile
 		localVarReturnValue  *GetPurchasePriceResponse

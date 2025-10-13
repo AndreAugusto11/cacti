@@ -26,7 +26,7 @@ import OAS from "../../json/openapi.json";
 
 export interface IGetAvailableTCO2sEndpointOptions {
   logLevel?: LogLevelDesc;
-  connector: PluginCarbonCredit;
+  plugin: PluginCarbonCredit;
 }
 
 export class GetAvailableTCO2sEndpoint implements IWebServiceEndpoint {
@@ -40,7 +40,7 @@ export class GetAvailableTCO2sEndpoint implements IWebServiceEndpoint {
   constructor(public readonly options: IGetAvailableTCO2sEndpointOptions) {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(options, `${fnTag} arg options`);
-    Checks.truthy(options.connector, `${fnTag} arg options.connector`);
+    Checks.truthy(options.plugin, `${fnTag} arg options.plugin`);
 
     const level = options.logLevel || "INFO";
     const label = this.className;
@@ -54,15 +54,15 @@ export class GetAvailableTCO2sEndpoint implements IWebServiceEndpoint {
   }
 
   public getPath(): string {
-    return this.oasPath.get["x-hyperledger-cacti"].http.path;
+    return this.oasPath.post["x-hyperledger-cacti"].http.path;
   }
 
   public getVerbLowerCase(): string {
-    return this.oasPath.get["x-hyperledger-cacti"].http.verbLowerCase;
+    return this.oasPath.post["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getOperationId(): string {
-    return this.oasPath.get.operationId;
+    return this.oasPath.post.operationId;
   }
 
   getAuthorizationOptionsProvider(): IAsyncProvider<IEndpointAuthzOptions> {
@@ -95,7 +95,7 @@ export class GetAvailableTCO2sEndpoint implements IWebServiceEndpoint {
     try {
       this.log.info(`Received a request to get available VCUs.`);
       const vcuResponse: GetAvailableTCO2sResponse =
-        await this.options.connector.getAvailableTCO2s(reqBody);
+        await this.options.plugin.getAvailableTCO2s(reqBody);
       res.status(200).json(vcuResponse);
     } catch (ex) {
       this.log.error(`Crash while serving ${reqTag}`, ex);

@@ -194,6 +194,27 @@ export type Network = typeof Network[keyof typeof Network];
 /**
  * 
  * @export
+ * @interface NetworkConfig
+ */
+export interface NetworkConfig {
+    /**
+     * 
+     * @type {string}
+     * @memberof NetworkConfig
+     */
+    'rpcUrl': string;
+    /**
+     * 
+     * @type {Network}
+     * @memberof NetworkConfig
+     */
+    'network': Network;
+}
+
+
+/**
+ * 
+ * @export
  * @interface RandomBuyRequest
  */
 export interface RandomBuyRequest {
@@ -537,7 +558,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
                 baseOptions = configuration.baseOptions;
             }
 
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 

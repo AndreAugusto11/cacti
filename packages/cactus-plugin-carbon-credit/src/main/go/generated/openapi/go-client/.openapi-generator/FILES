@@ -13,6 +13,7 @@ model_get_purchase_price_response.go
 model_get_vcu_metadata_request.go
 model_marketplace.go
 model_network.go
+model_network_config.go
 model_random_buy_request.go
 model_random_buy_response.go
 model_retire_request.go

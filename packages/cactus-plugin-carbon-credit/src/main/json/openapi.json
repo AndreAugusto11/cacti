@@ -19,6 +19,18 @@
         "type": "string",
         "enum": ["polygon", "ethereum", "celo", "alfajores", "base", "base-sepolia"]
       },
+      "NetworkConfig": {
+        "type": "object",
+        "properties": {
+          "rpcUrl": {
+            "type": "string"
+          },
+          "network": {
+            "$ref": "#/components/schemas/Network"
+          }
+        },
+        "required": ["rpcUrl", "network"]
+      },
       "SpecificBuyRequest": {
         "type": "object",
         "properties": {
@@ -495,10 +507,10 @@
       }
     },
     "/api/v1/@hyperledger/cactus-plugin-carbon-credit/get-purchase-price": {
-      "get": {
+      "post": {
         "x-hyperledger-cacti": {
           "http": {
-            "verbLowerCase": "get",
+            "verbLowerCase": "post",
             "path": "/api/v1/@hyperledger/cactus-plugin-carbon-credit/get-purchase-price"
           }
         },

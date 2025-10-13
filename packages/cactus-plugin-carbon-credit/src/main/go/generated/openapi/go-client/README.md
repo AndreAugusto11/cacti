@@ -78,7 +78,7 @@ All URIs are relative to *http://localhost*
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
 *DefaultApi* | [**GetAvailableTCO2sRequest**](docs/DefaultApi.md#getavailabletco2srequest) | **Post** /api/v1/@hyperledger/cactus-plugin-carbon-credit/get-available-tco2s | 
-*DefaultApi* | [**GetPurchasePriceRequest**](docs/DefaultApi.md#getpurchasepricerequest) | **Get** /api/v1/@hyperledger/cactus-plugin-carbon-credit/get-purchase-price | 
+*DefaultApi* | [**GetPurchasePriceRequest**](docs/DefaultApi.md#getpurchasepricerequest) | **Post** /api/v1/@hyperledger/cactus-plugin-carbon-credit/get-purchase-price | 
 *DefaultApi* | [**GetVCUMetadataRequest**](docs/DefaultApi.md#getvcumetadatarequest) | **Post** /api/v1/@hyperledger/cactus-plugin-carbon-credit/get-vcu-metadata | 
 *DefaultApi* | [**RandomBuyRequest**](docs/DefaultApi.md#randombuyrequest) | **Post** /api/v1/@hyperledger/cactus-plugin-carbon-credit/random-buy | 
 *DefaultApi* | [**RetireRequest**](docs/DefaultApi.md#retirerequest) | **Post** /api/v1/@hyperledger/cactus-plugin-carbon-credit/retire | 
@@ -94,6 +94,7 @@ Class | Method | HTTP request | Description
  - [GetVCUMetadataRequest](docs/GetVCUMetadataRequest.md)
  - [Marketplace](docs/Marketplace.md)
  - [Network](docs/Network.md)
+ - [NetworkConfig](docs/NetworkConfig.md)
  - [RandomBuyRequest](docs/RandomBuyRequest.md)
  - [RandomBuyResponse](docs/RandomBuyResponse.md)
  - [RetireRequest](docs/RetireRequest.md)

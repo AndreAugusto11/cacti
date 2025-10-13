@@ -110,7 +110,7 @@ paths:
           verbLowerCase: post
           path: /api/v1/@hyperledger/cactus-plugin-carbon-credit/get-vcu-metadata
   /api/v1/@hyperledger/cactus-plugin-carbon-credit/get-purchase-price:
-    get:
+    post:
       description: Get the purchase price for a specific VCU.
       operationId: getPurchasePriceRequest
       requestBody:
@@ -127,7 +127,7 @@ paths:
           description: Successful response with VCU metadata.
       x-hyperledger-cacti:
         http:
-          verbLowerCase: get
+          verbLowerCase: post
           path: /api/v1/@hyperledger/cactus-plugin-carbon-credit/get-purchase-price
 components:
   schemas:
@@ -144,6 +144,16 @@ components:
       - base
       - base-sepolia
       type: string
+    NetworkConfig:
+      properties:
+        rpcUrl:
+          type: string
+        network:
+          $ref: '#/components/schemas/Network'
+      required:
+      - network
+      - rpcUrl
+      type: object
     SpecificBuyRequest:
       example:
         paymentToken: paymentToken

@@ -3,7 +3,6 @@ import {
   GetAvailableTCO2sRequest,
   GetAvailableTCO2sResponse,
   GetVCUMetadataRequest,
-  Network,
   SpecificBuyRequest,
   SpecificBuyResponse,
   RandomBuyResponse,
@@ -13,6 +12,7 @@ import {
   VCUMetadata,
   GetPurchasePriceRequest,
   GetPurchasePriceResponse,
+  NetworkConfig,
 } from "./public-api";
 import {
   GasTransactionConfig,
@@ -25,7 +25,7 @@ import {
 export interface CarbonMarketplaceAbstractOptions {
   logLevel?: LogLevelDesc;
   signingCredential: Web3SigningCredentialPrivateKeyHex;
-  network: Network;
+  networkConfig: NetworkConfig;
   gasConfig?: GasTransactionConfig;
 }
 

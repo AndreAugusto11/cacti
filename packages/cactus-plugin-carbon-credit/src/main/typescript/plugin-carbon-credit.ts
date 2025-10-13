@@ -36,6 +36,7 @@ import {
   GetPurchasePriceRequest,
   GetPurchasePriceResponse,
   Marketplace,
+  NetworkConfig,
   Network,
 } from "./generated/openapi/typescript-axios";
 import { ToucanLeaf } from "./implementations/toucan-leaf";
@@ -44,6 +45,7 @@ import { CarbonMarketplaceAbstract } from "./carbon-marketplace-abstract";
 export interface IPluginCarbonCreditOptions extends ICactusPluginOptions {
   instanceId: string;
   signingCredential: Web3SigningCredentialPrivateKeyHex;
+  networkConfig?: NetworkConfig[];
   logLevel?: LogLevelDesc;
 }
 
@@ -99,42 +101,42 @@ export class PluginCarbonCredit implements ICactusPlugin, IPluginWebService {
     const endpoints: IWebServiceEndpoint[] = [];
     {
       const endpoint = new SpecificBuyEndpoint({
-        connector: this,
+        plugin: this,
         logLevel: this.options.logLevel,
       });
       endpoints.push(endpoint);
     }
     {
       const endpoint = new RandomBuyEndpoint({
-        connector: this,
+        plugin: this,
         logLevel: this.options.logLevel,
       });
       endpoints.push(endpoint);
     }
     {
       const endpoint = new RetireEndpoint({
-        connector: this,
+        plugin: this,
         logLevel: this.options.logLevel,
       });
       endpoints.push(endpoint);
     }
     {
       const endpoint = new GetAvailableTCO2sEndpoint({
-        connector: this,
+        plugin: this,
         logLevel: this.options.logLevel,
       });
       endpoints.push(endpoint);
     }
     {
       const endpoint = new GetVCUMetadataEndpoint({
-        connector: this,
+        plugin: this,
         logLevel: this.options.logLevel,
       });
       endpoints.push(endpoint);
     }
     {
       const endpoint = new GetPurchasePriceEndpoint({
-        connector: this,
+        plugin: this,
         logLevel: this.options.logLevel,
       });
       endpoints.push(endpoint);
@@ -151,10 +153,31 @@ export class PluginCarbonCredit implements ICactusPlugin, IPluginWebService {
     marketplace: string,
     network: Network,
   ): CarbonMarketplaceAbstract {
+    const fnTag = `${this.className}#getMarketplaceImplementation()`;
+    this.log.debug(
+      `${fnTag} Getting marketplace implementation for ${marketplace} on network ${network}`,
+    );
+
+    if (!this.options.networkConfig) {
+      throw new Error(
+        `${fnTag} No network configuration provided in plugin options.`,
+      );
+    }
+
+    const networkConfig = this.options.networkConfig.find(
+      (config) => config.network === network,
+    );
+
+    if (!networkConfig) {
+      throw new Error(
+        `${fnTag} No network configuration found for network ${network}. Please check the plugin options.`,
+      );
+    }
+
     switch (marketplace) {
       case Marketplace.Toucan:
         return new ToucanLeaf({
-          network: network,
+          networkConfig: networkConfig,
           signingCredential: this.options.signingCredential,
         });
       default:

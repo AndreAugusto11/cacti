@@ -18,7 +18,7 @@ import {
 import {
   SpecificBuyRequest,
   SpecificBuyResponse,
-} from "../generated/openapi/typescript-axios"; // confirmar depois se é necessário esse import
+} from "../generated/openapi/typescript-axios";
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
 import { PluginCarbonCredit } from "../plugin-carbon-credit";
@@ -27,13 +27,12 @@ import OAS from "../../json/openapi.json";
 
 export interface IBuyEndpointOptions {
   logLevel?: LogLevelDesc;
-  connector: PluginCarbonCredit;
+  plugin: PluginCarbonCredit;
 }
 
 export class SpecificBuyEndpoint implements IWebServiceEndpoint {
   public static readonly CLASS_NAME = "SpecificBuyEndpoint";
   private readonly log: Logger;
-  // private readonly connector: PluginCarbonCredit;
 
   public get className(): string {
     return SpecificBuyEndpoint.CLASS_NAME;
@@ -42,9 +41,8 @@ export class SpecificBuyEndpoint implements IWebServiceEndpoint {
   constructor(public readonly options: IBuyEndpointOptions) {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(options, `${fnTag} arg options`);
-    Checks.truthy(options.connector, `${fnTag} arg options.connector`);
+    Checks.truthy(options.plugin, `${fnTag} arg options.plugin`);
 
-    // this.connector = options.connector;
     const level = options.logLevel || "INFO";
     const label = this.className;
     this.log = LoggerProvider.getOrCreate({ level, label });
@@ -135,7 +133,7 @@ export class SpecificBuyEndpoint implements IWebServiceEndpoint {
         `Received specific buy request for ${items} units. on marketplace ${marketplace}`,
       );
       const specificBuyResponse: SpecificBuyResponse =
-        await this.options.connector.specificBuy(reqBody);
+        await this.options.plugin.specificBuy(reqBody);
       res.status(200).json(specificBuyResponse);
     } catch (ex) {
       this.log.error(`Crash while serving ${reqTag}`, ex);
