@@ -31,7 +31,7 @@ import { ethers } from "ethers";
 import { utils } from "ethers";
 import { Network as ToucanNetwork } from "toucan-sdk/dist/types";
 import dotenv from "dotenv";
-import { getDefaultDex, getTokenAddress } from "../utils";
+import { getDefaultDex, getTokenAddressBySymbol } from "../utils";
 
 dotenv.config({ path: "packages/cactus-plugin-carbon-credit/.env" });
 
@@ -135,7 +135,7 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
       const amountIn = utils.parseUnits(String(request.paymentToken), 6); // not this amount. This will be the amount of carbon credits in tonnes
       const path = [
         request.paymentToken,
-        await getTokenAddress(request.network, "NCT"),
+        await getTokenAddressBySymbol(request.network, "NCT"),
       ];
       await usdc.approve(router.target, amountIn);
 
@@ -154,7 +154,7 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
       this.logger.debug(`${fnTag} Redeeming pool tokens for TCO2s...`);
 
       const nct = new ethers.Contract(
-        await getTokenAddress(request.network, "NCT"),
+        await getTokenAddressBySymbol(request.network, "NCT"),
         [
           "function approve(address spender, uint256 value) external returns (bool)",
         ],
@@ -242,7 +242,7 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
       this.logger.debug(`${fnTag} Redeeming pool tokens for TCO2s...`);
 
       const nct = new ethers.Contract(
-        await getTokenAddress(request.network, "NCT"),
+        await getTokenAddressBySymbol(request.network, "NCT"),
         [
           "function approve(address spender, uint256 value) external returns (bool)",
           "function balanceOf(address account) external view returns (uint256)",
@@ -254,7 +254,7 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
 
       const nctBalance = await nct.balanceOf(this.signer.address);
       await nct.approve(
-        await getTokenAddress(request.network, "NCT"),
+        await getTokenAddressBySymbol(request.network, "NCT"),
         2n ** 256n,
       ); // infinite approval per #332
       // For non-custodial front-ends consider limited approvals equal to `nctBalance` instead.

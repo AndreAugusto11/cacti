@@ -11,7 +11,7 @@ import {
 } from "../../../main/typescript/public-api";
 import { Web3SigningCredentialPrivateKeyHex } from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
 import dotenv from "dotenv";
-import { getTokenAddress } from "../../../main/typescript/utils";
+import { getTokenAddressBySymbol } from "../../../main/typescript/utils";
 import { parseUnits } from "ethers/lib/utils";
 dotenv.config({ path: "packages/cactus-plugin-carbon-credit/.env" });
 
@@ -147,14 +147,42 @@ describe("PluginCarbonCredit Functionality", () => {
       const request = {
         marketplace: Marketplace.Toucan,
         network: Network.Polygon,
-        unit: getTokenAddress(Network.Polygon, "NCT"),
+        unit: getTokenAddressBySymbol(Network.Polygon, "NCT"),
         amount: parseUnits("1", 18).toString(), // 1 NCT
       };
 
       const response = await plugin.getPurchasePrice(request);
 
+      const USDC_balance = response.price / 10 ** 6;
+
+      console.log(
+        "getPurchasePrice Response (Polygon):",
+        USDC_balance + " USDC",
+      );
+
       expect(response).toBeDefined();
       expect(response.price).toBeGreaterThan(parseUnits("0.3", 6).toBigInt()); // Flaky test. Currently 1 NCT = 0.48 USDC
+      expect(response.price).toBeLessThan(parseUnits("1", 6).toBigInt());
+    });
+  });
+
+  describe("getPurchasePrice Functionality (Celo)", () => {
+    test("getPurchasePrice returns the correct price for a valid request", async () => {
+      const request = {
+        marketplace: Marketplace.Toucan,
+        network: Network.Celo,
+        unit: getTokenAddressBySymbol(Network.Celo, "NCT"),
+        amount: parseUnits("1", 18).toString(), // 1 NCT
+      };
+
+      const response = await plugin.getPurchasePrice(request);
+
+      const cUSD_balance = response.price / 10 ** 18;
+
+      console.log("getPurchasePrice Response (Celo):", cUSD_balance + " cUSD");
+
+      expect(response).toBeDefined();
+      expect(response.price).toBeGreaterThan(parseUnits("0.3", 18).toBigInt());
     });
   });
 

@@ -65,6 +65,8 @@
         "@hyperledger/cactus-core-api": "2.1.0",
         "@hyperledger/cactus-plugin-ledger-connector-ethereum": "2.1.0",
         "@uniswap/sdk-core": "7.7.2",
+        "@uniswap/v3-core": "1.0.1",
+        "@uniswap/v3-periphery": "1.4.4",
         "@uniswap/v3-sdk": "3.25.2",
         "axios": "1.8.4",
         "dotenv": "^17.2.3",
