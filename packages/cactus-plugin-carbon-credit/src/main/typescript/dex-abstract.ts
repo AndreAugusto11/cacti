@@ -35,7 +35,7 @@ export abstract class DexAbstract {
     fromToken: string,
     toToken: string,
     amount: string,
-  ): Promise<void>;
+  ): Promise<string>;
 
   /**
    * Abstract operation to get a quote for swapping from USDC to another token.

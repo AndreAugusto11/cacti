@@ -70,16 +70,35 @@ export interface GetAvailableTCO2sRequest {
 export interface GetAvailableTCO2sResponse {
     /**
      * 
-     * @type {Array<string>}
+     * @type {Array<GetAvailableTCO2sResponseTco2ListInner>}
      * @memberof GetAvailableTCO2sResponse
      */
-    'tco2List': Array<string>;
+    'tco2List': Array<GetAvailableTCO2sResponseTco2ListInner>;
     /**
      * 
      * @type {number}
      * @memberof GetAvailableTCO2sResponse
      */
     'totalCount': number;
+}
+/**
+ * 
+ * @export
+ * @interface GetAvailableTCO2sResponseTco2ListInner
+ */
+export interface GetAvailableTCO2sResponseTco2ListInner {
+    /**
+     * 
+     * @type {string}
+     * @memberof GetAvailableTCO2sResponseTco2ListInner
+     */
+    'address': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetAvailableTCO2sResponseTco2ListInner
+     */
+    'projectId': string;
 }
 /**
  * 
@@ -383,11 +402,11 @@ export interface SpecificBuyRequest {
      */
     'paymentToken': string;
     /**
-     * A mapping from address (string) to amount (number).
-     * @type {{ [key: string]: number; }}
+     * A mapping from address (string) to amount (string).
+     * @type {{ [key: string]: string; }}
      * @memberof SpecificBuyRequest
      */
-    'items': { [key: string]: number; };
+    'items': { [key: string]: string; };
     /**
      * 
      * @type {string}
@@ -409,6 +428,12 @@ export interface SpecificBuyResponse {
      * @memberof SpecificBuyResponse
      */
     'txHashSwap': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SpecificBuyResponse
+     */
+    'buyTxHash': string;
     /**
      * 
      * @type {string}
@@ -489,19 +514,13 @@ export interface VCUMetadataAttributes {
      * @type {string}
      * @memberof VCUMetadataAttributes
      */
-    'vintage'?: string;
+    'totalVintageQuantity'?: string;
     /**
      * 
      * @type {string}
      * @memberof VCUMetadataAttributes
      */
     'methodology'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof VCUMetadataAttributes
-     */
-    'other'?: string;
 }
 
 /**

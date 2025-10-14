@@ -159,7 +159,7 @@ components:
         paymentToken: paymentToken
         marketplace: null
         items:
-          key: 0.8008281904610115
+          key: items
         walletObject: walletObject
         network: null
       properties:
@@ -171,8 +171,8 @@ components:
           type: string
         items:
           additionalProperties:
-            type: number
-          description: A mapping from address (string) to amount (number).
+            type: string
+          description: A mapping from address (string) to amount (string).
           type: object
         walletObject:
           type: string
@@ -186,6 +186,7 @@ components:
     SpecificBuyResponse:
       example:
         assetAmount: assetAmount
+        buyTxHash: buyTxHash
         txHashSwap: txHashSwap
         tco2List:
         - amount: amount
@@ -195,6 +196,8 @@ components:
       properties:
         txHashSwap:
           type: string
+        buyTxHash:
+          type: string
         assetAmount:
           type: string
         tco2List:
@@ -203,6 +206,7 @@ components:
           type: array
       required:
       - assetAmount
+      - buyTxHash
       - txHashSwap
       type: object
     RandomBuyRequest:
@@ -339,12 +343,14 @@ components:
       example:
         totalCount: 0.8008281904610115
         tco2List:
-        - tco2List
-        - tco2List
+        - address: address
+          projectId: projectId
+        - address: address
+          projectId: projectId
       properties:
         tco2List:
           items:
-            type: string
+            $ref: '#/components/schemas/GetAvailableTCO2sResponse_tco2List_inner'
           type: array
         totalCount:
           type: number
@@ -379,8 +385,7 @@ components:
         totalSupply: 0.8008281904610115
         name: name
         attributes:
-          other: other
-          vintage: vintage
+          totalVintageQuantity: totalVintageQuantity
           region: region
           methodology: methodology
       properties:
@@ -444,19 +449,29 @@ components:
       - address
       - amount
       type: object
+    GetAvailableTCO2sResponse_tco2List_inner:
+      example:
+        address: address
+        projectId: projectId
+      properties:
+        address:
+          type: string
+        projectId:
+          type: string
+      required:
+      - address
+      - projectId
+      type: object
     VCUMetadata_attributes:
       example:
-        other: other
-        vintage: vintage
+        totalVintageQuantity: totalVintageQuantity
         region: region
         methodology: methodology
       properties:
         region:
           type: string
-        vintage:
+        totalVintageQuantity:
           type: string
         methodology:
-          type: string
-        other:
           type: string
       type: object

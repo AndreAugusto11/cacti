@@ -22,8 +22,8 @@ type SpecificBuyRequest struct {
 	Marketplace Marketplace `json:"marketplace"`
 	Network Network `json:"network"`
 	PaymentToken string `json:"paymentToken"`
-	// A mapping from address (string) to amount (number).
-	Items map[string]float32 `json:"items"`
+	// A mapping from address (string) to amount (string).
+	Items map[string]string `json:"items"`
 	WalletObject string `json:"walletObject"`
 }
 
@@ -31,7 +31,7 @@ type SpecificBuyRequest struct {
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewSpecificBuyRequest(marketplace Marketplace, network Network, paymentToken string, items map[string]float32, walletObject string) *SpecificBuyRequest {
+func NewSpecificBuyRequest(marketplace Marketplace, network Network, paymentToken string, items map[string]string, walletObject string) *SpecificBuyRequest {
 	this := SpecificBuyRequest{}
 	this.Marketplace = marketplace
 	this.Network = network
@@ -122,9 +122,9 @@ func (o *SpecificBuyRequest) SetPaymentToken(v string) {
 }
 
 // GetItems returns the Items field value
-func (o *SpecificBuyRequest) GetItems() map[string]float32 {
+func (o *SpecificBuyRequest) GetItems() map[string]string {
 	if o == nil {
-		var ret map[string]float32
+		var ret map[string]string
 		return ret
 	}
 
@@ -133,7 +133,7 @@ func (o *SpecificBuyRequest) GetItems() map[string]float32 {
 
 // GetItemsOk returns a tuple with the Items field value
 // and a boolean to check if the value has been set.
-func (o *SpecificBuyRequest) GetItemsOk() (*map[string]float32, bool) {
+func (o *SpecificBuyRequest) GetItemsOk() (*map[string]string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -141,7 +141,7 @@ func (o *SpecificBuyRequest) GetItemsOk() (*map[string]float32, bool) {
 }
 
 // SetItems sets field value
-func (o *SpecificBuyRequest) SetItems(v map[string]float32) {
+func (o *SpecificBuyRequest) SetItems(v map[string]string) {
 	o.Items = v
 }
 

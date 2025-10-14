@@ -140,26 +140,35 @@ export async function getERC20Balance(
 }
 
 /**
- * Returns the ERC20 token allowance for a given owner and spender.
+ * Approves the spender to spend the specified amount of tokens if allowance is insufficient.
  * @param tokenAddress ERC20 token contract address
- * @param ownerAddress Address of the token owner
+ * @param ownerSigner ethers.Signer for the token owner
  * @param spenderAddress Address of the spender
- * @param provider ethers provider
- * @returns Promise<BigInt> token allowance
+ * @param amount Amount to approve (as bigint)
+ * @returns Promise<string> transaction hash of the approval transaction, or undefined if no approval was needed
  */
-export async function getERC20Allowance(
+export async function approveERC20IfNeeded(
   tokenAddress: string,
-  ownerAddress: string,
+  ownerSigner: ethers.Signer,
   spenderAddress: string,
-  provider: ethers.providers.Provider,
-): Promise<bigint> {
+  amount: bigint,
+): Promise<string | null> {
   const erc20 = new ethers.Contract(
     tokenAddress,
     [
       "function allowance(address owner, address spender) view returns (uint256)",
+      "function approve(address spender, uint256 amount) returns (bool)",
     ],
-    provider,
+    ownerSigner,
   );
-  const allowance = await erc20.allowance(ownerAddress, spenderAddress);
-  return BigInt(allowance.toString());
+  const ownerAddress = await ownerSigner.getAddress();
+  const currentAllowance = await erc20.allowance(ownerAddress, spenderAddress);
+
+  if (BigInt(currentAllowance.toString()) < amount) {
+    const tx = await erc20.approve(spenderAddress, ethers.constants.MaxUint256);
+    await tx.wait();
+    return tx.hash;
+  }
+
+  return null; // No approval needed
 }

@@ -239,6 +239,8 @@ export class PluginCarbonCredit implements ICactusPlugin, IPluginWebService {
           networkConfig: networkConfig,
           provider: this.getRPCProvider(network),
           signingCredential: this.options.signingCredential,
+          logLevel: this.options.logLevel,
+          dexImpl: this.getDexImplementation(network),
         });
       default:
         throw new Error(`Unsupported marketplace: ${marketplace}`);

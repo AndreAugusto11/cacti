@@ -17,6 +17,7 @@ import {
   Web3SigningCredentialPrivateKeyHex,
 } from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
 import { ethers } from "ethers";
+import { DexAbstract } from "./dex-abstract";
 
 /**
  * Common interface options for all Carbon Credit Marketplaces.
@@ -26,6 +27,7 @@ export interface CarbonMarketplaceAbstractOptions {
   signingCredential: Web3SigningCredentialPrivateKeyHex;
   networkConfig: NetworkConfig;
   provider: ethers.providers.JsonRpcProvider;
+  dexImpl: DexAbstract;
   gasConfig?: GasTransactionConfig;
 }
 

@@ -70,12 +70,14 @@ describe("Uniswap quote and swap functionality", () => {
     await provider.send("hardhat_impersonateAccount", [impersonatedAddress]);
     const signer = provider.getSigner(impersonatedAddress);
 
-    await plugin.swapExactFromUSDC(
+    const receipt = await plugin.swapExactFromUSDC(
       signer,
       nctAddress,
       amountIn,
       Network.Polygon,
     );
+
+    expect(receipt).toBeDefined();
 
     // Final State
 

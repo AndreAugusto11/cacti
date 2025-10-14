@@ -19,7 +19,7 @@ var _ MappedNullable = &GetAvailableTCO2sResponse{}
 
 // GetAvailableTCO2sResponse struct for GetAvailableTCO2sResponse
 type GetAvailableTCO2sResponse struct {
-	Tco2List []string `json:"tco2List"`
+	Tco2List []GetAvailableTCO2sResponseTco2ListInner `json:"tco2List"`
 	TotalCount float32 `json:"totalCount"`
 }
 
@@ -27,7 +27,7 @@ type GetAvailableTCO2sResponse struct {
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewGetAvailableTCO2sResponse(tco2List []string, totalCount float32) *GetAvailableTCO2sResponse {
+func NewGetAvailableTCO2sResponse(tco2List []GetAvailableTCO2sResponseTco2ListInner, totalCount float32) *GetAvailableTCO2sResponse {
 	this := GetAvailableTCO2sResponse{}
 	this.Tco2List = tco2List
 	this.TotalCount = totalCount
@@ -43,9 +43,9 @@ func NewGetAvailableTCO2sResponseWithDefaults() *GetAvailableTCO2sResponse {
 }
 
 // GetTco2List returns the Tco2List field value
-func (o *GetAvailableTCO2sResponse) GetTco2List() []string {
+func (o *GetAvailableTCO2sResponse) GetTco2List() []GetAvailableTCO2sResponseTco2ListInner {
 	if o == nil {
-		var ret []string
+		var ret []GetAvailableTCO2sResponseTco2ListInner
 		return ret
 	}
 
@@ -54,7 +54,7 @@ func (o *GetAvailableTCO2sResponse) GetTco2List() []string {
 
 // GetTco2ListOk returns a tuple with the Tco2List field value
 // and a boolean to check if the value has been set.
-func (o *GetAvailableTCO2sResponse) GetTco2ListOk() ([]string, bool) {
+func (o *GetAvailableTCO2sResponse) GetTco2ListOk() ([]GetAvailableTCO2sResponseTco2ListInner, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -62,7 +62,7 @@ func (o *GetAvailableTCO2sResponse) GetTco2ListOk() ([]string, bool) {
 }
 
 // SetTco2List sets field value
-func (o *GetAvailableTCO2sResponse) SetTco2List(v []string) {
+func (o *GetAvailableTCO2sResponse) SetTco2List(v []GetAvailableTCO2sResponseTco2ListInner) {
 	o.Tco2List = v
 }
 

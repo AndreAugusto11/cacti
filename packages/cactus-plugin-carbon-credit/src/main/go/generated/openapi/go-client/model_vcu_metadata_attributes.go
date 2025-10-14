@@ -20,9 +20,8 @@ var _ MappedNullable = &VCUMetadataAttributes{}
 // VCUMetadataAttributes struct for VCUMetadataAttributes
 type VCUMetadataAttributes struct {
 	Region *string `json:"region,omitempty"`
-	Vintage *string `json:"vintage,omitempty"`
+	TotalVintageQuantity *string `json:"totalVintageQuantity,omitempty"`
 	Methodology *string `json:"methodology,omitempty"`
-	Other *string `json:"other,omitempty"`
 }
 
 // NewVCUMetadataAttributes instantiates a new VCUMetadataAttributes object
@@ -74,36 +73,36 @@ func (o *VCUMetadataAttributes) SetRegion(v string) {
 	o.Region = &v
 }
 
-// GetVintage returns the Vintage field value if set, zero value otherwise.
-func (o *VCUMetadataAttributes) GetVintage() string {
-	if o == nil || IsNil(o.Vintage) {
+// GetTotalVintageQuantity returns the TotalVintageQuantity field value if set, zero value otherwise.
+func (o *VCUMetadataAttributes) GetTotalVintageQuantity() string {
+	if o == nil || IsNil(o.TotalVintageQuantity) {
 		var ret string
 		return ret
 	}
-	return *o.Vintage
+	return *o.TotalVintageQuantity
 }
 
-// GetVintageOk returns a tuple with the Vintage field value if set, nil otherwise
+// GetTotalVintageQuantityOk returns a tuple with the TotalVintageQuantity field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *VCUMetadataAttributes) GetVintageOk() (*string, bool) {
-	if o == nil || IsNil(o.Vintage) {
+func (o *VCUMetadataAttributes) GetTotalVintageQuantityOk() (*string, bool) {
+	if o == nil || IsNil(o.TotalVintageQuantity) {
 		return nil, false
 	}
-	return o.Vintage, true
+	return o.TotalVintageQuantity, true
 }
 
-// HasVintage returns a boolean if a field has been set.
-func (o *VCUMetadataAttributes) HasVintage() bool {
-	if o != nil && !IsNil(o.Vintage) {
+// HasTotalVintageQuantity returns a boolean if a field has been set.
+func (o *VCUMetadataAttributes) HasTotalVintageQuantity() bool {
+	if o != nil && !IsNil(o.TotalVintageQuantity) {
 		return true
 	}
 
 	return false
 }
 
-// SetVintage gets a reference to the given string and assigns it to the Vintage field.
-func (o *VCUMetadataAttributes) SetVintage(v string) {
-	o.Vintage = &v
+// SetTotalVintageQuantity gets a reference to the given string and assigns it to the TotalVintageQuantity field.
+func (o *VCUMetadataAttributes) SetTotalVintageQuantity(v string) {
+	o.TotalVintageQuantity = &v
 }
 
 // GetMethodology returns the Methodology field value if set, zero value otherwise.
@@ -138,38 +137,6 @@ func (o *VCUMetadataAttributes) SetMethodology(v string) {
 	o.Methodology = &v
 }
 
-// GetOther returns the Other field value if set, zero value otherwise.
-func (o *VCUMetadataAttributes) GetOther() string {
-	if o == nil || IsNil(o.Other) {
-		var ret string
-		return ret
-	}
-	return *o.Other
-}
-
-// GetOtherOk returns a tuple with the Other field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *VCUMetadataAttributes) GetOtherOk() (*string, bool) {
-	if o == nil || IsNil(o.Other) {
-		return nil, false
-	}
-	return o.Other, true
-}
-
-// HasOther returns a boolean if a field has been set.
-func (o *VCUMetadataAttributes) HasOther() bool {
-	if o != nil && !IsNil(o.Other) {
-		return true
-	}
-
-	return false
-}
-
-// SetOther gets a reference to the given string and assigns it to the Other field.
-func (o *VCUMetadataAttributes) SetOther(v string) {
-	o.Other = &v
-}
-
 func (o VCUMetadataAttributes) MarshalJSON() ([]byte, error) {
 	toSerialize,err := o.ToMap()
 	if err != nil {
@@ -183,14 +150,11 @@ func (o VCUMetadataAttributes) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.Region) {
 		toSerialize["region"] = o.Region
 	}
-	if !IsNil(o.Vintage) {
-		toSerialize["vintage"] = o.Vintage
+	if !IsNil(o.TotalVintageQuantity) {
+		toSerialize["totalVintageQuantity"] = o.TotalVintageQuantity
 	}
 	if !IsNil(o.Methodology) {
 		toSerialize["methodology"] = o.Methodology
-	}
-	if !IsNil(o.Other) {
-		toSerialize["other"] = o.Other
 	}
 	return toSerialize, nil
 }

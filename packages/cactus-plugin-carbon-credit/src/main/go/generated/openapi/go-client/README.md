@@ -89,6 +89,7 @@ Class | Method | HTTP request | Description
 
  - [GetAvailableTCO2sRequest](docs/GetAvailableTCO2sRequest.md)
  - [GetAvailableTCO2sResponse](docs/GetAvailableTCO2sResponse.md)
+ - [GetAvailableTCO2sResponseTco2ListInner](docs/GetAvailableTCO2sResponseTco2ListInner.md)
  - [GetPurchasePriceRequest](docs/GetPurchasePriceRequest.md)
  - [GetPurchasePriceResponse](docs/GetPurchasePriceResponse.md)
  - [GetVCUMetadataRequest](docs/GetVCUMetadataRequest.md)

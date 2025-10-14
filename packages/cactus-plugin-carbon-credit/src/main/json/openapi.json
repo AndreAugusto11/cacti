@@ -46,9 +46,9 @@
           "items": {
             "type": "object",
             "additionalProperties": {
-              "type": "number"
+              "type": "string"
             },
-            "description": "A mapping from address (string) to amount (number)."
+            "description": "A mapping from address (string) to amount (string)."
           },
           "walletObject": {
             "type": "string"
@@ -66,6 +66,9 @@
         "type": "object",
         "properties": {
           "txHashSwap": {
+            "type": "string"
+          },
+          "buyTxHash": {
             "type": "string"
           },
           "assetAmount": {
@@ -92,6 +95,7 @@
         },
         "required": [
           "txHashSwap",
+          "buyTxHash",
           "assetAmount"
         ]
       },
@@ -248,7 +252,19 @@
           "tco2List": {
             "type": "array",
             "items": {
-              "type": "string"
+              "type": "object",
+              "properties": {
+                "address": {
+                  "type": "string"
+                },
+                "projectId": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "address",
+                "projectId"
+              ]
             }
           },
           "totalCount": {
@@ -299,9 +315,8 @@
             "type": "object",
             "properties": {
               "region": { "type": "string" },
-              "vintage": { "type": "string" },
-              "methodology": { "type": "string" },
-              "other": { "type": "string" }
+              "totalVintageQuantity": { "type": "string" },
+              "methodology": { "type": "string" }
             }
           }
         },

@@ -28,10 +28,13 @@ import {
 } from "../public-api";
 import ToucanClient from "toucan-sdk";
 import { ethers } from "ethers";
-import { utils } from "ethers";
 import { Network as ToucanNetwork } from "toucan-sdk/dist/types";
 import dotenv from "dotenv";
-import { getDefaultDex, getTokenAddressBySymbol } from "../utils";
+import {
+  approveERC20IfNeeded,
+  getERC20Balance,
+  getTokenAddressBySymbol,
+} from "../utils";
 
 dotenv.config({ path: "packages/cactus-plugin-carbon-credit/.env" });
 
@@ -47,8 +50,9 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
   private readonly signingCredential: Web3SigningCredentialPrivateKeyHex;
 
   private readonly toucanClient: ToucanClient;
-  private readonly signer: ethers.Wallet;
+  private readonly signer: ethers.Signer;
   private readonly provider: ethers.providers.JsonRpcProvider;
+  private readonly dexImpl;
 
   constructor(public readonly options: IToucanLeafOptions) {
     super();
@@ -71,9 +75,10 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
 
     this.provider = options.provider;
 
-    this.signer = new ethers.Wallet(
-      this.signingCredential.secret,
-      this.provider,
+    this.dexImpl = options.dexImpl;
+
+    this.signer = this.provider.getSigner(
+      "0xfa0b641678f5115ad8a8de5752016bd1359681b9",
     );
 
     const toucanNetwork = this.convertNetwork(options.networkConfig.network);
@@ -111,77 +116,80 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
         `Received specific buy request for ${request.items} units.`,
       );
 
-      // 1. Setup
-      const router = new ethers.Contract(
-        await getDefaultDex(request.network).router,
-        [
-          "function swapExactTokensForTokens(uint256 amountIn,uint256 amountOutMin,address[] path,address to,uint256 deadline) external returns (uint256[] memory)",
-        ],
-        this.signer,
+      const tco2Addresses = Object.keys(request.items);
+      const tonnesBigInt = Object.values(request.items).map((v) => BigInt(v));
+      const tonnes = tonnesBigInt.map((v) =>
+        ethers.BigNumber.from(v.toString()),
+      );
+      const totalTonnes = tonnesBigInt
+        .reduce((sum, t) => sum + t, 0n)
+        .toString();
+
+      const signer = this.provider.getSigner(
+        "0xfa0b641678f5115ad8a8de5752016bd1359681b9",
       );
 
-      const usdc = new ethers.Contract(
-        request.paymentToken,
-        [
-          "function approve(address spender, uint256 value) external returns (bool)",
-        ],
-        this.signer,
+      const txHashSwap = await this.dexImpl.swapExactFromUSDC(
+        signer,
+        getTokenAddressBySymbol(request.network, "NCT"),
+        BigInt(totalTonnes).toString(), // amount of NCT we want to buy
+        request.network,
       );
 
-      // 2. Swap USDC → NCT
-      this.logger.debug(
-        `${fnTag}  Swapping ${request.paymentToken} for pool tokens...`,
+      const usdc_balance = await getERC20Balance(
+        getTokenAddressBySymbol(request.network, "USDC"),
+        await signer.getAddress(),
+        this.provider,
       );
-      const amountIn = utils.parseUnits(String(request.paymentToken), 6); // not this amount. This will be the amount of carbon credits in tonnes
-      const path = [
-        request.paymentToken,
-        await getTokenAddressBySymbol(request.network, "NCT"),
-      ];
-      await usdc.approve(router.target, amountIn);
-
-      const swapTx = await router.swapExactTokensForTokens(
-        amountIn,
-        0, // set `amountOutMin` for real slippage control
-        path,
-        this.signer.address,
-        Math.floor(Date.now() / 1000) + 60 * 10,
+      this.logger.info(
+        `${fnTag} USDC balance after swap: ${ethers.utils.formatUnits(
+          usdc_balance,
+          6,
+        )} USDC`,
       );
 
-      const receipt = await swapTx.wait();
-      const txHashSwap = receipt.hash;
-
-      // 3. Approve NCT + Redeem chosen TCO2s
-      this.logger.debug(`${fnTag} Redeeming pool tokens for TCO2s...`);
-
-      const nct = new ethers.Contract(
-        await getTokenAddressBySymbol(request.network, "NCT"),
-        [
-          "function approve(address spender, uint256 value) external returns (bool)",
-        ],
-        this.signer,
+      const nct_balance = await getERC20Balance(
+        getTokenAddressBySymbol(request.network, "NCT"),
+        await signer.getAddress(),
+        this.provider,
+      );
+      this.logger.info(
+        `${fnTag} NCT balance after swap: ${ethers.utils.formatUnits(
+          nct_balance,
+          18,
+        )} NCT`,
       );
 
-      const tco2s = receipt.items.addresses; // TCO2 token addresses
-      const tonnes = Object.values(request.items);
+      // 3. Approve NCT
+      const approvalTx = await approveERC20IfNeeded(
+        getTokenAddressBySymbol(request.network, "NCT"),
+        signer,
+        this.toucanClient.getPoolAddress("NCT"),
+        BigInt(totalTonnes),
+      );
 
-      // Convert tonnes to BigNumber[]
-      const tonnesBigNumber = tonnes.map((t) => ethers.BigNumber.from(t));
+      if (approvalTx) {
+        this.logger.info(
+          `${fnTag} Approved pool ${this.toucanClient.getPoolAddress("NCT")} to spend NCT. Approval tx hash: ${approvalTx}`,
+        );
+      }
 
-      const amount = tonnes.reduce((a, b) => a + BigInt(b), 0n).toString();
-
-      await nct.approve(nct.target, 2n ** 256n); // infinite approval per #332
-      await this.toucanClient.redeemMany("NCT", tco2s, tonnesBigNumber);
-      const tco2ListString = tco2s.map((addr: string, i: number) => ({
-        address: addr,
-        amount: tonnes[i],
-      }));
+      const receipt = await this.toucanClient.redeemMany(
+        "NCT",
+        tco2Addresses,
+        tonnes,
+      );
 
       this.logger.info(`Buy operation completed successfully.`);
 
       return {
-        txHashSwap,
-        assetAmount: amount,
-        tco2List: tco2ListString || [],
+        txHashSwap: txHashSwap,
+        buyTxHash: receipt.transactionHash,
+        assetAmount: totalTonnes,
+        tco2List: tco2Addresses.map((addr, idx) => ({
+          address: addr,
+          amount: tonnesBigInt[idx].toString(),
+        })),
       };
     } catch (err) {
       this.logger.error("Error in buy:", err);
@@ -242,7 +250,7 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
       this.logger.debug(`${fnTag} Redeeming pool tokens for TCO2s...`);
 
       const nct = new ethers.Contract(
-        await getTokenAddressBySymbol(request.network, "NCT"),
+        getTokenAddressBySymbol(request.network, "NCT"),
         [
           "function approve(address spender, uint256 value) external returns (bool)",
           "function balanceOf(address account) external view returns (uint256)",
@@ -252,7 +260,7 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
         this.signer,
       );
 
-      const nctBalance = await nct.balanceOf(this.signer.address);
+      const nctBalance = await nct.balanceOf(this.signer.getAddress());
       await nct.approve(
         await getTokenAddressBySymbol(request.network, "NCT"),
         2n ** 256n,
@@ -321,7 +329,11 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
             tco2.totalSupply(),
           ]);
           const attrs = await tco2.getAttributes();
-          return { addr, name, symbol, totalSupply, ...attrs };
+
+          const region = attrs[0].region;
+          const projectId = attrs[0].projectId;
+
+          return { addr, name, symbol, totalSupply, region, projectId };
         }),
       );
 
@@ -340,10 +352,12 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
       }
 
       // Apply limit
-      const tco2List =
-        request.limit != null
-          ? projects.slice(0, Number(request.limit)).map((p) => p.addr)
-          : projects.slice(0, 100).map((p) => p.addr);
+      const tco2List = projects
+        .slice(0, Math.min(Number(request.limit ?? 100), 100))
+        .map((p) => ({
+          address: p.addr,
+          projectId: p.projectId,
+        }));
 
       this.logger.info(`There are ${projects.length} available VCUs.`);
 
@@ -357,60 +371,37 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async getVCUMetadata(
-    _req: GetVCUMetadataRequest,
+    req: GetVCUMetadataRequest,
   ): Promise<VCUMetadata> {
+    this.logger.info(`Fetching metadata for VCU with ID: ${req.vcuIdentifier}`);
+
     try {
-      this.logger.info(
-        `Fetching metadata for VCU with ID: ${_req.vcuIdentifier}`,
-      );
-      // Fetch redeemable TCO2s ordered by Toucan score
-      const tco2Addresses: string[] =
-        await this.toucanClient.getScoredTCO2s("NCT");
-
-      // Pull project data
-      const projects = await Promise.all(
-        tco2Addresses.map(async (addr) => {
-          const tco2 = await this.toucanClient.getTCO2Contract(addr);
-          const [name, symbol, totalSupply] = await Promise.all([
-            tco2.name(),
-            tco2.symbol(),
-            tco2.totalSupply(),
-          ]);
-          const attrs = await tco2.getAttributes();
-          return { addr, name, symbol, totalSupply, attrs };
-        }),
-      );
-
-      // Find matching project + VCU
-      const found = projects.find(
-        (p) =>
-          p.addr === _req.vcuIdentifier &&
-          p.attrs[0].projectId === _req.projectIdentifier,
-      );
-      if (!found) {
-        throw new Error(`VCU with ID ${_req.vcuIdentifier} not found.`);
-      }
+      const tco2 = await this.toucanClient.getTCO2Contract(req.vcuIdentifier);
 
       this.logger.info(
-        `Fetched metadata for VCU ${_req.vcuIdentifier} successfully.`,
+        `Fetched metadata for VCU ${req.vcuIdentifier} successfully.`,
       );
+
+      const [name, symbol, totalSupply] = await Promise.all([
+        tco2.name(),
+        tco2.symbol(),
+        tco2.totalSupply(),
+      ]);
+      const attrs = await tco2.getAttributes();
 
       return {
-        name: found.name,
-        symbol: found.symbol,
-        totalSupply: Number(found.totalSupply),
+        name,
+        symbol,
+        totalSupply: Number(totalSupply),
         attributes: {
-          region: found.attrs.region ?? "",
-          vintage: found.attrs.vintage ?? "",
-          methodology: found.attrs.methodology ?? "",
-          other: found.attrs.other ?? "",
+          region: attrs[0].region,
+          totalVintageQuantity: attrs[1].totalVintageQuantity.toString(),
+          methodology: attrs[0].methodology,
         },
       };
     } catch (err) {
-      this.logger.error("Error in getVCUMetadata:", err);
-      throw new Error(`VCU with ID ${_req.vcuIdentifier} not found.`);
+      throw new Error(`VCU with ID ${req.vcuIdentifier} not found.`);
     }
   }
 }

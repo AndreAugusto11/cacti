@@ -20,6 +20,7 @@ var _ MappedNullable = &SpecificBuyResponse{}
 // SpecificBuyResponse struct for SpecificBuyResponse
 type SpecificBuyResponse struct {
 	TxHashSwap string `json:"txHashSwap"`
+	BuyTxHash string `json:"buyTxHash"`
 	AssetAmount string `json:"assetAmount"`
 	Tco2List []SpecificBuyResponseTco2ListInner `json:"tco2List,omitempty"`
 }
@@ -28,9 +29,10 @@ type SpecificBuyResponse struct {
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewSpecificBuyResponse(txHashSwap string, assetAmount string) *SpecificBuyResponse {
+func NewSpecificBuyResponse(txHashSwap string, buyTxHash string, assetAmount string) *SpecificBuyResponse {
 	this := SpecificBuyResponse{}
 	this.TxHashSwap = txHashSwap
+	this.BuyTxHash = buyTxHash
 	this.AssetAmount = assetAmount
 	return &this
 }
@@ -65,6 +67,30 @@ func (o *SpecificBuyResponse) GetTxHashSwapOk() (*string, bool) {
 // SetTxHashSwap sets field value
 func (o *SpecificBuyResponse) SetTxHashSwap(v string) {
 	o.TxHashSwap = v
+}
+
+// GetBuyTxHash returns the BuyTxHash field value
+func (o *SpecificBuyResponse) GetBuyTxHash() string {
+	if o == nil {
+		var ret string
+		return ret
+	}
+
+	return o.BuyTxHash
+}
+
+// GetBuyTxHashOk returns a tuple with the BuyTxHash field value
+// and a boolean to check if the value has been set.
+func (o *SpecificBuyResponse) GetBuyTxHashOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.BuyTxHash, true
+}
+
+// SetBuyTxHash sets field value
+func (o *SpecificBuyResponse) SetBuyTxHash(v string) {
+	o.BuyTxHash = v
 }
 
 // GetAssetAmount returns the AssetAmount field value
@@ -134,6 +160,7 @@ func (o SpecificBuyResponse) MarshalJSON() ([]byte, error) {
 func (o SpecificBuyResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["txHashSwap"] = o.TxHashSwap
+	toSerialize["buyTxHash"] = o.BuyTxHash
 	toSerialize["assetAmount"] = o.AssetAmount
 	if !IsNil(o.Tco2List) {
 		toSerialize["tco2List"] = o.Tco2List
