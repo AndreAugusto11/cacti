@@ -48,7 +48,7 @@ import { DexAbstract } from "./dex-abstract";
 
 export interface IPluginCarbonCreditOptions extends ICactusPluginOptions {
   instanceId: string;
-  signingCredential: Web3SigningCredentialPrivateKeyHex;
+  signingCredential?: Web3SigningCredentialPrivateKeyHex;
   networkConfig?: NetworkConfig[];
   logLevel?: LogLevelDesc;
 }
@@ -60,11 +60,9 @@ export class PluginCarbonCredit implements ICactusPlugin, IPluginWebService {
   private readonly log: Logger;
   private endpoints: IWebServiceEndpoint[] | undefined;
 
-  private providers: Map<string, ethers.providers.JsonRpcProvider> = new Map();
+  private readonly signingCredential?: Web3SigningCredentialPrivateKeyHex;
 
-  public get className(): string {
-    return PluginCarbonCredit.CLASS_NAME;
-  }
+  private providers: Map<string, ethers.providers.Provider> = new Map();
 
   constructor(public readonly options: IPluginCarbonCreditOptions) {
     const fnTag = `${this.className}#constructor()`;
@@ -72,6 +70,8 @@ export class PluginCarbonCredit implements ICactusPlugin, IPluginWebService {
     Checks.truthy(options.instanceId, `${fnTag} options.instanceId`);
 
     this.instanceId = options.instanceId;
+
+    this.signingCredential = options.signingCredential;
 
     const level = this.options.logLevel || "INFO";
     const label = this.className;
@@ -87,11 +87,11 @@ export class PluginCarbonCredit implements ICactusPlugin, IPluginWebService {
           new ethers.providers.JsonRpcProvider(cfg.rpcUrl),
         );
       }
-    } else {
-      throw new Error(
-        `${this.className}#constructor: networkConfig is required to initialize providers.`,
-      );
     }
+  }
+
+  public get className(): string {
+    return PluginCarbonCredit.CLASS_NAME;
   }
 
   public getOpenApiSpec(): unknown {
@@ -171,7 +171,19 @@ export class PluginCarbonCredit implements ICactusPlugin, IPluginWebService {
     return `@hyperledger/cactus-plugin-carbon-credit`;
   }
 
-  public getRPCProvider(network: string): ethers.providers.JsonRpcProvider {
+  public createSigner(network: string, privateKey: string): ethers.Signer {
+    const provider = this.getRPCProvider(network);
+
+    if (!privateKey || privateKey === "") {
+      throw new Error(
+        `No private key provided for network ${network}. Please check the plugin options and ensure the signingCredential is correctly set.`,
+      );
+    }
+
+    return new ethers.Wallet(privateKey, provider);
+  }
+
+  public getRPCProvider(network: string): ethers.providers.Provider {
     const provider = this.providers.get(network);
 
     if (!provider) {
@@ -183,161 +195,160 @@ export class PluginCarbonCredit implements ICactusPlugin, IPluginWebService {
     return provider;
   }
 
-  public getDexImplementation(network: Network): DexAbstract {
+  public getDexImplementation(
+    network: Network,
+    signer?: ethers.Signer,
+  ): DexAbstract {
     const fnTag = `${this.className}#getDexImplementation()`;
 
-    if (!this.options.networkConfig) {
-      throw new Error(
-        `${fnTag} No network configuration provided in plugin options.`,
-      );
+    let provider = null;
+    if (signer) {
+      provider = signer.provider;
+    } else {
+      provider = this.getRPCProvider(network);
     }
 
-    const networkConfig = this.options.networkConfig.find(
-      (config) => config.network === network,
-    );
-
-    if (!networkConfig) {
-      throw new Error(
-        `${fnTag} No network configuration found for network ${network}. Please check the plugin options.`,
-      );
+    if (!provider) {
+      throw new Error(`${fnTag} No provider available for network ${network}.`);
     }
 
     return new UniswapImpl({
       logLevel: this.options.logLevel,
-      provider: this.getRPCProvider(network),
+      provider,
     });
   }
 
   public getMarketplaceImplementation(
     marketplace: string,
     network: Network,
+    signer?: ethers.Signer,
   ): CarbonMarketplaceAbstract {
     const fnTag = `${this.className}#getMarketplaceImplementation()`;
     this.log.debug(
       `${fnTag} Getting marketplace implementation for ${marketplace} on network ${network}`,
     );
 
-    if (!this.options.networkConfig) {
-      throw new Error(
-        `${fnTag} No network configuration provided in plugin options.`,
-      );
-    }
-
-    const networkConfig = this.options.networkConfig.find(
-      (config) => config.network === network,
-    );
-
-    if (!networkConfig) {
-      throw new Error(
-        `${fnTag} No network configuration found for network ${network}. Please check the plugin options.`,
-      );
-    }
-
     switch (marketplace) {
       case Marketplace.Toucan:
         return new ToucanLeaf({
-          networkConfig: networkConfig,
-          provider: this.getRPCProvider(network),
-          signingCredential: this.options.signingCredential,
+          network,
+          signer: signer
+            ? signer
+            : this.createSigner(network, this.signingCredential?.secret ?? ""),
           logLevel: this.options.logLevel,
-          dexImpl: this.getDexImplementation(network),
+          dexImpl: this.getDexImplementation(network, signer),
         });
       default:
         throw new Error(`Unsupported marketplace: ${marketplace}`);
     }
   }
 
+  private checkSignerOrProvider(signer?: ethers.Signer) {
+    if (signer && !signer.provider) {
+      throw new Error(
+        `The provided signer does not have a provider. Please ensure the signer is connected to a provider.`,
+      );
+    }
+    if (!signer && !this.signingCredential) {
+      throw new Error(
+        `No signer provided and no signingCredential available in plugin options. Cannot proceed without a signer.`,
+      );
+    }
+  }
+
   public async specificBuy(
     request: SpecificBuyRequest,
+    signer?: ethers.Signer,
   ): Promise<SpecificBuyResponse> {
+    this.checkSignerOrProvider(signer);
+
     const marketplaceImplementation: CarbonMarketplaceAbstract =
-      this.getMarketplaceImplementation(request.marketplace, request.network);
+      this.getMarketplaceImplementation(
+        request.marketplace,
+        request.network,
+        signer,
+      );
 
-    const response = await marketplaceImplementation.specificBuy(request);
-
-    return response;
+    return await marketplaceImplementation.specificBuy(request);
   }
 
   public async randomBuy(
     request: RandomBuyRequest,
+    signer?: ethers.Signer,
   ): Promise<RandomBuyResponse> {
+    this.checkSignerOrProvider(signer);
+
     const marketplaceImplementation: CarbonMarketplaceAbstract =
-      this.getMarketplaceImplementation(request.marketplace, request.network);
+      this.getMarketplaceImplementation(
+        request.marketplace,
+        request.network,
+        signer,
+      );
 
-    const response = await marketplaceImplementation.randomBuy(request);
-
-    return response;
+    return await marketplaceImplementation.randomBuy(request);
   }
 
-  public async retire(request: RetireRequest): Promise<RetireResponse> {
-    const fnTag = `${this.className}#retire()`;
-    this.log.info(
-      `Received retire request on marketplace ${request.marketplace}`,
-    );
+  public async retire(
+    request: RetireRequest,
+    signer?: ethers.Signer,
+  ): Promise<RetireResponse> {
+    this.checkSignerOrProvider(signer);
 
-    // Step 1: Transfer the tokens to be withdrawn to the contract
-    this.log.debug(`${fnTag} Burning ${request.amounts.join(", ")} units...`);
-    const txHashRetire = "txHashRetire_placeholder"; // Replace with real withdrawal logic
+    const marketplaceImplementation: CarbonMarketplaceAbstract =
+      this.getMarketplaceImplementation(
+        request.marketplace,
+        request.network,
+        signer,
+      );
 
-    // Step 2: Optional - Generate withdrawal certificate
-    this.log.debug(`${fnTag} Generating retirement certificate...`);
-    const retirementCertificate = "retirementCertificate_placeholder"; // Replace with real certificate logic
-
-    const response: RetireResponse = {
-      txHashRetire,
-      retirementCertificate,
-    };
-
-    this.log.info(`Retire operation completed successfully.`);
-    return response;
+    return await marketplaceImplementation.retire(request);
   }
 
   public async getAvailableTCO2s(
     request: GetAvailableTCO2sRequest,
+    signer?: ethers.Signer,
   ): Promise<GetAvailableTCO2sResponse> {
+    this.checkSignerOrProvider(signer);
+
     const marketplaceImplementation: CarbonMarketplaceAbstract =
-      this.getMarketplaceImplementation(request.marketplace, request.network);
+      this.getMarketplaceImplementation(
+        request.marketplace,
+        request.network,
+        signer,
+      );
 
-    const response = await marketplaceImplementation.getAvailableTCO2s(request);
-
-    return response;
+    return await marketplaceImplementation.getAvailableTCO2s(request);
   }
 
   public async getVCUMetadata(
     request: GetVCUMetadataRequest,
+    signer?: ethers.Signer,
   ): Promise<VCUMetadata> {
+    this.checkSignerOrProvider(signer);
+
     const marketplaceImplementation: CarbonMarketplaceAbstract =
-      this.getMarketplaceImplementation(request.marketplace, request.network);
+      this.getMarketplaceImplementation(
+        request.marketplace,
+        request.network,
+        signer,
+      );
 
-    const response = await marketplaceImplementation.getVCUMetadata(request);
-
-    if (!response) {
-      throw new Error(`VCU with ID ${request.vcuIdentifier} not found.`);
-    }
-    return response;
+    return await marketplaceImplementation.getVCUMetadata(request);
   }
 
   public async getPurchasePrice(
     request: GetPurchasePriceRequest,
+    signer?: ethers.Signer,
   ): Promise<GetPurchasePriceResponse> {
-    const quote = await this.getDexImplementation(request.network).getUSDCQuote(
-      request.unit,
-      request.amount,
+    this.checkSignerOrProvider(signer);
+
+    const quote = await this.getDexImplementation(
       request.network,
-    );
+      signer,
+    ).getUSDCQuote(request.unit, request.amount, request.network);
 
     return {
       price: Number(quote.amountOut),
     };
-  }
-
-  public async sell(): Promise<void> {
-    // Placeholder for sell functionality
-    this.log.info("Sell functionality not implemented yet.");
-  }
-
-  public async listVCUs(): Promise<void> {
-    // Placeholder for listing VCUs functionality
-    this.log.info("List VCUs functionality not implemented yet.");
   }
 }

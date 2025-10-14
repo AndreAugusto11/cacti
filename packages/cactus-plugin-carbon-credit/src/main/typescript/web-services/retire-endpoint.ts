@@ -15,10 +15,7 @@ import {
 } from "@hyperledger/cactus-core-api";
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
-import {
-  RetireRequest,
-  RetireResponse,
-} from "./../generated/openapi/typescript-axios";
+import { RetireRequest } from "./../generated/openapi/typescript-axios";
 
 import { PluginCarbonCredit } from "../plugin-carbon-credit";
 
@@ -90,39 +87,9 @@ export class RetireEndpoint implements IWebServiceEndpoint {
     this.log.debug(reqTag);
 
     const reqBody: RetireRequest = req.body;
-    const {
-      marketplace,
-      walletObject,
-      tco2s,
-      amounts,
-      beneficiaryAddress,
-      beneficiaryName,
-      message,
-      retirementReason,
-    } = reqBody;
-
-    if (
-      !marketplace ||
-      !walletObject ||
-      !tco2s ||
-      !amounts ||
-      !beneficiaryAddress ||
-      !beneficiaryName ||
-      !message ||
-      !retirementReason
-    ) {
-      const errorMessage = "Missing required parameters for retirement.";
-      this.log.error(errorMessage);
-      res.status(400).json({ error: errorMessage });
-      return;
-    }
 
     try {
-      this.log.info(
-        `Received a retire request for ${amounts} units on marketplace ${marketplace}`,
-      );
-      const retireResponse: RetireResponse =
-        await this.options.plugin.retire(reqBody);
+      const retireResponse = await this.options.plugin.retire(reqBody);
       res.status(200).json(retireResponse);
     } catch (ex) {
       this.log.error(`Crash while serving ${reqTag}`, ex);

@@ -10,12 +10,8 @@ import {
   RetireRequest,
   RetireResponse,
   VCUMetadata,
-  NetworkConfig,
+  Network,
 } from "./public-api";
-import {
-  GasTransactionConfig,
-  Web3SigningCredentialPrivateKeyHex,
-} from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
 import { ethers } from "ethers";
 import { DexAbstract } from "./dex-abstract";
 
@@ -24,11 +20,9 @@ import { DexAbstract } from "./dex-abstract";
  */
 export interface CarbonMarketplaceAbstractOptions {
   logLevel?: LogLevelDesc;
-  signingCredential: Web3SigningCredentialPrivateKeyHex;
-  networkConfig: NetworkConfig;
-  provider: ethers.providers.JsonRpcProvider;
+  network: Network;
+  signer: ethers.Signer;
   dexImpl: DexAbstract;
-  gasConfig?: GasTransactionConfig;
 }
 
 export abstract class CarbonMarketplaceAbstract {

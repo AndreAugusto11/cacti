@@ -26,7 +26,7 @@ export class UniswapImpl extends DexAbstract {
 
   protected readonly log: Logger;
   protected readonly logLevel: LogLevelDesc;
-  private readonly provider: ethers.providers.JsonRpcProvider;
+  private readonly provider: ethers.providers.Provider;
 
   constructor(public readonly options: IUniswapOptions) {
     super();

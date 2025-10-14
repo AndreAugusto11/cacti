@@ -24,20 +24,18 @@ type SpecificBuyRequest struct {
 	PaymentToken string `json:"paymentToken"`
 	// A mapping from address (string) to amount (string).
 	Items map[string]string `json:"items"`
-	WalletObject string `json:"walletObject"`
 }
 
 // NewSpecificBuyRequest instantiates a new SpecificBuyRequest object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewSpecificBuyRequest(marketplace Marketplace, network Network, paymentToken string, items map[string]string, walletObject string) *SpecificBuyRequest {
+func NewSpecificBuyRequest(marketplace Marketplace, network Network, paymentToken string, items map[string]string) *SpecificBuyRequest {
 	this := SpecificBuyRequest{}
 	this.Marketplace = marketplace
 	this.Network = network
 	this.PaymentToken = paymentToken
 	this.Items = items
-	this.WalletObject = walletObject
 	return &this
 }
 
@@ -145,30 +143,6 @@ func (o *SpecificBuyRequest) SetItems(v map[string]string) {
 	o.Items = v
 }
 
-// GetWalletObject returns the WalletObject field value
-func (o *SpecificBuyRequest) GetWalletObject() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.WalletObject
-}
-
-// GetWalletObjectOk returns a tuple with the WalletObject field value
-// and a boolean to check if the value has been set.
-func (o *SpecificBuyRequest) GetWalletObjectOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.WalletObject, true
-}
-
-// SetWalletObject sets field value
-func (o *SpecificBuyRequest) SetWalletObject(v string) {
-	o.WalletObject = v
-}
-
 func (o SpecificBuyRequest) MarshalJSON() ([]byte, error) {
 	toSerialize,err := o.ToMap()
 	if err != nil {
@@ -183,7 +157,6 @@ func (o SpecificBuyRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize["network"] = o.Network
 	toSerialize["paymentToken"] = o.PaymentToken
 	toSerialize["items"] = o.Items
-	toSerialize["walletObject"] = o.WalletObject
 	return toSerialize, nil
 }
 

@@ -17,10 +17,7 @@ import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
 import { PluginCarbonCredit } from "../plugin-carbon-credit";
 
-import {
-  GetAvailableTCO2sRequest,
-  GetAvailableTCO2sResponse,
-} from "./../generated/openapi/typescript-axios";
+import { GetAvailableTCO2sRequest } from "./../generated/openapi/typescript-axios";
 
 import OAS from "../../json/openapi.json";
 
@@ -93,9 +90,7 @@ export class GetAvailableTCO2sEndpoint implements IWebServiceEndpoint {
     const reqBody = req.body as GetAvailableTCO2sRequest;
 
     try {
-      this.log.info(`Received a request to get available VCUs.`);
-      const vcuResponse: GetAvailableTCO2sResponse =
-        await this.options.plugin.getAvailableTCO2s(reqBody);
+      const vcuResponse = await this.options.plugin.getAvailableTCO2s(reqBody);
       res.status(200).json(vcuResponse);
     } catch (ex) {
       this.log.error(`Crash while serving ${reqTag}`, ex);

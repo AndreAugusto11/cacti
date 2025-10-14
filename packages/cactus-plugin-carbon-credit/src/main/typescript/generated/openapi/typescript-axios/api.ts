@@ -261,12 +261,6 @@ export interface RandomBuyRequest {
      * @memberof RandomBuyRequest
      */
     'amount': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof RandomBuyRequest
-     */
-    'walletObject': string;
 }
 
 
@@ -313,12 +307,6 @@ export interface RetireRequest {
      * @memberof RetireRequest
      */
     'network': Network;
-    /**
-     * 
-     * @type {string}
-     * @memberof RetireRequest
-     */
-    'walletObject': string;
     /**
      * 
      * @type {Array<string>}
@@ -407,12 +395,6 @@ export interface SpecificBuyRequest {
      * @memberof SpecificBuyRequest
      */
     'items': { [key: string]: string; };
-    /**
-     * 
-     * @type {string}
-     * @memberof SpecificBuyRequest
-     */
-    'walletObject': string;
 }
 
 

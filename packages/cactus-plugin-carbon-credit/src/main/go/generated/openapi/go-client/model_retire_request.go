@@ -21,7 +21,6 @@ var _ MappedNullable = &RetireRequest{}
 type RetireRequest struct {
 	Marketplace Marketplace `json:"marketplace"`
 	Network Network `json:"network"`
-	WalletObject string `json:"walletObject"`
 	Tco2s []string `json:"tco2s"`
 	Amounts []float32 `json:"amounts"`
 	BeneficiaryAddress string `json:"beneficiaryAddress"`
@@ -34,11 +33,10 @@ type RetireRequest struct {
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewRetireRequest(marketplace Marketplace, network Network, walletObject string, tco2s []string, amounts []float32, beneficiaryAddress string, beneficiaryName string, message string, retirementReason string) *RetireRequest {
+func NewRetireRequest(marketplace Marketplace, network Network, tco2s []string, amounts []float32, beneficiaryAddress string, beneficiaryName string, message string, retirementReason string) *RetireRequest {
 	this := RetireRequest{}
 	this.Marketplace = marketplace
 	this.Network = network
-	this.WalletObject = walletObject
 	this.Tco2s = tco2s
 	this.Amounts = amounts
 	this.BeneficiaryAddress = beneficiaryAddress
@@ -102,30 +100,6 @@ func (o *RetireRequest) GetNetworkOk() (*Network, bool) {
 // SetNetwork sets field value
 func (o *RetireRequest) SetNetwork(v Network) {
 	o.Network = v
-}
-
-// GetWalletObject returns the WalletObject field value
-func (o *RetireRequest) GetWalletObject() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.WalletObject
-}
-
-// GetWalletObjectOk returns a tuple with the WalletObject field value
-// and a boolean to check if the value has been set.
-func (o *RetireRequest) GetWalletObjectOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.WalletObject, true
-}
-
-// SetWalletObject sets field value
-func (o *RetireRequest) SetWalletObject(v string) {
-	o.WalletObject = v
 }
 
 // GetTco2s returns the Tco2s field value
@@ -284,7 +258,6 @@ func (o RetireRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["marketplace"] = o.Marketplace
 	toSerialize["network"] = o.Network
-	toSerialize["walletObject"] = o.WalletObject
 	toSerialize["tco2s"] = o.Tco2s
 	toSerialize["amounts"] = o.Amounts
 	toSerialize["beneficiaryAddress"] = o.BeneficiaryAddress

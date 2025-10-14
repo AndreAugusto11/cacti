@@ -15,10 +15,7 @@ import {
   IWebServiceEndpoint,
 } from "@hyperledger/cactus-core-api";
 
-import {
-  SpecificBuyRequest,
-  SpecificBuyResponse,
-} from "../generated/openapi/typescript-axios";
+import { SpecificBuyRequest } from "../generated/openapi/typescript-axios";
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
 import { PluginCarbonCredit } from "../plugin-carbon-credit";
@@ -118,21 +115,9 @@ export class SpecificBuyEndpoint implements IWebServiceEndpoint {
     this.log.debug(reqTag);
 
     const reqBody: SpecificBuyRequest = req.body;
-    const { marketplace, paymentToken, items, walletObject } = reqBody;
-
-    if (!marketplace || !paymentToken || !items || !walletObject) {
-      const errorMessage =
-        "Missing required parameters: marketplace, paymentToken, items, or walletObject.";
-      this.log.error(errorMessage);
-      res.status(400).json({ error: errorMessage });
-      return;
-    }
 
     try {
-      this.log.info(
-        `Received specific buy request for ${items} units. on marketplace ${marketplace}`,
-      );
-      const specificBuyResponse: SpecificBuyResponse =
+      const specificBuyResponse =
         await this.options.plugin.specificBuy(reqBody);
       res.status(200).json(specificBuyResponse);
     } catch (ex) {

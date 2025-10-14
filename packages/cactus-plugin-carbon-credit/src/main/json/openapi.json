@@ -49,17 +49,13 @@
               "type": "string"
             },
             "description": "A mapping from address (string) to amount (string)."
-          },
-          "walletObject": {
-            "type": "string"
           }
         },
         "required": [
           "marketplace",
           "network",
           "paymentToken",
-          "items",
-          "walletObject"
+          "items"
         ]
       },
       "SpecificBuyResponse": {
@@ -113,16 +109,12 @@
           },
           "amount": {
             "type": "string"
-          },
-          "walletObject": {
-            "type": "string"
           }
         },
         "required": [
           "marketplace",
           "network",
-          "amount",
-          "walletObject"
+          "amount"
         ]
       },
       "RandomBuyResponse": {
@@ -167,9 +159,6 @@
           "network": {
             "$ref": "#/components/schemas/Network"
           },
-          "walletObject": {
-            "type": "string"
-          },
           "tco2s": {
             "type": "array",
             "items": {
@@ -198,7 +187,6 @@
         "required": [
           "marketplace",
           "network",
-          "walletObject",
           "tco2s",
           "amounts",
           "beneficiaryAddress",

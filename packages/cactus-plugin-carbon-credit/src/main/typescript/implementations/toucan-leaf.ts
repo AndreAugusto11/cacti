@@ -3,11 +3,7 @@ import {
   LogLevelDesc,
   LoggerProvider,
 } from "@hyperledger/cactus-common";
-import {
-  GasTransactionConfig,
-  isWeb3SigningCredentialNone,
-  Web3SigningCredentialPrivateKeyHex,
-} from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
+import { GasTransactionConfig } from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
 import {
   CarbonMarketplaceAbstract,
   CarbonMarketplaceAbstractOptions,
@@ -35,6 +31,7 @@ import {
   getERC20Balance,
   getTokenAddressBySymbol,
 } from "../utils";
+import { DexAbstract } from "../dex-abstract";
 
 dotenv.config({ path: "packages/cactus-plugin-carbon-credit/.env" });
 
@@ -47,47 +44,41 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
   protected readonly logLevel: LogLevelDesc;
   protected readonly gasConfig: GasTransactionConfig | undefined;
 
-  private readonly signingCredential: Web3SigningCredentialPrivateKeyHex;
-
   private readonly toucanClient: ToucanClient;
   private readonly signer: ethers.Signer;
-  private readonly provider: ethers.providers.JsonRpcProvider;
-  private readonly dexImpl;
+
+  private readonly dexImpl: DexAbstract;
 
   constructor(public readonly options: IToucanLeafOptions) {
     super();
-    const label = ToucanLeaf.CLASS_NAME;
+    const label = this.className;
     this.logLevel = options.logLevel || "INFO";
     this.logger = LoggerProvider.getOrCreate({ label, level: this.logLevel });
 
     this.logger.debug(
-      `${ToucanLeaf.CLASS_NAME}#constructor options: ${safeStableStringify(options)}`,
+      `${this.className}#constructor options: ${safeStableStringify(options)}`,
     );
-
-    this.gasConfig = options.gasConfig;
-
-    if (isWeb3SigningCredentialNone(options.signingCredential)) {
-      throw new Error(
-        `${ToucanLeaf.CLASS_NAME}#constructor, options.signingCredential`,
-      );
-    }
-    this.signingCredential = options.signingCredential;
-
-    this.provider = options.provider;
 
     this.dexImpl = options.dexImpl;
+    this.signer = options.signer;
 
-    this.signer = this.provider.getSigner(
-      "0xfa0b641678f5115ad8a8de5752016bd1359681b9",
-    );
+    if (!this.signer.provider) {
+      throw new Error(
+        `${this.className}#constructor The provided signer does not have a provider.`,
+      );
+    }
 
-    const toucanNetwork = this.convertNetwork(options.networkConfig.network);
+    const toucanNetwork = this.convertNetwork(options.network);
 
     this.toucanClient = new ToucanClient(
       toucanNetwork,
-      this.provider,
+      this.signer.provider,
       this.signer,
     );
+  }
+
+  public get className(): string {
+    return ToucanLeaf.CLASS_NAME;
   }
 
   private convertNetwork(network: Network): ToucanNetwork {
@@ -111,7 +102,7 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
     request: SpecificBuyRequest,
   ): Promise<SpecificBuyResponse> {
     try {
-      const fnTag = `${ToucanLeaf.CLASS_NAME}#specificBuy()`;
+      const fnTag = `${this.className}#specificBuy()`;
       this.logger.info(
         `${fnTag} Received specific buy request for ${request.items} units.`,
       );
@@ -125,12 +116,8 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
         .reduce((sum, t) => sum + t, 0n)
         .toString();
 
-      const signer = this.provider.getSigner(
-        "0xfa0b641678f5115ad8a8de5752016bd1359681b9",
-      );
-
       const txHashSwap = await this.swapTokensAndApproveNCT(
-        signer,
+        this.signer,
         totalTonnes,
         request.network,
       );
@@ -162,17 +149,13 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
     request: RandomBuyRequest,
   ): Promise<RandomBuyResponse> {
     try {
-      const fnTag = `${ToucanLeaf.CLASS_NAME}#randomBuy()`;
+      const fnTag = `${this.className}#randomBuy()`;
       this.logger.info(
         `${fnTag} Received buy request for ${request.amount} units.`,
       );
 
-      const signer = this.provider.getSigner(
-        "0xfa0b641678f5115ad8a8de5752016bd1359681b9",
-      );
-
       const txHashSwap = await this.swapTokensAndApproveNCT(
-        signer,
+        this.signer,
         request.amount,
         request.network,
       );
@@ -207,7 +190,7 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
     request: GetAvailableTCO2sRequest,
   ): Promise<GetAvailableTCO2sResponse> {
     try {
-      const fnTag = `${ToucanLeaf.CLASS_NAME}#getAvailableTCO2s()`;
+      const fnTag = `${this.className}#getAvailableTCO2s()`;
       this.logger.info(
         `Fetching available VCUs for marketplace ${request.marketplace}`,
       );
@@ -273,7 +256,11 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
   public async getVCUMetadata(
     req: GetVCUMetadataRequest,
   ): Promise<VCUMetadata> {
-    this.logger.info(`Fetching metadata for VCU with ID: ${req.vcuIdentifier}`);
+    const fnTag = `${this.className}#getVCUMetadata()`;
+
+    this.logger.info(
+      `${fnTag} Fetching metadata for VCU with ID: ${req.vcuIdentifier}`,
+    );
 
     try {
       const tco2 = await this.toucanClient.getTCO2Contract(req.vcuIdentifier);
@@ -309,7 +296,7 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
     totalTonnes: string,
     network: Network,
   ): Promise<string> {
-    const fnTag = `${ToucanLeaf.CLASS_NAME}#swapTokensAndApproveNCT()`;
+    const fnTag = `${this.className}#swapTokensAndApproveNCT()`;
 
     const txHashSwap = await this.dexImpl.swapExactFromUSDC(
       signer,
@@ -321,7 +308,7 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
     const usdc_balance = await getERC20Balance(
       getTokenAddressBySymbol(network, "USDC"),
       await signer.getAddress(),
-      this.provider,
+      signer.provider!,
     );
     this.logger.info(
       `${fnTag} USDC balance after swap: ${ethers.utils.formatUnits(
@@ -333,7 +320,7 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
     const nct_balance = await getERC20Balance(
       getTokenAddressBySymbol(network, "NCT"),
       await signer.getAddress(),
-      this.provider,
+      signer.provider!,
     );
     this.logger.info(
       `${fnTag} NCT balance after swap: ${ethers.utils.formatUnits(

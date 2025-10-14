@@ -160,7 +160,6 @@ components:
         marketplace: null
         items:
           key: items
-        walletObject: walletObject
         network: null
       properties:
         marketplace:
@@ -174,14 +173,11 @@ components:
             type: string
           description: A mapping from address (string) to amount (string).
           type: object
-        walletObject:
-          type: string
       required:
       - items
       - marketplace
       - network
       - paymentToken
-      - walletObject
       type: object
     SpecificBuyResponse:
       example:
@@ -214,7 +210,6 @@ components:
         paymentToken: paymentToken
         amount: amount
         marketplace: null
-        walletObject: walletObject
         network: null
       properties:
         marketplace:
@@ -225,13 +220,10 @@ components:
           type: string
         amount:
           type: string
-        walletObject:
-          type: string
       required:
       - amount
       - marketplace
       - network
-      - walletObject
       type: object
     RandomBuyResponse:
       example:
@@ -268,15 +260,12 @@ components:
         beneficiaryName: beneficiaryName
         beneficiaryAddress: beneficiaryAddress
         message: message
-        walletObject: walletObject
         network: null
       properties:
         marketplace:
           $ref: '#/components/schemas/Marketplace'
         network:
           $ref: '#/components/schemas/Network'
-        walletObject:
-          type: string
         tco2s:
           items:
             type: string
@@ -302,7 +291,6 @@ components:
       - network
       - retirementReason
       - tco2s
-      - walletObject
       type: object
     RetireResponse:
       example:

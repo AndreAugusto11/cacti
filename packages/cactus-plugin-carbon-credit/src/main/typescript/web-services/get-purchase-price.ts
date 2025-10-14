@@ -17,10 +17,7 @@ import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
 import { PluginCarbonCredit } from "../plugin-carbon-credit";
 
-import {
-  GetPurchasePriceRequest,
-  GetPurchasePriceResponse,
-} from "../generated/openapi/typescript-axios";
+import { GetPurchasePriceRequest } from "../generated/openapi/typescript-axios";
 
 import OAS from "../../json/openapi.json";
 
@@ -93,9 +90,7 @@ export class GetPurchasePriceEndpoint implements IWebServiceEndpoint {
     const reqBody = req.body as GetPurchasePriceRequest;
 
     try {
-      this.log.info(`Received a request to get purchase price.`);
-      const priceResponse: GetPurchasePriceResponse =
-        await this.options.plugin.getPurchasePrice(reqBody);
+      const priceResponse = await this.options.plugin.getPurchasePrice(reqBody);
       res.status(200).json(priceResponse);
     } catch (ex) {
       this.log.error(`Crash while serving ${reqTag}`, ex);

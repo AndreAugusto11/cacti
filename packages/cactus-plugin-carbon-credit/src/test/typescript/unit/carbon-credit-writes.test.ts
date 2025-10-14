@@ -1,7 +1,6 @@
 import "jest-extended";
 
 import { Logger } from "@hyperledger/cactus-common";
-import dotenv from "dotenv";
 import { ethers } from "ethers";
 import {
   GetAvailableTCO2sRequest,
@@ -16,31 +15,13 @@ import {
 } from "../../../main/typescript/utils";
 import { parseUnits } from "ethers/lib/utils";
 import safeStableStringify from "safe-stable-stringify";
-dotenv.config({ path: "packages/cactus-plugin-carbon-credit/.env" });
-
-const ALCHEMY_API_KEY = process.env.ALCHEMY_API_KEY;
-
-if (!ALCHEMY_API_KEY) {
-  throw new Error("ALCHEMY_API_KEY not set in environment");
-}
 
 const provider = new ethers.providers.JsonRpcProvider("http://127.0.0.1:8545");
-
 const impersonatedAddress = "0xfa0b641678f5115ad8a8de5752016bd1359681b9";
+const signer = provider.getSigner(impersonatedAddress);
 
 const pluginOptions: IPluginCarbonCreditOptions = {
   instanceId: "test-instance-id",
-  signingCredential: {
-    type: "PRIVATE_KEY_HEX",
-    ethAccount: "0xb5271339c211cC1EEeD30a2f9f447063a5faD1F0",
-    secret: "739ed7c97109f28bc8f13b354b30bbd01a47061be7676c3c3934aa4a56540de4",
-  },
-  networkConfig: [
-    {
-      rpcUrl: "http://127.0.0.1:8545",
-      network: Network.Polygon,
-    },
-  ],
   logLevel: "INFO",
 };
 
@@ -51,9 +32,19 @@ const logger = new Logger({
   level: "INFO",
 });
 
-// Create a Polygon hardfork on block 77660000
+// Create a Polygon hardfork on block 77660000, and start the node on port 8545
 
 describe("Uniswap quote and swap functionality", () => {
+  beforeAll(async () => {
+    await provider.send("hardhat_impersonateAccount", [impersonatedAddress]);
+  });
+
+  afterAll(async () => {
+    await provider.send("hardhat_stopImpersonatingAccount", [
+      impersonatedAddress,
+    ]);
+  });
+
   test("Specific buy function runs successfully", async () => {
     const usdcAddress = getTokenAddressBySymbol(Network.Polygon, "USDC");
     const nctAddress = getTokenAddressBySymbol(Network.Polygon, "NCT");
@@ -78,7 +69,7 @@ describe("Uniswap quote and swap functionality", () => {
       network: Network.Polygon,
     };
 
-    const tco2sResponse = await plugin.getAvailableTCO2s(tco2sRequest);
+    const tco2sResponse = await plugin.getAvailableTCO2s(tco2sRequest, signer);
 
     expect(tco2sResponse).toBeDefined();
     expect(tco2sResponse.tco2List).toBeInstanceOf(Array);
@@ -89,20 +80,20 @@ describe("Uniswap quote and swap functionality", () => {
 
     const vcusMetadata = await Promise.all(
       selectedTCO2s.map(async (t) =>
-        plugin.getVCUMetadata({
-          marketplace: Marketplace.Toucan,
-          network: Network.Polygon,
-          projectIdentifier: t.projectId,
-          vcuIdentifier: t.address,
-        }),
+        plugin.getVCUMetadata(
+          {
+            marketplace: Marketplace.Toucan,
+            network: Network.Polygon,
+            projectIdentifier: t.projectId,
+            vcuIdentifier: t.address,
+          },
+          signer,
+        ),
       ),
     );
 
     expect(vcusMetadata).toBeDefined();
     expect(vcusMetadata.length).toBe(3);
-
-    await provider.send("hardhat_impersonateAccount", [impersonatedAddress]);
-    // const signer = provider.getSigner(impersonatedAddress);
 
     const specificBuyRequest = {
       marketplace: Marketplace.Toucan,
@@ -113,10 +104,12 @@ describe("Uniswap quote and swap functionality", () => {
         [selectedTCO2s[1].address]: parseUnits("100", 18).toString(), // 100 tonnes
         [selectedTCO2s[2].address]: parseUnits("100", 18).toString(), // 100 tonnes
       },
-      walletObject: "signer",
     };
 
-    const specificBuyResponse = await plugin.specificBuy(specificBuyRequest);
+    const specificBuyResponse = await plugin.specificBuy(
+      specificBuyRequest,
+      signer,
+    );
     expect(specificBuyResponse).toBeDefined();
     expect(specificBuyResponse.txHashSwap).toBeDefined();
 
@@ -163,9 +156,8 @@ describe("Uniswap quote and swap functionality", () => {
       network: Network.Polygon,
       paymentToken: "0x2F25deB3848C207fc8E0c34035B3Ba7fC157602B", // USDC on Polygon
       amount: parseUnits("100", 18).toString(), // 100 tonnes
-      walletObject: "wallet-address-placeholder",
     };
-    const response = await plugin.randomBuy(request);
+    const response = await plugin.randomBuy(request, signer);
     expect(response).toBeDefined();
     expect(response.txHashSwap).toBeDefined();
     expect(response.assetAmount).toBeDefined();

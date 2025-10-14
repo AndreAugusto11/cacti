@@ -8,7 +8,7 @@ import { Quote } from "./types";
  */
 export interface DexAbstractOptions {
   logLevel?: LogLevelDesc;
-  provider: ethers.providers.JsonRpcProvider;
+  provider: ethers.providers.Provider;
 }
 
 export abstract class DexAbstract {

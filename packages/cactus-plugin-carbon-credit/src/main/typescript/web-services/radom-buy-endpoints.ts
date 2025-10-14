@@ -15,10 +15,7 @@ import {
   IWebServiceEndpoint,
 } from "@hyperledger/cactus-core-api";
 
-import {
-  RandomBuyRequest,
-  RandomBuyResponse,
-} from "../generated/openapi/typescript-axios";
+import { RandomBuyRequest } from "../generated/openapi/typescript-axios";
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
 import { PluginCarbonCredit } from "../plugin-carbon-credit";
@@ -92,20 +89,9 @@ export class RandomBuyEndpoint implements IWebServiceEndpoint {
     this.log.debug(reqTag);
 
     const reqBody: RandomBuyRequest = req.body;
-    const { marketplace, paymentToken, amount, walletObject } = reqBody;
-
-    if (!marketplace || !paymentToken || !amount || !walletObject) {
-      const errorMessage =
-        "Missing required parameters: marketplace, paymentToken, items, or walletObject.";
-      this.log.error(errorMessage);
-      res.status(400).json({ error: errorMessage });
-      return;
-    }
 
     try {
-      this.log.info(`Received buy request for ${amount} units.`);
-      const randomBuyResponse: RandomBuyResponse =
-        await this.options.plugin.randomBuy(reqBody);
+      const randomBuyResponse = await this.options.plugin.randomBuy(reqBody);
       res.status(200).json(randomBuyResponse);
     } catch (ex) {
       this.log.error(`Crash while serving ${reqTag}`, ex);

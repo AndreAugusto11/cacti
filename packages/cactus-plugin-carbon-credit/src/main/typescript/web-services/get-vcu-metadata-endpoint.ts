@@ -15,10 +15,7 @@ import {
 } from "@hyperledger/cactus-core-api";
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
-import {
-  GetVCUMetadataRequest,
-  VCUMetadata,
-} from "./../generated/openapi/typescript-axios";
+import { GetVCUMetadataRequest } from "./../generated/openapi/typescript-axios";
 
 import { PluginCarbonCredit } from "../plugin-carbon-credit";
 
@@ -91,10 +88,7 @@ export class GetVCUMetadataEndpoint implements IWebServiceEndpoint {
     const reqBody: GetVCUMetadataRequest = req.body;
 
     try {
-      this.log.info(
-        `Received a request to get metadata for VCU with ID: ${reqBody.vcuIdentifier}`,
-      );
-      const vcuMetadataResponse: VCUMetadata =
+      const vcuMetadataResponse =
         await this.options.plugin.getVCUMetadata(reqBody);
       res.status(200).json(vcuMetadataResponse);
     } catch (ex) {

@@ -23,19 +23,17 @@ type RandomBuyRequest struct {
 	Network Network `json:"network"`
 	PaymentToken *string `json:"paymentToken,omitempty"`
 	Amount string `json:"amount"`
-	WalletObject string `json:"walletObject"`
 }
 
 // NewRandomBuyRequest instantiates a new RandomBuyRequest object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewRandomBuyRequest(marketplace Marketplace, network Network, amount string, walletObject string) *RandomBuyRequest {
+func NewRandomBuyRequest(marketplace Marketplace, network Network, amount string) *RandomBuyRequest {
 	this := RandomBuyRequest{}
 	this.Marketplace = marketplace
 	this.Network = network
 	this.Amount = amount
-	this.WalletObject = walletObject
 	return &this
 }
 
@@ -151,30 +149,6 @@ func (o *RandomBuyRequest) SetAmount(v string) {
 	o.Amount = v
 }
 
-// GetWalletObject returns the WalletObject field value
-func (o *RandomBuyRequest) GetWalletObject() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.WalletObject
-}
-
-// GetWalletObjectOk returns a tuple with the WalletObject field value
-// and a boolean to check if the value has been set.
-func (o *RandomBuyRequest) GetWalletObjectOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.WalletObject, true
-}
-
-// SetWalletObject sets field value
-func (o *RandomBuyRequest) SetWalletObject(v string) {
-	o.WalletObject = v
-}
-
 func (o RandomBuyRequest) MarshalJSON() ([]byte, error) {
 	toSerialize,err := o.ToMap()
 	if err != nil {
@@ -191,7 +165,6 @@ func (o RandomBuyRequest) ToMap() (map[string]interface{}, error) {
 		toSerialize["paymentToken"] = o.PaymentToken
 	}
 	toSerialize["amount"] = o.Amount
-	toSerialize["walletObject"] = o.WalletObject
 	return toSerialize, nil
 }
 
