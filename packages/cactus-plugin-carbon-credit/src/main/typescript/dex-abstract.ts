@@ -1,6 +1,7 @@
 import type { LogLevelDesc } from "@hyperledger/cactus-common";
 import { Network } from "./public-api";
-import { ethers } from "ethers";
+import { ethers, Signer } from "ethers";
+import { Quote } from "./types";
 
 /**
  * Common interface options for all Carbon Credit Marketplaces.
@@ -29,17 +30,19 @@ export abstract class DexAbstract {
    * @throws Will throw an error if the swap fails.
    * @abstract
    */
-  public abstract swap(
+  public abstract swapExactFromUSDC(
+    signer: Signer,
     fromToken: string,
     toToken: string,
     amount: string,
-  ): Promise<string>;
+  ): Promise<void>;
 
   /**
-   * Abstract operation to get a quote for a token swap on the DEX.
-   * @param {string} fromToken - The address or symbol of the token to swap from.
-   * @param {string} amount - The amount of fromToken to swap.
-   * @returns {Promise<string>} A promise that resolves to the quoted amount of toToken.
+   * Abstract operation to get a quote for swapping from USDC to another token.
+   * @param {string} fromToken - The address or symbol of the token to swap from USDC.
+   * @param {string} amount - The amount of USDC to swap.
+   * @param {Network} network - The network on which to get the quote.
+   * @returns {Promise<Quote>} A promise that resolves to the quote details.
    * @throws Will throw an error if the quote retrieval fails.
    * @abstract
    */
@@ -47,5 +50,5 @@ export abstract class DexAbstract {
     fromToken: string,
     amount: string,
     network: Network,
-  ): Promise<string>;
+  ): Promise<Quote>;
 }

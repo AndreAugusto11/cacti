@@ -43,7 +43,7 @@ import { ToucanLeaf } from "./implementations/toucan-leaf";
 import { CarbonMarketplaceAbstract } from "./carbon-marketplace-abstract";
 import { ethers } from "ethers";
 
-import { UniswapLeaf } from "./dexes/uniswap-leaf";
+import { UniswapImpl } from "./dexes/uniswap";
 import { DexAbstract } from "./dex-abstract";
 
 export interface IPluginCarbonCreditOptions extends ICactusPluginOptions {
@@ -202,7 +202,7 @@ export class PluginCarbonCredit implements ICactusPlugin, IPluginWebService {
       );
     }
 
-    return new UniswapLeaf({
+    return new UniswapImpl({
       logLevel: this.options.logLevel,
       provider: this.getRPCProvider(network),
     });
@@ -318,12 +318,14 @@ export class PluginCarbonCredit implements ICactusPlugin, IPluginWebService {
   public async getPurchasePrice(
     request: GetPurchasePriceRequest,
   ): Promise<GetPurchasePriceResponse> {
-    const quotedPrice = await this.getDexImplementation(
+    const quote = await this.getDexImplementation(request.network).getUSDCQuote(
+      request.unit,
+      request.amount,
       request.network,
-    ).getUSDCQuote(request.unit, request.amount, request.network);
+    );
 
     return {
-      price: Number(quotedPrice),
+      price: Number(quote.amountOut),
     };
   }
 

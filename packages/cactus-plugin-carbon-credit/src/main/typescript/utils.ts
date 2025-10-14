@@ -1,20 +1,6 @@
+import { ethers } from "ethers";
 import { Network } from "./public-api";
-
-// Do not change the struct, this information is needed for the
-// computePoolAddress function from @uniswap/v3-sdk in getPurchasePrice
-export interface TokenInfo {
-  chainId: number;
-  address: string;
-  decimals: number;
-  symbol: string;
-  name: string;
-}
-
-interface DexInfo {
-  factory: string;
-  quoter: string;
-  router: string;
-}
+import { TokenInfo, DexInfo } from "./types";
 
 export const TOKEN_ADDRESSES: Record<string, Record<string, TokenInfo>> = {
   polygon: {
@@ -51,16 +37,16 @@ export const TOKEN_ADDRESSES: Record<string, Record<string, TokenInfo>> = {
   },
 };
 
-export const DEFAULT_DEX = {
+export const DEFAULT_DEX: Record<string, DexInfo> = {
   polygon: {
     factory: "0x1F98431c8aD98523631AE4a59f267346ea31F984", // Uniswap V2
     quoter: "0x61fFE014bA17989E743c5F6cB21bF9697530B21e", // Quoter V2
-    router: "xx", // TODO
+    router: "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45", // Swap Router V2
   },
   celo: {
     factory: "0xAfE208a311B21f13EF87E33A90049fC17A7acDEc", // Uniswap V2
     quoter: "0x82825d0554fA07f7FC52Ab63c961F330fdEFa8E8", // Quoter V2
-    router: "", // TODO
+    router: "0x5615CDAb10dc425a742d643d949a7F474C01abc4", // Swap Router V2
   },
 };
 
@@ -130,4 +116,50 @@ export function getDefaultDex(network: Network): DexInfo {
     default:
       throw new Error(`Unsupported network: ${network}`);
   }
+}
+
+/**
+ * Returns the ERC20 token balance for a given address.
+ * @param tokenAddress ERC20 token contract address
+ * @param ownerAddress Address to check balance for
+ * @param provider ethers provider
+ * @returns Promise<BigInt> token balance
+ */
+export async function getERC20Balance(
+  tokenAddress: string,
+  ownerAddress: string,
+  provider: ethers.providers.Provider,
+): Promise<bigint> {
+  const erc20 = new ethers.Contract(
+    tokenAddress,
+    ["function balanceOf(address owner) view returns (uint256)"],
+    provider,
+  );
+  const balance = await erc20.balanceOf(ownerAddress);
+  return BigInt(balance.toString());
+}
+
+/**
+ * Returns the ERC20 token allowance for a given owner and spender.
+ * @param tokenAddress ERC20 token contract address
+ * @param ownerAddress Address of the token owner
+ * @param spenderAddress Address of the spender
+ * @param provider ethers provider
+ * @returns Promise<BigInt> token allowance
+ */
+export async function getERC20Allowance(
+  tokenAddress: string,
+  ownerAddress: string,
+  spenderAddress: string,
+  provider: ethers.providers.Provider,
+): Promise<bigint> {
+  const erc20 = new ethers.Contract(
+    tokenAddress,
+    [
+      "function allowance(address owner, address spender) view returns (uint256)",
+    ],
+    provider,
+  );
+  const allowance = await erc20.allowance(ownerAddress, spenderAddress);
+  return BigInt(allowance.toString());
 }
