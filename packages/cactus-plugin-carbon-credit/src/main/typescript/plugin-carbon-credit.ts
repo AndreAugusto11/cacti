@@ -42,13 +42,9 @@ import {
 import { ToucanLeaf } from "./implementations/toucan-leaf";
 import { CarbonMarketplaceAbstract } from "./carbon-marketplace-abstract";
 import { ethers } from "ethers";
-import { computePoolAddress, FeeAmount } from "@uniswap/v3-sdk";
-import { Token } from "@uniswap/sdk-core";
-import IUniswapV3PoolABI from "@uniswap/v3-core/artifacts/contracts/interfaces/IUniswapV3Pool.sol/IUniswapV3Pool.json";
-import Quoter from "@uniswap/v3-periphery/artifacts/contracts/lens/QuoterV2.sol/QuoterV2.json";
-// import Quoter from '@uniswap/v3-periphery/artifacts/contracts/lens/Quoter.sol/Quoter.json'
 
-import { getDefaultDex, getTokenByAddress, getTokenBySymbol } from "./utils";
+import { UniswapLeaf } from "./dexes/uniswap-leaf";
+import { DexAbstract } from "./dex-abstract";
 
 export interface IPluginCarbonCreditOptions extends ICactusPluginOptions {
   instanceId: string;
@@ -187,6 +183,31 @@ export class PluginCarbonCredit implements ICactusPlugin, IPluginWebService {
     return provider;
   }
 
+  public getDexImplementation(network: Network): DexAbstract {
+    const fnTag = `${this.className}#getDexImplementation()`;
+
+    if (!this.options.networkConfig) {
+      throw new Error(
+        `${fnTag} No network configuration provided in plugin options.`,
+      );
+    }
+
+    const networkConfig = this.options.networkConfig.find(
+      (config) => config.network === network,
+    );
+
+    if (!networkConfig) {
+      throw new Error(
+        `${fnTag} No network configuration found for network ${network}. Please check the plugin options.`,
+      );
+    }
+
+    return new UniswapLeaf({
+      logLevel: this.options.logLevel,
+      provider: this.getRPCProvider(network),
+    });
+  }
+
   public getMarketplaceImplementation(
     marketplace: string,
     network: Network,
@@ -297,88 +318,13 @@ export class PluginCarbonCredit implements ICactusPlugin, IPluginWebService {
   public async getPurchasePrice(
     request: GetPurchasePriceRequest,
   ): Promise<GetPurchasePriceResponse> {
-    const usdcInfo = getTokenBySymbol(request.network, "USDC");
-    const USDC_TOKEN = new Token(
-      usdcInfo.chainId,
-      usdcInfo.address,
-      usdcInfo.decimals,
-      usdcInfo.symbol,
-      usdcInfo.name,
-    );
+    const quotedPrice = await this.getDexImplementation(
+      request.network,
+    ).getUSDCQuote(request.unit, request.amount, request.network);
 
-    const swapToken = getTokenByAddress(request.network, request.unit);
-    const SWAP_TOKEN = new Token(
-      swapToken.chainId,
-      swapToken.address,
-      swapToken.decimals,
-      swapToken.symbol,
-      swapToken.name,
-    );
-
-    let currentPoolAddress: string | null = null;
-    let fee: FeeAmount | null = null;
-
-    for (fee of [FeeAmount.LOW, FeeAmount.MEDIUM, FeeAmount.HIGH]) {
-      currentPoolAddress = computePoolAddress({
-        factoryAddress: getDefaultDex(request.network).factory,
-        tokenA: USDC_TOKEN,
-        tokenB: SWAP_TOKEN,
-        fee: fee,
-        chainId: USDC_TOKEN.chainId,
-      });
-
-      const poolContract = new ethers.Contract(
-        currentPoolAddress,
-        IUniswapV3PoolABI.abi,
-        this.getRPCProvider(request.network),
-      );
-
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const [token0, token1, fee] = await Promise.all([
-          poolContract.token0(),
-          poolContract.token1(),
-          poolContract.fee(),
-          poolContract.liquidity(),
-          poolContract.slot0(),
-        ]);
-
-        this.log.debug(
-          `Found pool for ${SWAP_TOKEN.symbol}/${USDC_TOKEN.symbol} on fee tier ${fee} at address ${currentPoolAddress}`,
-        );
-
-        const quoterContract = new ethers.Contract(
-          getDefaultDex(request.network).quoter,
-          Quoter.abi,
-          this.getRPCProvider(request.network),
-        );
-
-        try {
-          const result = await quoterContract.callStatic.quoteExactInputSingle({
-            tokenIn: token1,
-            tokenOut: token0,
-            amountIn: request.amount,
-            fee: fee,
-            sqrtPriceLimitX96: 0,
-          });
-
-          return {
-            price: Number(result.amountOut),
-          };
-        } catch (error) {
-          this.log.error(`Error during quoting: ${error}`);
-          throw error;
-        }
-      } catch (error) {
-        this.log.warn(
-          `Pool not found for fee tier ${fee} on address ${currentPoolAddress}. Trying next fee tier...`,
-        );
-      }
-    }
-
-    throw new Error(
-      `No pool found for ${SWAP_TOKEN.symbol}/${USDC_TOKEN.symbol} on any fee tier.`,
-    );
+    return {
+      price: Number(quotedPrice),
+    };
   }
 
   public async sell(): Promise<void> {

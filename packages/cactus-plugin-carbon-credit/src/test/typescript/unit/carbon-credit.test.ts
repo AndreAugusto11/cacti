@@ -46,10 +46,6 @@ const pluginOptions: IPluginCarbonCreditOptions = {
 const plugin = new PluginCarbonCredit(pluginOptions);
 
 describe("PluginCarbonCredit Functionality", () => {
-  afterEach(async () => {
-    await new Promise((resolve) => setTimeout(resolve, 10000));
-  });
-
   describe("GetAvailableTCO2s Functionality", () => {
     test("getAvailableTCO2s returns a list of TCO2s (Polygon)", async () => {
       const request: GetAvailableTCO2sRequest = {
@@ -182,7 +178,7 @@ describe("PluginCarbonCredit Functionality", () => {
       console.log("getPurchasePrice Response (Celo):", cUSD_balance + " cUSD");
 
       expect(response).toBeDefined();
-      expect(response.price).toBeGreaterThan(parseUnits("0.3", 18).toBigInt());
+      expect(response.price).toBeGreaterThan(parseUnits("1.6", 18).toBigInt()); // Flaky test. Currently 1 NCT = 1.66 cUSD
     });
   });
 

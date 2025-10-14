@@ -1,5 +1,4 @@
 import { Network } from "./public-api";
-import { Token } from "@uniswap/sdk-core";
 
 // Do not change the struct, this information is needed for the
 // computePoolAddress function from @uniswap/v3-sdk in getPurchasePrice
