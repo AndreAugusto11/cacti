@@ -257,10 +257,10 @@ export interface RandomBuyRequest {
     'paymentToken'?: string;
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof RandomBuyRequest
      */
-    'amount': number;
+    'amount': string;
     /**
      * 
      * @type {string}

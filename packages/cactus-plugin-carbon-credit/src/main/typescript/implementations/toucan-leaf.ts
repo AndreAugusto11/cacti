@@ -27,7 +27,7 @@ import {
   Network,
 } from "../public-api";
 import ToucanClient from "toucan-sdk";
-import { ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import { Network as ToucanNetwork } from "toucan-sdk/dist/types";
 import dotenv from "dotenv";
 import {
@@ -113,7 +113,7 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
     try {
       const fnTag = `${ToucanLeaf.CLASS_NAME}#specificBuy()`;
       this.logger.info(
-        `Received specific buy request for ${request.items} units.`,
+        `${fnTag} Received specific buy request for ${request.items} units.`,
       );
 
       const tco2Addresses = Object.keys(request.items);
@@ -129,50 +129,11 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
         "0xfa0b641678f5115ad8a8de5752016bd1359681b9",
       );
 
-      const txHashSwap = await this.dexImpl.swapExactFromUSDC(
+      const txHashSwap = await this.swapTokensAndApproveNCT(
         signer,
-        getTokenAddressBySymbol(request.network, "NCT"),
-        BigInt(totalTonnes).toString(), // amount of NCT we want to buy
+        totalTonnes,
         request.network,
       );
-
-      const usdc_balance = await getERC20Balance(
-        getTokenAddressBySymbol(request.network, "USDC"),
-        await signer.getAddress(),
-        this.provider,
-      );
-      this.logger.info(
-        `${fnTag} USDC balance after swap: ${ethers.utils.formatUnits(
-          usdc_balance,
-          6,
-        )} USDC`,
-      );
-
-      const nct_balance = await getERC20Balance(
-        getTokenAddressBySymbol(request.network, "NCT"),
-        await signer.getAddress(),
-        this.provider,
-      );
-      this.logger.info(
-        `${fnTag} NCT balance after swap: ${ethers.utils.formatUnits(
-          nct_balance,
-          18,
-        )} NCT`,
-      );
-
-      // 3. Approve NCT
-      const approvalTx = await approveERC20IfNeeded(
-        getTokenAddressBySymbol(request.network, "NCT"),
-        signer,
-        this.toucanClient.getPoolAddress("NCT"),
-        BigInt(totalTonnes),
-      );
-
-      if (approvalTx) {
-        this.logger.info(
-          `${fnTag} Approved pool ${this.toucanClient.getPoolAddress("NCT")} to spend NCT. Approval tx hash: ${approvalTx}`,
-        );
-      }
 
       const receipt = await this.toucanClient.redeemMany(
         "NCT",
@@ -180,7 +141,7 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
         tonnes,
       );
 
-      this.logger.info(`Buy operation completed successfully.`);
+      this.logger.info(`Specific buy operation completed successfully.`);
 
       return {
         txHashSwap: txHashSwap,
@@ -197,101 +158,39 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async randomBuy(
     request: RandomBuyRequest,
   ): Promise<RandomBuyResponse> {
     try {
       const fnTag = `${ToucanLeaf.CLASS_NAME}#randomBuy()`;
-      this.logger.info(`Received buy request for ${request.amount} units.`);
-
-      // // 1. Setup
-      // const router = new ethers.Contract(
-      //   process.env.ROUTER!, // Ex: SushiSwap em Polygon
-      //   [
-      //     "function swapExactTokensForTokens(uint256 amountIn,uint256 amountOutMin,address[] path,address to,uint256 deadline) external returns (uint256[] memory)",
-      //   ],
-      //   this.signer,
-      // );
-
-      // if (request.paymentToken === undefined) {
-      //   request.paymentToken = process.env.USDC!;
-      // }
-
-      // const usdc = new ethers.Contract(
-      //   request.paymentToken,
-      //   [
-      //     "function approve(address spender, uint256 value) external returns (bool)",
-      //   ],
-      //   this.signer,
-      // );
-
-      // 2. Swap USDC → NCT
-      // this.logger.debug(
-      //   `${fnTag}  Swapping ${request.paymentToken} for pool tokens...`,
-      // );
-      // const amountIn = utils.parseUnits(String(request.amount), 6); // not this amount. This will be the amount of carbon credits in tonnes
-      // const path = [request.paymentToken, process.env.NCT!];
-      // await usdc.approve(router.address, amountIn);
-
-      // const swapTx = await router.swapExactTokensForTokens(
-      //   amountIn,
-      //   0, // set `amountOutMin` for real slippage control
-      //   path,
-      //   this.signer.address,
-      //   Math.floor(Date.now() / 1000) + 60 * 10,
-      // );
-
-      // const receipt = await swapTx.wait();
-      // const txHashSwap = receipt.hash;
-      const txHashSwap = "txHashSwap_placeholder";
-
-      // 3. Approve NCT + Redeem chosen TCO2s
-      this.logger.debug(`${fnTag} Redeeming pool tokens for TCO2s...`);
-
-      const nct = new ethers.Contract(
-        getTokenAddressBySymbol(request.network, "NCT"),
-        [
-          "function approve(address spender, uint256 value) external returns (bool)",
-          "function balanceOf(address account) external view returns (uint256)",
-          "function redeemAuto(uint256 amount) external returns (uint256[] memory)",
-          "event Redeem(address indexed tco2, uint256 amount)",
-        ],
-        this.signer,
+      this.logger.info(
+        `${fnTag} Received buy request for ${request.amount} units.`,
       );
 
-      const nctBalance = await nct.balanceOf(this.signer.getAddress());
-      await nct.approve(
-        await getTokenAddressBySymbol(request.network, "NCT"),
-        2n ** 256n,
-      ); // infinite approval per #332
-      // For non-custodial front-ends consider limited approvals equal to `nctBalance` instead.
-      const redeemTx = await nct.redeemAuto(nctBalance);
-      const redeemReceipt = await redeemTx.wait();
+      const signer = this.provider.getSigner(
+        "0xfa0b641678f5115ad8a8de5752016bd1359681b9",
+      );
 
-      // 4. Parse events to build tco2List
-      const tco2List: { address: string; amount: string }[] = [];
-      for (const log of redeemReceipt.logs) {
-        try {
-          const parsed = nct.interface.parseLog(log);
-          if (parsed && parsed.name === "Redeem") {
-            const [tco2Addr, amt] = parsed.args;
-            tco2List.push({
-              address: tco2Addr,
-              amount: amt.toString(),
-            });
-          }
-        } catch {
-          // ignore logs that don’t match
-        }
-      }
+      const txHashSwap = await this.swapTokensAndApproveNCT(
+        signer,
+        request.amount,
+        request.network,
+      );
 
-      this.logger.info(`Buy operation completed successfully.`);
+      const receipt = await this.toucanClient.redeemAuto(
+        "NCT",
+        BigNumber.from(request.amount),
+      );
+
+      this.logger.info(`Random buy operation completed successfully.`);
 
       return {
         txHashSwap,
-        assetAmount: nctBalance.toString(),
-        tco2List,
+        assetAmount: request.amount.toString(),
+        tco2List: receipt.map((addr) => ({
+          address: addr.address,
+          amount: addr.amount.toString(),
+        })),
       };
     } catch (err) {
       this.logger.error("Error in randomBuy:", err);
@@ -313,7 +212,7 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
         `Fetching available VCUs for marketplace ${request.marketplace}`,
       );
 
-      this.logger.debug(`${fnTag} Fetching available VCUs...`);
+      this.logger.info(`${fnTag} Fetching available VCUs...`);
 
       // Search for available TCO2s already sorted by quality score
       const tco2Addresses: string[] =
@@ -403,5 +302,60 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
     } catch (err) {
       throw new Error(`VCU with ID ${req.vcuIdentifier} not found.`);
     }
+  }
+
+  public async swapTokensAndApproveNCT(
+    signer: ethers.Signer,
+    totalTonnes: string,
+    network: Network,
+  ): Promise<string> {
+    const fnTag = `${ToucanLeaf.CLASS_NAME}#swapTokensAndApproveNCT()`;
+
+    const txHashSwap = await this.dexImpl.swapExactFromUSDC(
+      signer,
+      getTokenAddressBySymbol(network, "NCT"),
+      totalTonnes, // amount of NCT we want to buy
+      network,
+    );
+
+    const usdc_balance = await getERC20Balance(
+      getTokenAddressBySymbol(network, "USDC"),
+      await signer.getAddress(),
+      this.provider,
+    );
+    this.logger.info(
+      `${fnTag} USDC balance after swap: ${ethers.utils.formatUnits(
+        usdc_balance,
+        6,
+      )} USDC`,
+    );
+
+    const nct_balance = await getERC20Balance(
+      getTokenAddressBySymbol(network, "NCT"),
+      await signer.getAddress(),
+      this.provider,
+    );
+    this.logger.info(
+      `${fnTag} NCT balance after swap: ${ethers.utils.formatUnits(
+        nct_balance,
+        18,
+      )} NCT`,
+    );
+
+    // 3. Approve NCT
+    const approvalTx = await approveERC20IfNeeded(
+      getTokenAddressBySymbol(network, "NCT"),
+      signer,
+      this.toucanClient.getPoolAddress("NCT"),
+      BigInt(totalTonnes),
+    );
+
+    if (approvalTx) {
+      this.logger.info(
+        `${fnTag} Approved pool ${this.toucanClient.getPoolAddress("NCT")} to spend NCT. Approval tx hash: ${approvalTx}`,
+      );
+    }
+
+    return txHashSwap;
   }
 }

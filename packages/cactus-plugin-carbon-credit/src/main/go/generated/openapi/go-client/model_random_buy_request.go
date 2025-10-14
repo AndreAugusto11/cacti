@@ -22,7 +22,7 @@ type RandomBuyRequest struct {
 	Marketplace Marketplace `json:"marketplace"`
 	Network Network `json:"network"`
 	PaymentToken *string `json:"paymentToken,omitempty"`
-	Amount float32 `json:"amount"`
+	Amount string `json:"amount"`
 	WalletObject string `json:"walletObject"`
 }
 
@@ -30,7 +30,7 @@ type RandomBuyRequest struct {
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewRandomBuyRequest(marketplace Marketplace, network Network, amount float32, walletObject string) *RandomBuyRequest {
+func NewRandomBuyRequest(marketplace Marketplace, network Network, amount string, walletObject string) *RandomBuyRequest {
 	this := RandomBuyRequest{}
 	this.Marketplace = marketplace
 	this.Network = network
@@ -128,9 +128,9 @@ func (o *RandomBuyRequest) SetPaymentToken(v string) {
 }
 
 // GetAmount returns the Amount field value
-func (o *RandomBuyRequest) GetAmount() float32 {
+func (o *RandomBuyRequest) GetAmount() string {
 	if o == nil {
-		var ret float32
+		var ret string
 		return ret
 	}
 
@@ -139,7 +139,7 @@ func (o *RandomBuyRequest) GetAmount() float32 {
 
 // GetAmountOk returns a tuple with the Amount field value
 // and a boolean to check if the value has been set.
-func (o *RandomBuyRequest) GetAmountOk() (*float32, bool) {
+func (o *RandomBuyRequest) GetAmountOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -147,7 +147,7 @@ func (o *RandomBuyRequest) GetAmountOk() (*float32, bool) {
 }
 
 // SetAmount sets field value
-func (o *RandomBuyRequest) SetAmount(v float32) {
+func (o *RandomBuyRequest) SetAmount(v string) {
 	o.Amount = v
 }
 

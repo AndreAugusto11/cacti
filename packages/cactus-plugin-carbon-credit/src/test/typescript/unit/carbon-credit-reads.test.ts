@@ -10,6 +10,7 @@ import {
 } from "../../../main/typescript/public-api";
 import { Web3SigningCredentialPrivateKeyHex } from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
 import dotenv from "dotenv";
+import { Logger } from "@hyperledger/cactus-common";
 import { getTokenAddressBySymbol } from "../../../main/typescript/utils";
 import { parseUnits } from "ethers/lib/utils";
 dotenv.config({ path: "packages/cactus-plugin-carbon-credit/.env" });
@@ -40,6 +41,11 @@ const pluginOptions: IPluginCarbonCreditOptions = {
 };
 
 const plugin = new PluginCarbonCredit(pluginOptions);
+
+const logger = new Logger({
+  label: "carbon-credit-writes.test.ts",
+  level: "INFO",
+});
 
 describe("PluginCarbonCredit Functionality", () => {
   test("getAvailableTCO2s returns a list of TCO2s (Polygon)", async () => {
@@ -77,7 +83,7 @@ describe("PluginCarbonCredit Functionality", () => {
     };
     const response = await plugin.getVCUMetadata(request);
 
-    console.log("getVCUMetadata Response:", response);
+    logger.info("getVCUMetadata Response:", response);
 
     expect(response).toBeDefined();
     expect(response.name).toEqual("Toucan Protocol: TCO2-VCS-1529-2012");
@@ -93,7 +99,7 @@ describe("PluginCarbonCredit Functionality", () => {
     };
     const response = await plugin.getVCUMetadata(request);
 
-    console.log("getVCUMetadata Response:", response);
+    logger.info("getVCUMetadata Response:", response);
 
     expect(response).toBeDefined();
     expect(response.name).toEqual("Toucan Protocol: TCO2-VCS-1529-2012");
@@ -112,7 +118,7 @@ describe("PluginCarbonCredit Functionality", () => {
 
     const USDC_balance = response.price / 10 ** 6;
 
-    console.log("getPurchasePrice Response (Polygon):", USDC_balance + " USDC");
+    logger.info("getPurchasePrice Response (Polygon):", USDC_balance + " USDC");
 
     expect(response).toBeDefined();
     expect(response.price).toBeGreaterThan(parseUnits("0.3", 6).toBigInt()); // Flaky test. Currently 1 NCT = 0.48 USDC
@@ -131,7 +137,7 @@ describe("PluginCarbonCredit Functionality", () => {
 
     const cUSD_balance = response.price / 10 ** 18;
 
-    console.log("getPurchasePrice Response (Celo):", cUSD_balance + " cUSD");
+    logger.info("getPurchasePrice Response (Celo):", cUSD_balance + " cUSD");
 
     expect(response).toBeDefined();
     expect(response.price).toBeGreaterThan(parseUnits("1.6", 18).toBigInt()); // Flaky test. Currently 1 NCT = 1.66 cUSD

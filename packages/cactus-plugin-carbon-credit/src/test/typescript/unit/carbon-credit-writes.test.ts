@@ -15,6 +15,7 @@ import {
   getTokenAddressBySymbol,
 } from "../../../main/typescript/utils";
 import { parseUnits } from "ethers/lib/utils";
+import safeStableStringify from "safe-stable-stringify";
 dotenv.config({ path: "packages/cactus-plugin-carbon-credit/.env" });
 
 const ALCHEMY_API_KEY = process.env.ALCHEMY_API_KEY;
@@ -136,21 +137,64 @@ describe("Uniswap quote and swap functionality", () => {
     expect(nctBalance).toBe(0n); // No NCT should remain
   });
 
-  //   test("Random buy function returns the correct placeholder data", async () => {
-  //     const request = {
-  //       marketplace: Marketplace.Toucan,
-  //       network: Network.Polygon,
-  //       paymentToken: "0x2F25deB3848C207fc8E0c34035B3Ba7fC157602B", // USDC on Polygon
-  //       amount: 100,
-  //       walletObject: "wallet-address-placeholder",
-  //     };
-  //     const response = await plugin.randomBuy(request);
-  //     expect(response).toBeDefined();
-  //     expect(response.txHashSwap).toBe("txHashSwap_placeholder");
-  //     expect(response.assetAmount).toBe("100");
-  //     expect(response.tco2List).toEqual(["0xABCD", "0x1234"]);
-  //   });
-  // });
+  test("Random buy function runs successfully", async () => {
+    const usdcAddress = getTokenAddressBySymbol(Network.Polygon, "USDC");
+    const nctAddress = getTokenAddressBySymbol(Network.Polygon, "NCT");
+
+    const initial_usdc_balance = await getERC20Balance(
+      usdcAddress,
+      impersonatedAddress,
+      provider,
+    );
+    logger.info(
+      `Initial USDC balance: ${initial_usdc_balance / 10n ** 6n} USDC`,
+    );
+    expect(initial_usdc_balance).toBeGreaterThan(BigInt(0));
+
+    const initial_nct_balance = await getERC20Balance(
+      nctAddress,
+      impersonatedAddress,
+      provider,
+    );
+    logger.info(`Initial NCT balance: ${initial_nct_balance / 10n ** 18n} NCT`);
+
+    const request = {
+      marketplace: Marketplace.Toucan,
+      network: Network.Polygon,
+      paymentToken: "0x2F25deB3848C207fc8E0c34035B3Ba7fC157602B", // USDC on Polygon
+      amount: parseUnits("100", 18).toString(), // 100 tonnes
+      walletObject: "wallet-address-placeholder",
+    };
+    const response = await plugin.randomBuy(request);
+    expect(response).toBeDefined();
+    expect(response.txHashSwap).toBeDefined();
+    expect(response.assetAmount).toBeDefined();
+    expect(response.tco2List).toBeDefined();
+    expect(response.tco2List!.length).toBeGreaterThan(0);
+
+    if (response.tco2List) {
+      logger.info(`TCO2s purchased: ${safeStableStringify(response.tco2List)}`);
+    }
+
+    const final_usdc_balance = await getERC20Balance(
+      usdcAddress,
+      impersonatedAddress,
+      provider,
+    );
+    logger.info(`Final USDC balance: ${final_usdc_balance / 10n ** 6n} USDC`);
+    expect(final_usdc_balance).toBeLessThan(
+      initial_usdc_balance - BigInt(parseUnits("40", 6).toString()), // Expect at least 40 USDC spent (estimate is 48 USDC due to 100 * 0.48 USDC per NCT)
+    );
+
+    const nctBalance = await getERC20Balance(
+      nctAddress,
+      impersonatedAddress,
+      provider,
+    );
+    logger.info(`Final NCT balance: ${nctBalance / 10n ** 18n} NCT`);
+    expect(nctBalance).toBe(0n); // No NCT should remain
+  });
+
   // describe("Retire Functionality", () => {
   //   test("Retire function returns the correct placeholder data", async () => {
   //     const request = {

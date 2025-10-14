@@ -212,7 +212,7 @@ components:
     RandomBuyRequest:
       example:
         paymentToken: paymentToken
-        amount: 0.8008281904610115
+        amount: amount
         marketplace: null
         walletObject: walletObject
         network: null
@@ -224,7 +224,7 @@ components:
         paymentToken:
           type: string
         amount:
-          type: number
+          type: string
         walletObject:
           type: string
       required:

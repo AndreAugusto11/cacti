@@ -112,7 +112,7 @@
             "type": "string"
           },
           "amount": {
-            "type": "number"
+            "type": "string"
           },
           "walletObject": {
             "type": "string"
