@@ -1,4 +1,4 @@
-module github.com/hyperledger/cactus-plugin-carbon-credit/src/main/go/generated/openapi/go-client
+module github.com/GIT_USER_ID/GIT_REPO_ID
 
 go 1.18
 
