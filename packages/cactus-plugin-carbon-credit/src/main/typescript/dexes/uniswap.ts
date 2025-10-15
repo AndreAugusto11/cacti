@@ -33,7 +33,7 @@ export interface IUniswapOptions extends DexAbstractOptions {}
  * import { ethers } from "ethers";
  *
  * const provider = new ethers.providers.JsonRpcProvider("<RPC_URL>");
- * const uniswap = new UniswapImpl({ provider, logLevel: "INFO" });
+ * const uniswap = new UniswapImpl({ logLevel: "INFO" });
  * ```
  */
 export class UniswapImpl extends DexAbstract {
@@ -41,7 +41,7 @@ export class UniswapImpl extends DexAbstract {
 
   protected readonly log: Logger;
   protected readonly logLevel: LogLevelDesc;
-  private readonly provider: ethers.providers.Provider;
+  protected readonly signer: Signer;
 
   constructor(public readonly options: IUniswapOptions) {
     super();
@@ -49,19 +49,17 @@ export class UniswapImpl extends DexAbstract {
     if (!options) {
       throw new Error(`${fnTag} options was not defined.`);
     }
-    if (!options.provider) {
-      throw new Error(`${fnTag} options.provider was not defined.`);
-    }
+
+    this.signer = options.signer;
+
     this.logLevel = options.logLevel || "INFO";
     this.log = new Logger({
       label: UniswapImpl.CLASS_NAME,
       level: this.logLevel,
     });
-    this.provider = options.provider;
   }
 
   public async swapExactFromUSDC(
-    signer: Signer,
     toToken: string,
     amountOut: string, // amount of NCT we want to buy
     network: Network,
@@ -76,14 +74,18 @@ export class UniswapImpl extends DexAbstract {
 
     const USDC_ADDRESS = getTokenBySymbol(network, "USDC").address;
 
-    const router = new ethers.Contract(routerAddress, routerABI, signer);
+    const router = new ethers.Contract(routerAddress, routerABI, this.signer);
 
-    await getBalances(this.log, await signer.getAddress(), this.provider);
+    await getBalances(
+      this.log,
+      await this.signer.getAddress(),
+      this.signer.provider!,
+    );
 
     // Step 2: Approve router to spend USDC (infinite approval for simplicity) if not already approved
     const approvalTx = await approveERC20IfNeeded(
       USDC_ADDRESS,
-      signer,
+      this.signer,
       routerAddress,
       BigInt(quote.amountIn),
     );
@@ -94,7 +96,7 @@ export class UniswapImpl extends DexAbstract {
       );
     }
 
-    const recipient = ethers.utils.getAddress(await signer.getAddress());
+    const recipient = ethers.utils.getAddress(await this.signer.getAddress());
 
     const params = {
       tokenIn: ethers.utils.getAddress(USDC_ADDRESS),
@@ -114,7 +116,11 @@ export class UniswapImpl extends DexAbstract {
     const receipt = await tx.wait();
     this.log.info(`${fnTag} Swap successful: ${receipt.transactionHash}`);
 
-    await getBalances(this.log, await signer.getAddress(), this.provider);
+    await getBalances(
+      this.log,
+      await this.signer.getAddress(),
+      this.signer.provider!,
+    );
 
     return receipt.transactionHash;
   }
@@ -159,7 +165,7 @@ export class UniswapImpl extends DexAbstract {
       const poolContract = new ethers.Contract(
         currentPoolAddress,
         IUniswapV3PoolABI.abi,
-        this.provider,
+        this.signer,
       );
 
       try {
@@ -178,7 +184,7 @@ export class UniswapImpl extends DexAbstract {
         const quoterContract = new ethers.Contract(
           getDefaultDex(network).quoter,
           Quoter.abi,
-          this.provider,
+          this.signer,
         );
 
         try {

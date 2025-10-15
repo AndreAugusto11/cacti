@@ -1,6 +1,6 @@
 import type { LogLevelDesc } from "@hyperledger/cactus-common";
 import { Network } from "./public-api";
-import { ethers, Signer } from "ethers";
+import { Signer } from "ethers";
 import { Quote } from "./types";
 
 /**
@@ -8,7 +8,7 @@ import { Quote } from "./types";
  */
 export interface DexAbstractOptions {
   logLevel?: LogLevelDesc;
-  provider: ethers.providers.Provider;
+  signer: Signer;
 }
 
 /**
@@ -36,7 +36,6 @@ export abstract class DexAbstract {
    * @abstract
    */
   public abstract swapExactFromUSDC(
-    signer: Signer,
     fromToken: string,
     toToken: string,
     amount: string,

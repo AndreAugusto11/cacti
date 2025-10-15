@@ -95,6 +95,7 @@ describe("Uniswap quote and swap functionality", () => {
         [selectedTCO2s[1].address]: parseUnits("100", 18).toString(), // 100 tonnes
         [selectedTCO2s[2].address]: parseUnits("100", 18).toString(), // 100 tonnes
       },
+      walletObject: { privateKey: "", providerURL: "http://127.0.0.1:8545" },
     };
 
     const specificBuyResponse = await plugin.specificBuy(
@@ -129,6 +130,7 @@ describe("Uniswap quote and swap functionality", () => {
       network: Network.Polygon,
       paymentToken: "0x2F25deB3848C207fc8E0c34035B3Ba7fC157602B", // USDC on Polygon
       amount: parseUnits("100", 18).toString(), // 100 tonnes
+      walletObject: { privateKey: "", providerURL: "http://127.0.0.1:8545" },
     };
     const response = await plugin.randomBuy(request, signer);
     expect(response).toBeDefined();
@@ -166,6 +168,7 @@ describe("Uniswap quote and swap functionality", () => {
       network: Network.Polygon,
       paymentToken: usdcAddress,
       amount: parseUnits("100", 18).toString(), // Buy 100 tonnes
+      walletObject: { privateKey: "", providerURL: "http://127.0.0.1:8545" },
     };
     const buyResponse = await plugin.randomBuy(buyRequest, signer);
 
@@ -196,6 +199,7 @@ describe("Uniswap quote and swap functionality", () => {
       beneficiaryName: "Unit Test Beneficiary",
       message: "Retired for unit test",
       retirementReason: "Unit testing of carbon credit plugin",
+      walletObject: { privateKey: "", providerURL: "http://127.0.0.1:8545" },
     };
 
     const retireResponse = await plugin.retire(retireRequest, signer);
@@ -264,6 +268,7 @@ describe("Uniswap quote and swap functionality", () => {
         [selectedTCO2s[1].address]: parseUnits("400", 18).toString(),
         [selectedTCO2s[2].address]: parseUnits("400", 18).toString(),
       },
+      walletObject: { privateKey: "", providerURL: "http://127.0.0.1:8545" },
     };
     const specificBuyResponse = await plugin.specificBuy(
       specificBuyRequest,
@@ -294,6 +299,7 @@ describe("Uniswap quote and swap functionality", () => {
       beneficiaryName: "Unit Test Beneficiary",
       message: "Retired for specific buy test",
       retirementReason: "Unit testing specific buy retire",
+      walletObject: { privateKey: "", providerURL: "http://127.0.0.1:8545" },
     };
 
     const retireResponse = await plugin.retire(retireRequest, signer);

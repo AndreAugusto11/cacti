@@ -199,22 +199,13 @@ export class PluginCarbonCredit implements ICactusPlugin, IPluginWebService {
     network: Network,
     signer?: ethers.Signer,
   ): DexAbstract {
-    const fnTag = `${this.className}#getDexImplementation()`;
-
-    let provider = null;
-    if (signer) {
-      provider = signer.provider;
-    } else {
-      provider = this.getRPCProvider(network);
-    }
-
-    if (!provider) {
-      throw new Error(`${fnTag} No provider available for network ${network}.`);
+    if (!signer) {
+      signer = this.createSigner(network, this.signingCredential?.secret ?? "");
     }
 
     return new UniswapImpl({
       logLevel: this.options.logLevel,
-      provider,
+      signer: signer,
     });
   }
 

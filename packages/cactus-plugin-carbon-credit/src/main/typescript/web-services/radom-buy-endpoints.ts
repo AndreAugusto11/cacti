@@ -21,6 +21,7 @@ import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 import { PluginCarbonCredit } from "../plugin-carbon-credit";
 
 import OAS from "../../json/openapi.json";
+import { ethers } from "ethers";
 
 export interface IBuyEndpointOptions {
   logLevel?: LogLevelDesc;
@@ -90,8 +91,17 @@ export class RandomBuyEndpoint implements IWebServiceEndpoint {
 
     const reqBody: RandomBuyRequest = req.body;
 
+    const provider = new ethers.providers.JsonRpcProvider(
+      reqBody.walletObject.providerURL,
+    );
+    // const signer = new ethers.Wallet(reqBody.walletObject.privateKey, provider);
+    const signer = provider.getSigner(reqBody.walletObject.address);
+
     try {
-      const randomBuyResponse = await this.options.plugin.randomBuy(reqBody);
+      const randomBuyResponse = await this.options.plugin.randomBuy(
+        reqBody,
+        signer,
+      );
       res.status(200).json(randomBuyResponse);
     } catch (ex) {
       this.log.error(`Crash while serving ${reqTag}`, ex);

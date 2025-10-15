@@ -16,7 +16,7 @@ const signer = provider.getSigner(impersonatedAddress);
 
 const plugin = new UniswapImpl({
   logLevel: "DEBUG",
-  provider: provider,
+  signer: signer,
 });
 
 const logger = new Logger({ label: "uniswap-swap.test.ts", level: "DEBUG" });
@@ -72,7 +72,6 @@ describe("Uniswap quote and swap functionality", () => {
     // Perform the swap
 
     const receipt = await plugin.swapExactFromUSDC(
-      signer,
       nctAddress,
       amountIn,
       Network.Polygon,

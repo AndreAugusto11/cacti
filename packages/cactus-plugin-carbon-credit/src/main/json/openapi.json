@@ -51,15 +51,22 @@
             "description": "A mapping from address (string) to amount (string)."
           },
           "walletObject": {
-            "type": "string",
-            "description": "A serialization of the wallet object (encrypted or unencrypted)."
+            "type": "object",
+            "properties": {
+              "address": { "type": "string" },
+              "privateKey": { "type": "string" },
+              "providerURL": { "type": "string" }
+            },
+            "required": ["privateKey", "providerURL"],
+            "description": "An object containing the private key and provider URL for the wallet."
           }
         },
         "required": [
           "marketplace",
           "network",
           "paymentToken",
-          "items"
+          "items",
+          "walletObject"
         ]
       },
       "SpecificBuyResponse": {
@@ -112,14 +119,21 @@
             "type": "string"
           },
           "walletObject": {
-            "type": "string",
-            "description": "A serialization of the wallet object (encrypted or unencrypted)."
+            "type": "object",
+            "properties": {
+              "address": { "type": "string" },
+              "privateKey": { "type": "string" },
+              "providerURL": { "type": "string" }
+            },
+            "required": ["privateKey", "providerURL"],
+            "description": "An object containing the private key and provider URL for the wallet."
           }
         },
         "required": [
           "marketplace",
           "network",
-          "amount"
+          "amount",
+          "walletObject"
         ]
       },
       "RandomBuyResponse": {
@@ -206,8 +220,14 @@
             "type": "string"
           },
           "walletObject": {
-            "type": "string",
-            "description": "A serialization of the wallet object (encrypted or unencrypted)."
+            "type": "object",
+            "properties": {
+              "address": { "type": "string" },
+              "privateKey": { "type": "string" },
+              "providerURL": { "type": "string" }
+            },
+            "required": ["privateKey", "providerURL"],
+            "description": "An object containing the private key and provider URL for the wallet."
           }
         },
         "required": [
@@ -218,7 +238,8 @@
           "amounts",
           "beneficiaryAddress",
           "beneficiaryName",
-          "retirementReason"
+          "retirementReason",
+          "walletObject"
         ]
       },
       "RetireResponse": {
@@ -239,7 +260,7 @@
         },
         "required": [
           "txHashesRetire",
-          "retirementCertificates"
+          "retirementCertificateIds"
         ]
       },
       "GetAvailableTCO2sRequest": {

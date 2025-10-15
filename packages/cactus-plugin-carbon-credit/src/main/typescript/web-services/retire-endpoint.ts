@@ -20,6 +20,7 @@ import { RetireRequest } from "./../generated/openapi/typescript-axios";
 import { PluginCarbonCredit } from "../plugin-carbon-credit";
 
 import OAS from "../../json/openapi.json";
+import { ethers } from "ethers";
 
 export interface IRetireEndpointOptions {
   logLevel?: LogLevelDesc;
@@ -88,8 +89,14 @@ export class RetireEndpoint implements IWebServiceEndpoint {
 
     const reqBody: RetireRequest = req.body;
 
+    const provider = new ethers.providers.JsonRpcProvider(
+      reqBody.walletObject.providerURL,
+    );
+    // const signer = new ethers.Wallet(reqBody.walletObject.privateKey, provider);
+    const signer = provider.getSigner(reqBody.walletObject.address);
+
     try {
-      const retireResponse = await this.options.plugin.retire(reqBody);
+      const retireResponse = await this.options.plugin.retire(reqBody, signer);
       res.status(200).json(retireResponse);
     } catch (ex) {
       this.log.error(`Crash while serving ${reqTag}`, ex);

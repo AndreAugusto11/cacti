@@ -259,11 +259,11 @@ export interface RandomBuyRequest {
      */
     'amount': string;
     /**
-     * A serialization of the wallet object (encrypted or unencrypted).
-     * @type {string}
+     * 
+     * @type {SpecificBuyRequestWalletObject}
      * @memberof RandomBuyRequest
      */
-    'walletObject'?: string;
+    'walletObject': SpecificBuyRequestWalletObject;
 }
 
 
@@ -353,11 +353,11 @@ export interface RetireRequest {
      */
     'retirementReason': string;
     /**
-     * A serialization of the wallet object (encrypted or unencrypted).
-     * @type {string}
+     * 
+     * @type {SpecificBuyRequestWalletObject}
      * @memberof RetireRequest
      */
-    'walletObject'?: string;
+    'walletObject': SpecificBuyRequestWalletObject;
 }
 
 
@@ -378,7 +378,7 @@ export interface RetireResponse {
      * @type {Array<number>}
      * @memberof RetireResponse
      */
-    'retirementCertificateIds'?: Array<number>;
+    'retirementCertificateIds': Array<number>;
 }
 /**
  * 
@@ -411,14 +411,39 @@ export interface SpecificBuyRequest {
      */
     'items': { [key: string]: string; };
     /**
-     * A serialization of the wallet object (encrypted or unencrypted).
-     * @type {string}
+     * 
+     * @type {SpecificBuyRequestWalletObject}
      * @memberof SpecificBuyRequest
      */
-    'walletObject'?: string;
+    'walletObject': SpecificBuyRequestWalletObject;
 }
 
 
+/**
+ * An object containing the private key and provider URL for the wallet.
+ * @export
+ * @interface SpecificBuyRequestWalletObject
+ */
+export interface SpecificBuyRequestWalletObject {
+    /**
+     * 
+     * @type {string}
+     * @memberof SpecificBuyRequestWalletObject
+     */
+    'address'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SpecificBuyRequestWalletObject
+     */
+    'privateKey': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SpecificBuyRequestWalletObject
+     */
+    'providerURL': string;
+}
 /**
  * 
  * @export

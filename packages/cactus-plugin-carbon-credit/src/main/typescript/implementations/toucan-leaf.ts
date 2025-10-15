@@ -377,7 +377,6 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
 
     // 1. Swap USDC for NCT
     const txHashSwap = await this.dexImpl.swapExactFromUSDC(
-      signer,
       getTokenAddressBySymbol(network, "NCT"),
       totalTonnes, // amount of NCT we want to buy
       network,
