@@ -51,7 +51,6 @@
         "codegen": "yarn run --top-level run-s 'codegen:*'",
         "codegen:openapi": "npm run generate-sdk",
         "generate-sdk": "run-p 'generate-sdk:*'",
-        "generate-sdk:go": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g go -o ./src/main/go/generated/openapi/go-client/ --ignore-file-override ../../openapi-generator-ignore",
         "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --ignore-file-override ../../openapi-generator-ignore",
         "watch": "npm-watch",
         "webpack": "npm-run-all webpack:dev",

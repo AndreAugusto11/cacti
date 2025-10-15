@@ -17,7 +17,7 @@
       },
       "Network": {
         "type": "string",
-        "enum": ["polygon", "ethereum", "celo", "alfajores", "base", "base-sepolia"]
+        "enum": ["polygon", "celo", "alfajores"]
       },
       "NetworkConfig": {
         "type": "object",
@@ -49,6 +49,10 @@
               "type": "string"
             },
             "description": "A mapping from address (string) to amount (string)."
+          },
+          "walletObject": {
+            "type": "string",
+            "description": "A serialization of the wallet object (encrypted or unencrypted)."
           }
         },
         "required": [
@@ -106,6 +110,10 @@
           },
           "amount": {
             "type": "string"
+          },
+          "walletObject": {
+            "type": "string",
+            "description": "A serialization of the wallet object (encrypted or unencrypted)."
           }
         },
         "required": [
@@ -120,8 +128,22 @@
           "txHashSwap": {
             "type": "string"
           },
-          "assetAmount": {
-            "type": "string"
+          "assetAmounts": {
+            "items": {
+              "type": "object",
+              "properties": {
+                "address": {
+                  "type": "string"
+                },
+                "amount": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "address",
+                "amount"
+              ]
+            }
           },
           "tco2List": {
             "type": "array",
@@ -144,7 +166,7 @@
         },
         "required": [
           "txHashSwap",
-          "assetAmount"
+          "assetAmounts"
         ]
       },
       "RetireRequest": {
@@ -182,6 +204,10 @@
           },
           "retirementReason": {
             "type": "string"
+          },
+          "walletObject": {
+            "type": "string",
+            "description": "A serialization of the wallet object (encrypted or unencrypted)."
           }
         },
         "required": [
@@ -198,7 +224,7 @@
       "RetireResponse": {
         "type": "object",
         "properties": {
-          "txHashRetires": {
+          "txHashesRetire": {
             "type": "array",
             "items": {
               "type": "string"
@@ -212,7 +238,7 @@
           }
         },
         "required": [
-          "txHashRetires",
+          "txHashesRetire",
           "retirementCertificates"
         ]
       },
@@ -226,7 +252,8 @@
             "$ref": "#/components/schemas/Network"
           },
           "filterCriteria": {
-            "type": "string"
+            "type": "string",
+            "description": "A string to filter the results by (e.g., supply)."
           },
           "orderBy": {
             "type": "string"
@@ -270,7 +297,7 @@
           "totalCount"
         ]
       },
-      "GetVCUMetadataRequest": {
+      "GetTCO2MetadataRequest": {
         "type": "object",
         "properties": {
           "marketplace": {
@@ -282,7 +309,7 @@
           "projectIdentifier": {
             "type": "string"
           },
-          "vcuIdentifier": {
+          "tco2Identifier": {
             "type": "string"
           }
         },
@@ -290,10 +317,10 @@
           "marketplace",
           "network",
           "projectIdentifier",
-          "vcuIdentifier"
+          "tco2Identifier"
         ]
       },
-      "VCUMetadata": {
+      "TCO2Metadata": {
         "type": "object",
         "properties": {
           "name": {
@@ -332,7 +359,7 @@
           },
           "amount": {
             "type": "string",
-            "description": "The amount of Units to price."
+            "description": "The amount of Units to retrieve the price for."
           }
         },
         "required": ["marketplace", "network", "unit", "amount"]
@@ -470,7 +497,7 @@
         },
         "responses": {
           "200": {
-            "description": "Successful response with a list of available VCUs.",
+            "description": "Successful response with a list of available TCO2s.",
             "content": {
               "application/json": {
                 "schema": {
@@ -482,21 +509,21 @@
         }
       }
     },
-    "/api/v1/@hyperledger/cactus-plugin-carbon-credit/get-vcu-metadata": {
+    "/api/v1/@hyperledger/cactus-plugin-carbon-credit/get-tco2-metadata": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/@hyperledger/cactus-plugin-carbon-credit/get-vcu-metadata"
+            "path": "/api/v1/@hyperledger/cactus-plugin-carbon-credit/get-tco2-metadata"
           }
         },
-        "operationId": "getVCUMetadataRequest",
-        "description": "Get metadata for a specific VCU.",
+        "operationId": "getTCO2MetadataRequest",
+        "description": "Get metadata for a specific TCO2.",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/GetVCUMetadataRequest"
+                "$ref": "#/components/schemas/GetTCO2MetadataRequest"
               }
             }
           }
@@ -507,7 +534,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/VCUMetadata"
+                  "$ref": "#/components/schemas/TCO2Metadata"
                 }
               }
             }
@@ -524,7 +551,7 @@
           }
         },
         "operationId": "getPurchasePriceRequest",
-        "description": "Get the purchase price for a specific VCU.",
+        "description": "Get the purchase price for a specific TCO2.",
         "requestBody": {
           "content": {
             "application/json": {
@@ -536,7 +563,7 @@
         },
         "responses": {
           "200": {
-            "description": "Successful response with VCU metadata.",
+            "description": "Successful response with the purchase price.",
             "content": {
               "application/json": {
                 "schema": {

@@ -18,8 +18,8 @@ import {
   RetireResponse,
   GetAvailableTCO2sRequest,
   GetAvailableTCO2sResponse,
-  GetVCUMetadataRequest,
-  VCUMetadata,
+  GetTCO2MetadataRequest,
+  TCO2Metadata,
   Network,
 } from "../public-api";
 import ToucanClient from "toucan-sdk";
@@ -190,8 +190,7 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
 
     return {
       txHashSwap,
-      assetAmount: request.amount.toString(),
-      tco2List: receipt.map((addr) => ({
+      assetAmounts: receipt.map((addr) => ({
         address: addr.address,
         amount: addr.amount.toString(),
       })),
@@ -249,7 +248,7 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
     this.logger.info(`${fnTag} Retire operation completed successfully.`);
 
     return {
-      txHashRetires: responses.map((r) => r.txHash),
+      txHashesRetire: responses.map((r) => r.txHash),
       retirementCertificateIds: responses.map((r) => r.certificateId),
     };
   }
@@ -317,20 +316,20 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
     };
   }
 
-  public async getVCUMetadata(
-    req: GetVCUMetadataRequest,
-  ): Promise<VCUMetadata> {
-    const fnTag = `${this.className}#getVCUMetadata()`;
+  public async getTCO2Metadata(
+    req: GetTCO2MetadataRequest,
+  ): Promise<TCO2Metadata> {
+    const fnTag = `${this.className}#getTCO2Metadata()`;
 
     this.logger.info(
-      `${fnTag} Fetching metadata for VCU with ID: ${req.vcuIdentifier}`,
+      `${fnTag} Fetching metadata for TCO2 with ID: ${req.tco2Identifier}`,
     );
 
     try {
-      const tco2 = await this.toucanClient.getTCO2Contract(req.vcuIdentifier);
+      const tco2 = await this.toucanClient.getTCO2Contract(req.tco2Identifier);
 
       this.logger.info(
-        `Fetched metadata for VCU ${req.vcuIdentifier} successfully.`,
+        `Fetched metadata for TCO2 ${req.tco2Identifier} successfully.`,
       );
 
       const [name, symbol, totalSupply] = await Promise.all([
@@ -351,7 +350,7 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
         },
       };
     } catch (err) {
-      throw new Error(`VCU with ID ${req.vcuIdentifier} not found. ${err}`);
+      throw new Error(`TCO2 with ID ${req.tco2Identifier} not found. ${err}`);
     }
   }
 

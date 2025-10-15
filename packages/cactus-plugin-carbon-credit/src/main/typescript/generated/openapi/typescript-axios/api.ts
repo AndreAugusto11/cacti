@@ -42,7 +42,7 @@ export interface GetAvailableTCO2sRequest {
      */
     'network': Network;
     /**
-     * 
+     * A string to filter the results by (e.g., supply).
      * @type {string}
      * @memberof GetAvailableTCO2sRequest
      */
@@ -125,7 +125,7 @@ export interface GetPurchasePriceRequest {
      */
     'unit': string;
     /**
-     * The amount of Units to price.
+     * The amount of Units to retrieve the price for.
      * @type {string}
      * @memberof GetPurchasePriceRequest
      */
@@ -149,33 +149,33 @@ export interface GetPurchasePriceResponse {
 /**
  * 
  * @export
- * @interface GetVCUMetadataRequest
+ * @interface GetTCO2MetadataRequest
  */
-export interface GetVCUMetadataRequest {
+export interface GetTCO2MetadataRequest {
     /**
      * 
      * @type {Marketplace}
-     * @memberof GetVCUMetadataRequest
+     * @memberof GetTCO2MetadataRequest
      */
     'marketplace': Marketplace;
     /**
      * 
      * @type {Network}
-     * @memberof GetVCUMetadataRequest
+     * @memberof GetTCO2MetadataRequest
      */
     'network': Network;
     /**
      * 
      * @type {string}
-     * @memberof GetVCUMetadataRequest
+     * @memberof GetTCO2MetadataRequest
      */
     'projectIdentifier': string;
     /**
      * 
      * @type {string}
-     * @memberof GetVCUMetadataRequest
+     * @memberof GetTCO2MetadataRequest
      */
-    'vcuIdentifier': string;
+    'tco2Identifier': string;
 }
 
 
@@ -200,11 +200,8 @@ export type Marketplace = typeof Marketplace[keyof typeof Marketplace];
 
 export const Network = {
     Polygon: 'polygon',
-    Ethereum: 'ethereum',
     Celo: 'celo',
-    Alfajores: 'alfajores',
-    Base: 'base',
-    BaseSepolia: 'base-sepolia'
+    Alfajores: 'alfajores'
 } as const;
 
 export type Network = typeof Network[keyof typeof Network];
@@ -261,6 +258,12 @@ export interface RandomBuyRequest {
      * @memberof RandomBuyRequest
      */
     'amount': string;
+    /**
+     * A serialization of the wallet object (encrypted or unencrypted).
+     * @type {string}
+     * @memberof RandomBuyRequest
+     */
+    'walletObject'?: string;
 }
 
 
@@ -278,10 +281,10 @@ export interface RandomBuyResponse {
     'txHashSwap': string;
     /**
      * 
-     * @type {string}
+     * @type {Array<SpecificBuyResponseAssetAmountsInner>}
      * @memberof RandomBuyResponse
      */
-    'assetAmount': string;
+    'assetAmounts': Array<SpecificBuyResponseAssetAmountsInner>;
     /**
      * 
      * @type {Array<SpecificBuyResponseAssetAmountsInner>}
@@ -349,6 +352,12 @@ export interface RetireRequest {
      * @memberof RetireRequest
      */
     'retirementReason': string;
+    /**
+     * A serialization of the wallet object (encrypted or unencrypted).
+     * @type {string}
+     * @memberof RetireRequest
+     */
+    'walletObject'?: string;
 }
 
 
@@ -363,7 +372,7 @@ export interface RetireResponse {
      * @type {Array<string>}
      * @memberof RetireResponse
      */
-    'txHashRetires': Array<string>;
+    'txHashesRetire': Array<string>;
     /**
      * 
      * @type {Array<number>}
@@ -401,6 +410,12 @@ export interface SpecificBuyRequest {
      * @memberof SpecificBuyRequest
      */
     'items': { [key: string]: string; };
+    /**
+     * A serialization of the wallet object (encrypted or unencrypted).
+     * @type {string}
+     * @memberof SpecificBuyRequest
+     */
+    'walletObject'?: string;
 }
 
 
@@ -451,56 +466,56 @@ export interface SpecificBuyResponseAssetAmountsInner {
 /**
  * 
  * @export
- * @interface VCUMetadata
+ * @interface TCO2Metadata
  */
-export interface VCUMetadata {
+export interface TCO2Metadata {
     /**
      * 
      * @type {string}
-     * @memberof VCUMetadata
+     * @memberof TCO2Metadata
      */
     'name': string;
     /**
      * 
      * @type {string}
-     * @memberof VCUMetadata
+     * @memberof TCO2Metadata
      */
     'symbol': string;
     /**
      * 
      * @type {number}
-     * @memberof VCUMetadata
+     * @memberof TCO2Metadata
      */
     'totalSupply': number;
     /**
      * 
-     * @type {VCUMetadataAttributes}
-     * @memberof VCUMetadata
+     * @type {TCO2MetadataAttributes}
+     * @memberof TCO2Metadata
      */
-    'attributes': VCUMetadataAttributes;
+    'attributes': TCO2MetadataAttributes;
 }
 /**
  * 
  * @export
- * @interface VCUMetadataAttributes
+ * @interface TCO2MetadataAttributes
  */
-export interface VCUMetadataAttributes {
+export interface TCO2MetadataAttributes {
     /**
      * 
      * @type {string}
-     * @memberof VCUMetadataAttributes
+     * @memberof TCO2MetadataAttributes
      */
     'region'?: string;
     /**
      * 
      * @type {string}
-     * @memberof VCUMetadataAttributes
+     * @memberof TCO2MetadataAttributes
      */
     'totalVintageQuantity'?: string;
     /**
      * 
      * @type {string}
-     * @memberof VCUMetadataAttributes
+     * @memberof TCO2MetadataAttributes
      */
     'methodology'?: string;
 }
@@ -545,7 +560,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * Get the purchase price for a specific VCU.
+         * Get the purchase price for a specific TCO2.
          * @param {GetPurchasePriceRequest} [getPurchasePriceRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -578,13 +593,13 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * Get metadata for a specific VCU.
-         * @param {GetVCUMetadataRequest} [getVCUMetadataRequest] 
+         * Get metadata for a specific TCO2.
+         * @param {GetTCO2MetadataRequest} [getTCO2MetadataRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getVCUMetadataRequest: async (getVCUMetadataRequest?: GetVCUMetadataRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/@hyperledger/cactus-plugin-carbon-credit/get-vcu-metadata`;
+        getTCO2MetadataRequest: async (getTCO2MetadataRequest?: GetTCO2MetadataRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/@hyperledger/cactus-plugin-carbon-credit/get-tco2-metadata`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -603,7 +618,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(getVCUMetadataRequest, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(getTCO2MetadataRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -730,7 +745,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Get the purchase price for a specific VCU.
+         * Get the purchase price for a specific TCO2.
          * @param {GetPurchasePriceRequest} [getPurchasePriceRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -740,13 +755,13 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Get metadata for a specific VCU.
-         * @param {GetVCUMetadataRequest} [getVCUMetadataRequest] 
+         * Get metadata for a specific TCO2.
+         * @param {GetTCO2MetadataRequest} [getTCO2MetadataRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getVCUMetadataRequest(getVCUMetadataRequest?: GetVCUMetadataRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<VCUMetadata>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getVCUMetadataRequest(getVCUMetadataRequest, options);
+        async getTCO2MetadataRequest(getTCO2MetadataRequest?: GetTCO2MetadataRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TCO2Metadata>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getTCO2MetadataRequest(getTCO2MetadataRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -799,7 +814,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.getAvailableTCO2sRequest(getAvailableTCO2sRequest, options).then((request) => request(axios, basePath));
         },
         /**
-         * Get the purchase price for a specific VCU.
+         * Get the purchase price for a specific TCO2.
          * @param {GetPurchasePriceRequest} [getPurchasePriceRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -808,13 +823,13 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.getPurchasePriceRequest(getPurchasePriceRequest, options).then((request) => request(axios, basePath));
         },
         /**
-         * Get metadata for a specific VCU.
-         * @param {GetVCUMetadataRequest} [getVCUMetadataRequest] 
+         * Get metadata for a specific TCO2.
+         * @param {GetTCO2MetadataRequest} [getTCO2MetadataRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getVCUMetadataRequest(getVCUMetadataRequest?: GetVCUMetadataRequest, options?: any): AxiosPromise<VCUMetadata> {
-            return localVarFp.getVCUMetadataRequest(getVCUMetadataRequest, options).then((request) => request(axios, basePath));
+        getTCO2MetadataRequest(getTCO2MetadataRequest?: GetTCO2MetadataRequest, options?: any): AxiosPromise<TCO2Metadata> {
+            return localVarFp.getTCO2MetadataRequest(getTCO2MetadataRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * Acquire a random basket of TCO2s from a marketplace.
@@ -865,7 +880,7 @@ export class DefaultApi extends BaseAPI {
     }
 
     /**
-     * Get the purchase price for a specific VCU.
+     * Get the purchase price for a specific TCO2.
      * @param {GetPurchasePriceRequest} [getPurchasePriceRequest] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -876,14 +891,14 @@ export class DefaultApi extends BaseAPI {
     }
 
     /**
-     * Get metadata for a specific VCU.
-     * @param {GetVCUMetadataRequest} [getVCUMetadataRequest] 
+     * Get metadata for a specific TCO2.
+     * @param {GetTCO2MetadataRequest} [getTCO2MetadataRequest] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public getVCUMetadataRequest(getVCUMetadataRequest?: GetVCUMetadataRequest, options?: AxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).getVCUMetadataRequest(getVCUMetadataRequest, options).then((request) => request(this.axios, this.basePath));
+    public getTCO2MetadataRequest(getTCO2MetadataRequest?: GetTCO2MetadataRequest, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getTCO2MetadataRequest(getTCO2MetadataRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

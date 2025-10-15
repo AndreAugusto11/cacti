@@ -69,22 +69,22 @@ describe("Uniswap quote and swap functionality", () => {
     // Select 3 randomly
     const selectedTCO2s = tco2sResponse.tco2List.slice(0, 3);
 
-    const vcusMetadata = await Promise.all(
+    const tco2Metadata = await Promise.all(
       selectedTCO2s.map(async (t) =>
-        plugin.getVCUMetadata(
+        plugin.getTCO2Metadata(
           {
             marketplace: Marketplace.Toucan,
             network: Network.Polygon,
             projectIdentifier: t.projectId,
-            vcuIdentifier: t.address,
+            tco2Identifier: t.address,
           },
           signer,
         ),
       ),
     );
 
-    expect(vcusMetadata).toBeDefined();
-    expect(vcusMetadata.length).toBe(3);
+    expect(tco2Metadata).toBeDefined();
+    expect(tco2Metadata.length).toBe(3);
 
     const specificBuyRequest = {
       marketplace: Marketplace.Toucan,
@@ -133,12 +133,13 @@ describe("Uniswap quote and swap functionality", () => {
     const response = await plugin.randomBuy(request, signer);
     expect(response).toBeDefined();
     expect(response.txHashSwap).toBeDefined();
-    expect(response.assetAmount).toBeDefined();
-    expect(response.tco2List).toBeDefined();
-    expect(response.tco2List!.length).toBeGreaterThan(0);
+    expect(response.assetAmounts).toBeDefined();
+    expect(response.assetAmounts!.length).toBeGreaterThan(0);
 
-    if (response.tco2List) {
-      logger.info(`TCO2s purchased: ${safeStableStringify(response.tco2List)}`);
+    if (response.assetAmounts) {
+      logger.info(
+        `TCO2s purchased: ${safeStableStringify(response.assetAmounts)}`,
+      );
     }
 
     const { usdcBalance: final_usdc_balance, nctBalance: final_nct_balance } =
@@ -169,8 +170,8 @@ describe("Uniswap quote and swap functionality", () => {
     const buyResponse = await plugin.randomBuy(buyRequest, signer);
 
     expect(buyResponse).toBeDefined();
-    expect(buyResponse.tco2List).toBeDefined();
-    expect(buyResponse.tco2List!.length).toBeGreaterThan(0);
+    expect(buyResponse.assetAmounts).toBeDefined();
+    expect(buyResponse.assetAmounts!.length).toBeGreaterThan(0);
 
     const {
       usdcBalance: post_buy_usdc_balance,
@@ -181,7 +182,7 @@ describe("Uniswap quote and swap functionality", () => {
 
     // Step 2: Retire the purchased TCO2s
     const retireItems: Record<string, string> = {};
-    buyResponse.tco2List!.forEach((tco2) => {
+    buyResponse.assetAmounts!.forEach((tco2) => {
       retireItems[tco2.address] = parseUnits("50", 18).toString(); // Retire 50 tonnes from each
     });
 
@@ -200,13 +201,13 @@ describe("Uniswap quote and swap functionality", () => {
     const retireResponse = await plugin.retire(retireRequest, signer);
 
     expect(retireResponse).toBeDefined();
-    expect(retireResponse.txHashRetires).toBeDefined();
-    expect(retireResponse.txHashRetires.length).toBe(
-      buyResponse.tco2List!.length,
+    expect(retireResponse.txHashesRetire).toBeDefined();
+    expect(retireResponse.txHashesRetire.length).toBe(
+      buyResponse.assetAmounts!.length,
     );
     expect(retireResponse.retirementCertificateIds).toBeDefined();
     expect(retireResponse.retirementCertificateIds!.length).toBe(
-      buyResponse.tco2List!.length,
+      buyResponse.assetAmounts!.length,
     );
 
     const { usdcBalance: final_usdc_balance, nctBalance: final_nct_balance } =
@@ -298,8 +299,8 @@ describe("Uniswap quote and swap functionality", () => {
     const retireResponse = await plugin.retire(retireRequest, signer);
 
     expect(retireResponse).toBeDefined();
-    expect(retireResponse.txHashRetires).toBeDefined();
-    expect(retireResponse.txHashRetires.length).toBe(selectedTCO2s.length);
+    expect(retireResponse.txHashesRetire).toBeDefined();
+    expect(retireResponse.txHashesRetire.length).toBe(selectedTCO2s.length);
     expect(retireResponse.retirementCertificateIds).toBeDefined();
     expect(retireResponse.retirementCertificateIds!.length).toBe(
       selectedTCO2s.length,

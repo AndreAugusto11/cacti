@@ -15,26 +15,26 @@ import {
 } from "@hyperledger/cactus-core-api";
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
-import { GetVCUMetadataRequest } from "./../generated/openapi/typescript-axios";
+import { GetTCO2MetadataRequest } from "./../generated/openapi/typescript-axios";
 
 import { PluginCarbonCredit } from "../plugin-carbon-credit";
 
 import OAS from "../../json/openapi.json";
 
-export interface IGetVCUMetadataEndpointOptions {
+export interface IGetTCO2MetadataEndpointOptions {
   logLevel?: LogLevelDesc;
   plugin: PluginCarbonCredit;
 }
 
-export class GetVCUMetadataEndpoint implements IWebServiceEndpoint {
-  public static readonly CLASS_NAME = "GetVCUMetadataEndpoint";
+export class GetTCO2MetadataEndpoint implements IWebServiceEndpoint {
+  public static readonly CLASS_NAME = "GetTCO2MetadataEndpoint";
   private readonly log: Logger;
 
   public get className(): string {
-    return GetVCUMetadataEndpoint.CLASS_NAME;
+    return GetTCO2MetadataEndpoint.CLASS_NAME;
   }
 
-  constructor(public readonly options: IGetVCUMetadataEndpointOptions) {
+  constructor(public readonly options: IGetTCO2MetadataEndpointOptions) {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(options, `${fnTag} arg options`);
     Checks.truthy(options.plugin, `${fnTag} arg options.plugin`);
@@ -44,9 +44,9 @@ export class GetVCUMetadataEndpoint implements IWebServiceEndpoint {
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public get oasPath(): (typeof OAS.paths)["/api/v1/@hyperledger/cactus-plugin-carbon-credit/get-vcu-metadata"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/@hyperledger/cactus-plugin-carbon-credit/get-tco2-metadata"] {
     return OAS.paths[
-      "/api/v1/@hyperledger/cactus-plugin-carbon-credit/get-vcu-metadata"
+      "/api/v1/@hyperledger/cactus-plugin-carbon-credit/get-tco2-metadata"
     ];
   }
 
@@ -85,12 +85,12 @@ export class GetVCUMetadataEndpoint implements IWebServiceEndpoint {
     const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;
     this.log.debug(reqTag);
 
-    const reqBody: GetVCUMetadataRequest = req.body;
+    const reqBody: GetTCO2MetadataRequest = req.body;
 
     try {
-      const vcuMetadataResponse =
-        await this.options.plugin.getVCUMetadata(reqBody);
-      res.status(200).json(vcuMetadataResponse);
+      const tco2MetadataResponse =
+        await this.options.plugin.getTCO2Metadata(reqBody);
+      res.status(200).json(tco2MetadataResponse);
     } catch (ex) {
       this.log.error(`Crash while serving ${reqTag}`, ex);
       res.status(500).json({

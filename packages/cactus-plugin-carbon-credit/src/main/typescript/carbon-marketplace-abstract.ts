@@ -2,14 +2,14 @@ import type { LogLevelDesc } from "@hyperledger/cactus-common";
 import {
   GetAvailableTCO2sRequest,
   GetAvailableTCO2sResponse,
-  GetVCUMetadataRequest,
+  GetTCO2MetadataRequest,
   SpecificBuyRequest,
   SpecificBuyResponse,
   RandomBuyResponse,
   RandomBuyRequest,
   RetireRequest,
   RetireResponse,
-  VCUMetadata,
+  TCO2Metadata,
   Network,
 } from "./public-api";
 import { ethers } from "ethers";
@@ -82,13 +82,13 @@ export abstract class CarbonMarketplaceAbstract {
   ): Promise<GetAvailableTCO2sResponse>;
 
   /**
-   * Abstract method to get the metadata of a VCU.
-   * @param {string} vcuIdentifier - The identifier of the VCU.
-   * @returns {Promise<VCUMetadata>} A promise that resolves to the metadata of the VCU.
+   * Abstract method to get the metadata of a TCO2.
+   * @param {string} tco2Identifier - The identifier of the TCO2.
+   * @returns {Promise<TCO2Metadata>} A promise that resolves to the metadata of the TCO2.
    * @throws Will throw an error if the retrieval fails.
    * @abstract
    */
-  public abstract getVCUMetadata(
-    req: GetVCUMetadataRequest,
-  ): Promise<VCUMetadata>;
+  public abstract getTCO2Metadata(
+    req: GetTCO2MetadataRequest,
+  ): Promise<TCO2Metadata>;
 }

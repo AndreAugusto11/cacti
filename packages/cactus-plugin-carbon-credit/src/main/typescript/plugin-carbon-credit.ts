@@ -18,8 +18,8 @@ import {
 import { SpecificBuyEndpoint } from "./web-services/specific-buy-endpoint";
 import { RandomBuyEndpoint } from "./web-services/radom-buy-endpoints";
 import { RetireEndpoint } from "./web-services/retire-endpoint";
+import { GetTCO2MetadataEndpoint } from "./web-services/get-tco2-metadata-endpoint";
 import { GetAvailableTCO2sEndpoint } from "./web-services/get-available-tco2s-endpoint";
-import { GetVCUMetadataEndpoint } from "./web-services/get-vcu-metadata-endpoint";
 import { GetPurchasePriceEndpoint } from "./web-services/get-purchase-price";
 import { Web3SigningCredentialPrivateKeyHex } from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
 import {
@@ -30,8 +30,8 @@ import {
   RetireRequest,
   RetireResponse,
   GetAvailableTCO2sResponse,
-  GetVCUMetadataRequest,
-  VCUMetadata,
+  GetTCO2MetadataRequest,
+  TCO2Metadata,
   GetAvailableTCO2sRequest,
   GetPurchasePriceRequest,
   GetPurchasePriceResponse,
@@ -150,7 +150,7 @@ export class PluginCarbonCredit implements ICactusPlugin, IPluginWebService {
       endpoints.push(endpoint);
     }
     {
-      const endpoint = new GetVCUMetadataEndpoint({
+      const endpoint = new GetTCO2MetadataEndpoint({
         plugin: this,
         logLevel: this.options.logLevel,
       });
@@ -320,10 +320,10 @@ export class PluginCarbonCredit implements ICactusPlugin, IPluginWebService {
     return await marketplaceImplementation.getAvailableTCO2s(request);
   }
 
-  public async getVCUMetadata(
-    request: GetVCUMetadataRequest,
+  public async getTCO2Metadata(
+    request: GetTCO2MetadataRequest,
     signer?: ethers.Signer,
-  ): Promise<VCUMetadata> {
+  ): Promise<TCO2Metadata> {
     this.checkSignerOrProvider(signer);
 
     const marketplaceImplementation: CarbonMarketplaceAbstract =
@@ -333,7 +333,7 @@ export class PluginCarbonCredit implements ICactusPlugin, IPluginWebService {
         signer,
       );
 
-    return await marketplaceImplementation.getVCUMetadata(request);
+    return await marketplaceImplementation.getTCO2Metadata(request);
   }
 
   public async getPurchasePrice(
