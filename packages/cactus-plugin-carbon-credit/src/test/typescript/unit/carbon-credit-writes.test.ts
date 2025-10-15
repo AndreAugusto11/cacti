@@ -17,6 +17,8 @@ import { parseUnits } from "ethers/lib/utils";
 import safeStableStringify from "safe-stable-stringify";
 
 const provider = new ethers.providers.JsonRpcProvider("http://127.0.0.1:8545");
+
+// This is the address of a Polygon wallet with a good amount of USDC. It was randomly selected
 const impersonatedAddress = "0xfa0b641678f5115ad8a8de5752016bd1359681b9";
 const signer = provider.getSigner(impersonatedAddress);
 
@@ -46,23 +48,11 @@ describe("Uniswap quote and swap functionality", () => {
   });
 
   test("Specific buy function runs successfully", async () => {
-    const usdcAddress = getTokenAddressBySymbol(Network.Polygon, "USDC");
-    const nctAddress = getTokenAddressBySymbol(Network.Polygon, "NCT");
-
-    const initial_usdc_balance = await getERC20Balance(
-      usdcAddress,
-      impersonatedAddress,
-      provider,
-    );
-    logger.info(`Initial USDC balance: ${initial_usdc_balance}`);
+    const {
+      usdcBalance: initial_usdc_balance,
+      nctBalance: initial_nct_balance,
+    } = await getBalances(impersonatedAddress, provider);
     expect(initial_usdc_balance).toBeGreaterThan(BigInt(0));
-
-    const initial_nct_balance = await getERC20Balance(
-      nctAddress,
-      impersonatedAddress,
-      provider,
-    );
-    logger.info(`Initial NCT balance: ${initial_nct_balance}`);
 
     const tco2sRequest: GetAvailableTCO2sRequest = {
       marketplace: Marketplace.Toucan,
@@ -113,43 +103,19 @@ describe("Uniswap quote and swap functionality", () => {
     expect(specificBuyResponse).toBeDefined();
     expect(specificBuyResponse.txHashSwap).toBeDefined();
 
-    const final_usdc_balance = await getERC20Balance(
-      usdcAddress,
-      impersonatedAddress,
-      provider,
-    );
-    logger.info(`Final USDC balance: ${final_usdc_balance / 10n ** 6n} USDC`);
-    expect(final_usdc_balance).toBeLessThan(initial_usdc_balance);
+    const { usdcBalance: final_usdc_balance, nctBalance: final_nct_balance } =
+      await getBalances(impersonatedAddress, provider);
 
-    const nctBalance = await getERC20Balance(
-      nctAddress,
-      impersonatedAddress,
-      provider,
-    );
-    logger.info(`Final NCT balance: ${nctBalance / 10n ** 18n} NCT`);
-    expect(nctBalance).toBe(0n); // No NCT should remain
+    expect(final_usdc_balance).toBeLessThan(initial_usdc_balance);
+    expect(final_nct_balance).toBe(initial_nct_balance); // No NCT should remain beyond what was there initially
   });
 
   test("Random buy function runs successfully", async () => {
-    const usdcAddress = getTokenAddressBySymbol(Network.Polygon, "USDC");
-    const nctAddress = getTokenAddressBySymbol(Network.Polygon, "NCT");
-
-    const initial_usdc_balance = await getERC20Balance(
-      usdcAddress,
-      impersonatedAddress,
-      provider,
-    );
-    logger.info(
-      `Initial USDC balance: ${initial_usdc_balance / 10n ** 6n} USDC`,
-    );
+    const {
+      usdcBalance: initial_usdc_balance,
+      nctBalance: initial_nct_balance,
+    } = await getBalances(impersonatedAddress, provider);
     expect(initial_usdc_balance).toBeGreaterThan(BigInt(0));
-
-    const initial_nct_balance = await getERC20Balance(
-      nctAddress,
-      impersonatedAddress,
-      provider,
-    );
-    logger.info(`Initial NCT balance: ${initial_nct_balance / 10n ** 18n} NCT`);
 
     const request = {
       marketplace: Marketplace.Toucan,
@@ -168,42 +134,117 @@ describe("Uniswap quote and swap functionality", () => {
       logger.info(`TCO2s purchased: ${safeStableStringify(response.tco2List)}`);
     }
 
-    const final_usdc_balance = await getERC20Balance(
-      usdcAddress,
-      impersonatedAddress,
-      provider,
-    );
-    logger.info(`Final USDC balance: ${final_usdc_balance / 10n ** 6n} USDC`);
+    const { usdcBalance: final_usdc_balance, nctBalance: final_nct_balance } =
+      await getBalances(impersonatedAddress, provider);
+
     expect(final_usdc_balance).toBeLessThan(
       initial_usdc_balance - BigInt(parseUnits("40", 6).toString()), // Expect at least 40 USDC spent (estimate is 48 USDC due to 100 * 0.48 USDC per NCT)
     );
-
-    const nctBalance = await getERC20Balance(
-      nctAddress,
-      impersonatedAddress,
-      provider,
-    );
-    logger.info(`Final NCT balance: ${nctBalance / 10n ** 18n} NCT`);
-    expect(nctBalance).toBe(0n); // No NCT should remain
+    expect(final_nct_balance).toBe(initial_nct_balance); // No NCT should remain beyond what was there initially
   });
 
-  // describe("Retire Functionality", () => {
-  //   test("Retire function returns the correct placeholder data", async () => {
-  //     const request = {
-  //       marketplace: Marketplace.Toucan,
-  //       network: Network.Polygon,
-  //       walletObject: "wallet-address-placeholder",
-  //       objectsList: ["0xABCD", "0x1234"],
-  //       amounts: [100, 200],
-  //       beneficiary: "beneficiary-address-placeholder",
-  //       message: "Offset for my project",
-  //       retirementReason: "Offset for my footprint",
-  //     };
-  //     const response = await plugin.retire(request);
-  //     expect(response).toBeDefined();
-  //     expect(response.txHashRetire).toBe("txHashRetire_placeholder");
-  //     expect(response.retirementCertificate).toBe(
-  //       "retirementCertificate_placeholder",
-  //     );
-  //   });
+  test("Retire function retires purchased TCO2s successfully", async () => {
+    const usdcAddress = getTokenAddressBySymbol(Network.Polygon, "USDC");
+
+    const {
+      usdcBalance: initial_usdc_balance,
+      nctBalance: initial_nct_balance,
+    } = await getBalances(impersonatedAddress, provider);
+    expect(initial_usdc_balance).toBeGreaterThan(BigInt(0));
+
+    // Step 1: Buy some TCO2s using randomBuy
+    const buyRequest = {
+      marketplace: Marketplace.Toucan,
+      network: Network.Polygon,
+      paymentToken: usdcAddress,
+      amount: parseUnits("100", 18).toString(), // Buy 100 tonnes
+    };
+    const buyResponse = await plugin.randomBuy(buyRequest, signer);
+
+    expect(buyResponse).toBeDefined();
+    expect(buyResponse.tco2List).toBeDefined();
+    expect(buyResponse.tco2List!.length).toBeGreaterThan(0);
+
+    const {
+      usdcBalance: post_buy_usdc_balance,
+      nctBalance: post_buy_nct_balance,
+    } = await getBalances(impersonatedAddress, provider);
+    expect(post_buy_usdc_balance).toBeLessThan(initial_usdc_balance);
+    expect(post_buy_nct_balance).toBe(initial_nct_balance);
+
+    // Step 2: Retire the purchased TCO2s
+    const retireItems: Record<string, string> = {};
+    buyResponse.tco2List!.forEach((tco2) => {
+      retireItems[tco2.address] = parseUnits("50", 18).toString(); // Retire 50 tonnes from each
+    });
+
+    const retireRequest = {
+      marketplace: Marketplace.Toucan,
+      network: Network.Polygon,
+      entityName: "Unit Test Entity",
+      tco2s: Object.keys(retireItems),
+      amounts: Object.values(retireItems),
+      beneficiaryAddress: impersonatedAddress,
+      beneficiaryName: "Unit Test Beneficiary",
+      message: "Retired for unit test",
+      retirementReason: "Unit testing of carbon credit plugin",
+    };
+
+    const retireResponse = await plugin.retire(retireRequest, signer);
+
+    expect(retireResponse).toBeDefined();
+    expect(retireResponse.txHashRetires).toBeDefined();
+    expect(retireResponse.txHashRetires.length).toBe(
+      buyResponse.tco2List!.length,
+    );
+    expect(retireResponse.retirementCertificateIds).toBeDefined();
+    expect(retireResponse.retirementCertificateIds!.length).toBe(
+      buyResponse.tco2List!.length,
+    );
+
+    const { usdcBalance: final_usdc_balance, nctBalance: final_nct_balance } =
+      await getBalances(impersonatedAddress, provider);
+
+    expect(final_usdc_balance).toBe(post_buy_usdc_balance); // No USDC change on retire
+    expect(final_nct_balance).toBe(post_buy_nct_balance); // No NCT change on retire
+
+    // Step 3: Verify on-chain that the TCO2s were indeed retired in the NFTs
+    for (const certificateId of retireResponse.retirementCertificateIds!) {
+      const retiredAmount = await getRetiredAmountInNFT(certificateId, signer);
+      expect(retiredAmount).toBe(parseUnits("50", 18).toBigInt());
+      logger.info(
+        `Retirement certificate ${certificateId} has ${retiredAmount.toString()} TCO2s retired.`,
+      );
+    }
+  });
+
+  async function getBalances(
+    address: string,
+    provider: ethers.providers.JsonRpcProvider,
+  ) {
+    const usdcAddress = getTokenAddressBySymbol(Network.Polygon, "USDC");
+    const nctAddress = getTokenAddressBySymbol(Network.Polygon, "NCT");
+
+    const usdcBalance = await getERC20Balance(usdcAddress, address, provider);
+    const nctBalance = await getERC20Balance(nctAddress, address, provider);
+
+    logger.info("\n");
+    logger.info(`********* Balances for ${address} *********`);
+    logger.info(`USDC Balance: ${usdcBalance / 10n ** 6n} USDC`);
+    logger.info(`NCT Balance: ${nctBalance / 10n ** 18n} NCT`);
+    logger.info("****************************************");
+    logger.info("\n");
+
+    return { usdcBalance, nctBalance };
+  }
+
+  async function getRetiredAmountInNFT(nftId: number, signer: ethers.Signer) {
+    const nftContractAddress = "0x5e377f16e4ec6001652befd737341a28889af002"; // Toucan TCO2 NFT contract on Polygon
+    const nftAbi = [
+      "function getRetiredAmount(uint256) view returns (uint256)",
+    ];
+    const nftContract = new ethers.Contract(nftContractAddress, nftAbi, signer);
+    const retiredAmount = await nftContract.getRetiredAmount(nftId);
+    return BigInt(retiredAmount.toString());
+  }
 });

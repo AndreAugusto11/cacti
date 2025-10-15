@@ -309,16 +309,22 @@ export interface RetireRequest {
     'network': Network;
     /**
      * 
+     * @type {string}
+     * @memberof RetireRequest
+     */
+    'entityName': string;
+    /**
+     * 
      * @type {Array<string>}
      * @memberof RetireRequest
      */
     'tco2s': Array<string>;
     /**
      * 
-     * @type {Array<number>}
+     * @type {Array<string>}
      * @memberof RetireRequest
      */
-    'amounts': Array<number>;
+    'amounts': Array<string>;
     /**
      * 
      * @type {string}
@@ -336,7 +342,7 @@ export interface RetireRequest {
      * @type {string}
      * @memberof RetireRequest
      */
-    'message': string;
+    'message'?: string;
     /**
      * 
      * @type {string}
@@ -354,16 +360,16 @@ export interface RetireRequest {
 export interface RetireResponse {
     /**
      * 
-     * @type {string}
+     * @type {Array<string>}
      * @memberof RetireResponse
      */
-    'txHashRetire': string;
+    'txHashRetires': Array<string>;
     /**
      * 
-     * @type {string}
+     * @type {Array<number>}
      * @memberof RetireResponse
      */
-    'retirementCertificate': string;
+    'retirementCertificateIds'?: Array<number>;
 }
 /**
  * 

@@ -19,18 +19,17 @@ var _ MappedNullable = &RetireResponse{}
 
 // RetireResponse struct for RetireResponse
 type RetireResponse struct {
-	TxHashRetire string `json:"txHashRetire"`
-	RetirementCertificate string `json:"retirementCertificate"`
+	TxHashRetires []string `json:"txHashRetires"`
+	RetirementCertificateIds []float32 `json:"retirementCertificateIds,omitempty"`
 }
 
 // NewRetireResponse instantiates a new RetireResponse object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewRetireResponse(txHashRetire string, retirementCertificate string) *RetireResponse {
+func NewRetireResponse(txHashRetires []string) *RetireResponse {
 	this := RetireResponse{}
-	this.TxHashRetire = txHashRetire
-	this.RetirementCertificate = retirementCertificate
+	this.TxHashRetires = txHashRetires
 	return &this
 }
 
@@ -42,52 +41,60 @@ func NewRetireResponseWithDefaults() *RetireResponse {
 	return &this
 }
 
-// GetTxHashRetire returns the TxHashRetire field value
-func (o *RetireResponse) GetTxHashRetire() string {
+// GetTxHashRetires returns the TxHashRetires field value
+func (o *RetireResponse) GetTxHashRetires() []string {
 	if o == nil {
-		var ret string
+		var ret []string
 		return ret
 	}
 
-	return o.TxHashRetire
+	return o.TxHashRetires
 }
 
-// GetTxHashRetireOk returns a tuple with the TxHashRetire field value
+// GetTxHashRetiresOk returns a tuple with the TxHashRetires field value
 // and a boolean to check if the value has been set.
-func (o *RetireResponse) GetTxHashRetireOk() (*string, bool) {
+func (o *RetireResponse) GetTxHashRetiresOk() ([]string, bool) {
 	if o == nil {
 		return nil, false
 	}
-	return &o.TxHashRetire, true
+	return o.TxHashRetires, true
 }
 
-// SetTxHashRetire sets field value
-func (o *RetireResponse) SetTxHashRetire(v string) {
-	o.TxHashRetire = v
+// SetTxHashRetires sets field value
+func (o *RetireResponse) SetTxHashRetires(v []string) {
+	o.TxHashRetires = v
 }
 
-// GetRetirementCertificate returns the RetirementCertificate field value
-func (o *RetireResponse) GetRetirementCertificate() string {
-	if o == nil {
-		var ret string
+// GetRetirementCertificateIds returns the RetirementCertificateIds field value if set, zero value otherwise.
+func (o *RetireResponse) GetRetirementCertificateIds() []float32 {
+	if o == nil || IsNil(o.RetirementCertificateIds) {
+		var ret []float32
 		return ret
 	}
-
-	return o.RetirementCertificate
+	return o.RetirementCertificateIds
 }
 
-// GetRetirementCertificateOk returns a tuple with the RetirementCertificate field value
+// GetRetirementCertificateIdsOk returns a tuple with the RetirementCertificateIds field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *RetireResponse) GetRetirementCertificateOk() (*string, bool) {
-	if o == nil {
+func (o *RetireResponse) GetRetirementCertificateIdsOk() ([]float32, bool) {
+	if o == nil || IsNil(o.RetirementCertificateIds) {
 		return nil, false
 	}
-	return &o.RetirementCertificate, true
+	return o.RetirementCertificateIds, true
 }
 
-// SetRetirementCertificate sets field value
-func (o *RetireResponse) SetRetirementCertificate(v string) {
-	o.RetirementCertificate = v
+// HasRetirementCertificateIds returns a boolean if a field has been set.
+func (o *RetireResponse) HasRetirementCertificateIds() bool {
+	if o != nil && !IsNil(o.RetirementCertificateIds) {
+		return true
+	}
+
+	return false
+}
+
+// SetRetirementCertificateIds gets a reference to the given []float32 and assigns it to the RetirementCertificateIds field.
+func (o *RetireResponse) SetRetirementCertificateIds(v []float32) {
+	o.RetirementCertificateIds = v
 }
 
 func (o RetireResponse) MarshalJSON() ([]byte, error) {
@@ -100,8 +107,10 @@ func (o RetireResponse) MarshalJSON() ([]byte, error) {
 
 func (o RetireResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	toSerialize["txHashRetire"] = o.TxHashRetire
-	toSerialize["retirementCertificate"] = o.RetirementCertificate
+	toSerialize["txHashRetires"] = o.TxHashRetires
+	if !IsNil(o.RetirementCertificateIds) {
+		toSerialize["retirementCertificateIds"] = o.RetirementCertificateIds
+	}
 	return toSerialize, nil
 }
 

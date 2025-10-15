@@ -181,9 +181,60 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public retire(request: RetireRequest): Promise<RetireResponse> {
-    throw new Error("Method not implemented.");
+  public async retire(request: RetireRequest): Promise<RetireResponse> {
+    const fnTag = `${this.className}#retire()`;
+    this.logger.info(`${fnTag} Retiring ${request.tco2s.length} TCO2s...`);
+
+    const responses = [];
+
+    for (let i = 0; i < request.tco2s.length; i++) {
+      const tco2Address = request.tco2s[i];
+      const amount = request.amounts[i];
+
+      const response = await this.toucanClient.retireAndMintCertificate(
+        request.entityName,
+        request.beneficiaryAddress,
+        request.beneficiaryName,
+        request.retirementReason,
+        BigNumber.from(amount),
+        tco2Address,
+      );
+
+      // We need to collect the certificate ID from the event CertificateMinted (uint256 tokenId)
+      // with signature 0x54b249c3cd4a5f80e81d2ad036b251d58d8f5482a926f25d12eabec192cf1ecd
+
+      const certificateId = response.events
+        ?.find(
+          (event) =>
+            event.topics[0] ===
+            "0x54b249c3cd4a5f80e81d2ad036b251d58d8f5482a926f25d12eabec192cf1ecd",
+        )
+        ?.data.toString();
+
+      this.logger.info(
+        `${fnTag} Retired ${amount} units of TCO2 at address ${tco2Address}. Transaction hash: ${response.transactionHash}. Retirement certificate ID: ${certificateId}`,
+      );
+
+      if (!certificateId) {
+        throw new Error(
+          `${fnTag} Certificate ID not found in transaction events.`,
+        );
+      }
+
+      responses.push({
+        tco2Address,
+        amount,
+        certificateId: parseInt(certificateId, 16),
+        txHash: response.transactionHash,
+      });
+    }
+
+    this.logger.info(`${fnTag} Retire operation completed successfully.`);
+
+    return {
+      txHashRetires: responses.map((r) => r.txHash),
+      retirementCertificateIds: responses.map((r) => r.certificateId),
+    };
   }
 
   public async getAvailableTCO2s(
@@ -192,10 +243,10 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
     try {
       const fnTag = `${this.className}#getAvailableTCO2s()`;
       this.logger.info(
-        `Fetching available VCUs for marketplace ${request.marketplace}`,
+        `Fetching available TCO2s for marketplace ${request.marketplace}`,
       );
 
-      this.logger.info(`${fnTag} Fetching available VCUs...`);
+      this.logger.info(`${fnTag} Fetching available TCO2s...`);
 
       // Search for available TCO2s already sorted by quality score
       const tco2Addresses: string[] =
@@ -241,7 +292,7 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
           projectId: p.projectId,
         }));
 
-      this.logger.info(`There are ${projects.length} available VCUs.`);
+      this.logger.info(`There are ${projects.length} available TCO2s.`);
 
       return {
         tco2List,
@@ -249,7 +300,7 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
       };
     } catch (err) {
       this.logger.error("Error in getAvailableTCO2s:", err);
-      throw new Error("Failed to fetch available VCUs");
+      throw new Error("Failed to fetch available TCO2s");
     }
   }
 
@@ -291,6 +342,20 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
     }
   }
 
+  /**
+   * Before any buy function we need to perform a swap of USDC for the specific amount of NCT tokens
+   * using the configured DEX implementation and approve the Toucan NCT pool to spend the acquired NCT tokens.
+   *
+   * This function performs the following steps:
+   * 1. Swaps USDC for the specified amount of NCT tokens.
+   * 2. Logs the USDC and NCT balances after the swap.
+   * 3. Approves the Toucan NCT pool to spend the acquired NCT tokens if necessary.
+   *
+   * @param signer - The ethers.Signer instance used to sign transactions.
+   * @param totalTonnes - The amount of NCT tokens to acquire and approve, specified as a string.
+   * @param network - The network where these actions will be taken.
+   * @returns A promise that resolves to the transaction hash of the swap operation.
+   */
   public async swapTokensAndApproveNCT(
     signer: ethers.Signer,
     totalTonnes: string,

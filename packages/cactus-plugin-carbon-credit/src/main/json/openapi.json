@@ -159,6 +159,9 @@
           "network": {
             "$ref": "#/components/schemas/Network"
           },
+          "entityName": {
+            "type": "string"
+          },
           "tco2s": {
             "type": "array",
             "items": {
@@ -168,7 +171,7 @@
           "amounts": {
             "type": "array",
             "items": {
-              "type": "number"
+              "type": "string"
             }
           },
           "beneficiaryAddress": {
@@ -187,27 +190,33 @@
         "required": [
           "marketplace",
           "network",
+          "entityName",
           "tco2s",
           "amounts",
           "beneficiaryAddress",
           "beneficiaryName",
-          "message",
           "retirementReason"
         ]
       },
       "RetireResponse": {
         "type": "object",
         "properties": {
-          "txHashRetire": {
-            "type": "string"
+          "txHashRetires": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
-          "retirementCertificate": {
-            "type": "string"
+          "retirementCertificateIds": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
           }
         },
         "required": [
-          "txHashRetire",
-          "retirementCertificate"
+          "txHashRetires",
+          "retirementCertificates"
         ]
       },
       "GetAvailableTCO2sRequest": {

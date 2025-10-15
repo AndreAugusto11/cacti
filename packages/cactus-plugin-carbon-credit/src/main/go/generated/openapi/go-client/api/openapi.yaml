@@ -255,8 +255,9 @@ components:
         retirementReason: retirementReason
         marketplace: null
         amounts:
-        - 0.8008281904610115
-        - 0.8008281904610115
+        - amounts
+        - amounts
+        entityName: entityName
         beneficiaryName: beneficiaryName
         beneficiaryAddress: beneficiaryAddress
         message: message
@@ -266,13 +267,15 @@ components:
           $ref: '#/components/schemas/Marketplace'
         network:
           $ref: '#/components/schemas/Network'
+        entityName:
+          type: string
         tco2s:
           items:
             type: string
           type: array
         amounts:
           items:
-            type: number
+            type: string
           type: array
         beneficiaryAddress:
           type: string
@@ -286,24 +289,32 @@ components:
       - amounts
       - beneficiaryAddress
       - beneficiaryName
+      - entityName
       - marketplace
-      - message
       - network
       - retirementReason
       - tco2s
       type: object
     RetireResponse:
       example:
-        txHashRetire: txHashRetire
-        retirementCertificate: retirementCertificate
+        txHashRetires:
+        - txHashRetires
+        - txHashRetires
+        retirementCertificateIds:
+        - 0.8008281904610115
+        - 0.8008281904610115
       properties:
-        txHashRetire:
-          type: string
-        retirementCertificate:
-          type: string
+        txHashRetires:
+          items:
+            type: string
+          type: array
+        retirementCertificateIds:
+          items:
+            type: number
+          type: array
       required:
-      - retirementCertificate
-      - txHashRetire
+      - retirementCertificates
+      - txHashRetires
       type: object
     GetAvailableTCO2sRequest:
       example:

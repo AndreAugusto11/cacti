@@ -21,11 +21,12 @@ var _ MappedNullable = &RetireRequest{}
 type RetireRequest struct {
 	Marketplace Marketplace `json:"marketplace"`
 	Network Network `json:"network"`
+	EntityName string `json:"entityName"`
 	Tco2s []string `json:"tco2s"`
-	Amounts []float32 `json:"amounts"`
+	Amounts []string `json:"amounts"`
 	BeneficiaryAddress string `json:"beneficiaryAddress"`
 	BeneficiaryName string `json:"beneficiaryName"`
-	Message string `json:"message"`
+	Message *string `json:"message,omitempty"`
 	RetirementReason string `json:"retirementReason"`
 }
 
@@ -33,15 +34,15 @@ type RetireRequest struct {
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewRetireRequest(marketplace Marketplace, network Network, tco2s []string, amounts []float32, beneficiaryAddress string, beneficiaryName string, message string, retirementReason string) *RetireRequest {
+func NewRetireRequest(marketplace Marketplace, network Network, entityName string, tco2s []string, amounts []string, beneficiaryAddress string, beneficiaryName string, retirementReason string) *RetireRequest {
 	this := RetireRequest{}
 	this.Marketplace = marketplace
 	this.Network = network
+	this.EntityName = entityName
 	this.Tco2s = tco2s
 	this.Amounts = amounts
 	this.BeneficiaryAddress = beneficiaryAddress
 	this.BeneficiaryName = beneficiaryName
-	this.Message = message
 	this.RetirementReason = retirementReason
 	return &this
 }
@@ -102,6 +103,30 @@ func (o *RetireRequest) SetNetwork(v Network) {
 	o.Network = v
 }
 
+// GetEntityName returns the EntityName field value
+func (o *RetireRequest) GetEntityName() string {
+	if o == nil {
+		var ret string
+		return ret
+	}
+
+	return o.EntityName
+}
+
+// GetEntityNameOk returns a tuple with the EntityName field value
+// and a boolean to check if the value has been set.
+func (o *RetireRequest) GetEntityNameOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.EntityName, true
+}
+
+// SetEntityName sets field value
+func (o *RetireRequest) SetEntityName(v string) {
+	o.EntityName = v
+}
+
 // GetTco2s returns the Tco2s field value
 func (o *RetireRequest) GetTco2s() []string {
 	if o == nil {
@@ -127,9 +152,9 @@ func (o *RetireRequest) SetTco2s(v []string) {
 }
 
 // GetAmounts returns the Amounts field value
-func (o *RetireRequest) GetAmounts() []float32 {
+func (o *RetireRequest) GetAmounts() []string {
 	if o == nil {
-		var ret []float32
+		var ret []string
 		return ret
 	}
 
@@ -138,7 +163,7 @@ func (o *RetireRequest) GetAmounts() []float32 {
 
 // GetAmountsOk returns a tuple with the Amounts field value
 // and a boolean to check if the value has been set.
-func (o *RetireRequest) GetAmountsOk() ([]float32, bool) {
+func (o *RetireRequest) GetAmountsOk() ([]string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -146,7 +171,7 @@ func (o *RetireRequest) GetAmountsOk() ([]float32, bool) {
 }
 
 // SetAmounts sets field value
-func (o *RetireRequest) SetAmounts(v []float32) {
+func (o *RetireRequest) SetAmounts(v []string) {
 	o.Amounts = v
 }
 
@@ -198,28 +223,36 @@ func (o *RetireRequest) SetBeneficiaryName(v string) {
 	o.BeneficiaryName = v
 }
 
-// GetMessage returns the Message field value
+// GetMessage returns the Message field value if set, zero value otherwise.
 func (o *RetireRequest) GetMessage() string {
-	if o == nil {
+	if o == nil || IsNil(o.Message) {
 		var ret string
 		return ret
 	}
-
-	return o.Message
+	return *o.Message
 }
 
-// GetMessageOk returns a tuple with the Message field value
+// GetMessageOk returns a tuple with the Message field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *RetireRequest) GetMessageOk() (*string, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.Message) {
 		return nil, false
 	}
-	return &o.Message, true
+	return o.Message, true
 }
 
-// SetMessage sets field value
+// HasMessage returns a boolean if a field has been set.
+func (o *RetireRequest) HasMessage() bool {
+	if o != nil && !IsNil(o.Message) {
+		return true
+	}
+
+	return false
+}
+
+// SetMessage gets a reference to the given string and assigns it to the Message field.
 func (o *RetireRequest) SetMessage(v string) {
-	o.Message = v
+	o.Message = &v
 }
 
 // GetRetirementReason returns the RetirementReason field value
@@ -258,11 +291,14 @@ func (o RetireRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["marketplace"] = o.Marketplace
 	toSerialize["network"] = o.Network
+	toSerialize["entityName"] = o.EntityName
 	toSerialize["tco2s"] = o.Tco2s
 	toSerialize["amounts"] = o.Amounts
 	toSerialize["beneficiaryAddress"] = o.BeneficiaryAddress
 	toSerialize["beneficiaryName"] = o.BeneficiaryName
-	toSerialize["message"] = o.Message
+	if !IsNil(o.Message) {
+		toSerialize["message"] = o.Message
+	}
 	toSerialize["retirementReason"] = o.RetirementReason
 	return toSerialize, nil
 }
