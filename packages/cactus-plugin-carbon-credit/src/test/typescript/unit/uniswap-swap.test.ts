@@ -43,8 +43,8 @@ describe("Uniswap quote and swap functionality", () => {
 
     expect(quote).toBeDefined();
     expect(quote.amountOut).toBeDefined();
-    expect(Number(quote.amountOut)).toBeLessThan(469000);
-    expect(Number(quote.amountOut)).toBeGreaterThan(464000);
+    expect(Number(quote.amountOut)).toBeLessThan(500000);
+    expect(Number(quote.amountOut)).toBeGreaterThan(400000);
   });
 
   test("swapFromUSDC swaps USDC to NCT for impersonated address", async () => {

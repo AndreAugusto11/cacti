@@ -1,6 +1,7 @@
 import { ethers } from "ethers";
 import { Network } from "./public-api";
 import { TokenInfo, DexInfo } from "./types";
+import { Logger } from "@hyperledger/cactus-common";
 
 export const TOKEN_ADDRESSES: Record<string, Record<string, TokenInfo>> = {
   polygon: {
@@ -171,4 +172,27 @@ export async function approveERC20IfNeeded(
   }
 
   return null; // No approval needed
+}
+
+export async function getBalances(
+  logger: Logger,
+  address: string,
+  provider: ethers.providers.Provider,
+) {
+  const usdcAddress = getTokenAddressBySymbol(Network.Polygon, "USDC");
+  const nctAddress = getTokenAddressBySymbol(Network.Polygon, "NCT");
+
+  const usdcBalance = await getERC20Balance(usdcAddress, address, provider);
+  const nctBalance = await getERC20Balance(nctAddress, address, provider);
+
+  logger.info("\n");
+  logger.info(`********* Balances for ${address} *********`);
+  logger.info(
+    `USDC Balance: ${(Number(usdcBalance) / 10 ** 6).toFixed(6)} USDC`,
+  );
+  logger.info(`NCT Balance: ${(Number(nctBalance) / 10 ** 18).toFixed(6)} NCT`);
+  logger.info("****************************************");
+  logger.info("\n");
+
+  return { usdcBalance, nctBalance };
 }

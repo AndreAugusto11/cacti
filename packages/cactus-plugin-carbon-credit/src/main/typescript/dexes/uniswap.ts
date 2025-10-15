@@ -5,8 +5,8 @@ import { ethers, Signer } from "ethers";
 import dotenv from "dotenv";
 import {
   approveERC20IfNeeded,
+  getBalances,
   getDefaultDex,
-  getERC20Balance,
   getTokenByAddress,
   getTokenBySymbol,
 } from "../utils";
@@ -63,18 +63,7 @@ export class UniswapImpl extends DexAbstract {
 
     const router = new ethers.Contract(routerAddress, routerABI, signer);
 
-    const current_balance = await getERC20Balance(
-      USDC_ADDRESS,
-      await signer.getAddress(),
-      this.provider,
-    );
-
-    this.log.info(
-      `${fnTag} Current USDC balance: ${ethers.utils.formatUnits(
-        current_balance,
-        6,
-      )} USDC`,
-    );
+    await getBalances(this.log, await signer.getAddress(), this.provider);
 
     // Step 2: Approve router to spend USDC (infinite approval for simplicity) if not already approved
 
@@ -100,16 +89,18 @@ export class UniswapImpl extends DexAbstract {
       recipient,
       amountOut: ethers.BigNumber.from(amountOut),
       amountInMaximum: ethers.BigNumber.from(
-        Math.ceil(Number(quote.amountIn) * 1.05).toString(),
+        ((BigInt(quote.amountIn) * 105n) / 100n).toString(),
       ), // add 5% slippage tolerance
       sqrtPriceLimitX96: ethers.BigNumber.from(0),
     };
 
-    this.log.info(`${fnTag} Swap params: ${JSON.stringify(params)}`);
+    this.log.debug(`${fnTag} Swap params: ${JSON.stringify(params)}`);
 
     const tx = await router.exactOutputSingle(params);
     const receipt = await tx.wait();
     this.log.info(`${fnTag} Swap successful: ${receipt.transactionHash}`);
+
+    await getBalances(this.log, await signer.getAddress(), this.provider);
 
     return receipt.transactionHash;
   }
