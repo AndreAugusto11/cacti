@@ -25,6 +25,11 @@ export interface CarbonMarketplaceAbstractOptions {
   dexImpl: DexAbstract;
 }
 
+/**
+ * An abstract class representing a Carbon Credit Marketplace.
+ * This class defines the common interface and operations that any specific
+ * carbon credit marketplace implementation must provide.
+ */
 export abstract class CarbonMarketplaceAbstract {
   /**
    * Logging level.

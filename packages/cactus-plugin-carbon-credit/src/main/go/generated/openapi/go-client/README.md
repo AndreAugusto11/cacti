@@ -102,7 +102,7 @@ Class | Method | HTTP request | Description
  - [RetireResponse](docs/RetireResponse.md)
  - [SpecificBuyRequest](docs/SpecificBuyRequest.md)
  - [SpecificBuyResponse](docs/SpecificBuyResponse.md)
- - [SpecificBuyResponseTco2ListInner](docs/SpecificBuyResponseTco2ListInner.md)
+ - [SpecificBuyResponseAssetAmountsInner](docs/SpecificBuyResponseAssetAmountsInner.md)
  - [VCUMetadata](docs/VCUMetadata.md)
  - [VCUMetadataAttributes](docs/VCUMetadataAttributes.md)
 

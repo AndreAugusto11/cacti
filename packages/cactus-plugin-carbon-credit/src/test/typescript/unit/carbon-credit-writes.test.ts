@@ -57,6 +57,7 @@ describe("Uniswap quote and swap functionality", () => {
     const tco2sRequest: GetAvailableTCO2sRequest = {
       marketplace: Marketplace.Toucan,
       network: Network.Polygon,
+      orderBy: "supply",
     };
 
     const tco2sResponse = await plugin.getAvailableTCO2s(tco2sRequest, signer);
@@ -102,6 +103,12 @@ describe("Uniswap quote and swap functionality", () => {
     );
     expect(specificBuyResponse).toBeDefined();
     expect(specificBuyResponse.txHashSwap).toBeDefined();
+    expect(specificBuyResponse.buyTxHash).toBeDefined();
+    expect(specificBuyResponse.assetAmounts).toBeDefined();
+    expect(specificBuyResponse.assetAmounts.length).toBe(3);
+    for (const assetAmount of specificBuyResponse.assetAmounts) {
+      expect(assetAmount.amount).toBe("90000000000000000000"); // 90 tonnes after 10% fee
+    }
 
     const { usdcBalance: final_usdc_balance, nctBalance: final_nct_balance } =
       await getBalances(logger, impersonatedAddress, provider);
@@ -230,6 +237,7 @@ describe("Uniswap quote and swap functionality", () => {
     const tco2sRequest: GetAvailableTCO2sRequest = {
       marketplace: Marketplace.Toucan,
       network: Network.Polygon,
+      orderBy: "supply",
     };
     const tco2sResponse = await plugin.getAvailableTCO2s(tco2sRequest, signer);
     expect(tco2sResponse).toBeDefined();
@@ -251,9 +259,9 @@ describe("Uniswap quote and swap functionality", () => {
       network: Network.Polygon,
       paymentToken: getTokenAddressBySymbol(Network.Polygon, "USDC"),
       items: {
-        [selectedTCO2s[0].address]: parseUnits("1000", 18).toString(),
-        [selectedTCO2s[1].address]: parseUnits("1000", 18).toString(),
-        [selectedTCO2s[2].address]: parseUnits("1000", 18).toString(),
+        [selectedTCO2s[0].address]: parseUnits("400", 18).toString(),
+        [selectedTCO2s[1].address]: parseUnits("400", 18).toString(),
+        [selectedTCO2s[2].address]: parseUnits("400", 18).toString(),
       },
     };
     const specificBuyResponse = await plugin.specificBuy(
@@ -262,11 +270,17 @@ describe("Uniswap quote and swap functionality", () => {
     );
     expect(specificBuyResponse).toBeDefined();
     expect(specificBuyResponse.txHashSwap).toBeDefined();
+    expect(specificBuyResponse.buyTxHash).toBeDefined();
+    expect(specificBuyResponse.assetAmounts).toBeDefined();
+    expect(specificBuyResponse.assetAmounts.length).toBe(3);
+    for (const assetAmount of specificBuyResponse.assetAmounts) {
+      expect(assetAmount.amount).toBe("360000000000000000000"); // 360 tonnes after 10% fee
+    }
 
     // Step 4: Retire all specifically purchased TCO2s
     const retireItems: Record<string, string> = {};
     selectedTCO2s.forEach((tco2) => {
-      retireItems[tco2.address] = parseUnits("500", 18).toString();
+      retireItems[tco2.address] = parseUnits("200", 18).toString();
     });
 
     const retireRequest = {
@@ -294,7 +308,7 @@ describe("Uniswap quote and swap functionality", () => {
     // Step 5: Verify certificates on-chain
     for (const certificateId of retireResponse.retirementCertificateIds!) {
       const retiredAmount = await getRetiredAmountInNFT(certificateId, signer);
-      expect(retiredAmount).toBe(parseUnits("500", 18).toBigInt());
+      expect(retiredAmount).toBe(parseUnits("200", 18).toBigInt());
       logger.info(
         `Retirement certificate ${certificateId} has ${retiredAmount.toString()} TCO2s retired.`,
       );

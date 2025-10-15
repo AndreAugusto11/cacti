@@ -284,10 +284,10 @@ export interface RandomBuyResponse {
     'assetAmount': string;
     /**
      * 
-     * @type {Array<SpecificBuyResponseTco2ListInner>}
+     * @type {Array<SpecificBuyResponseAssetAmountsInner>}
      * @memberof RandomBuyResponse
      */
-    'tco2List'?: Array<SpecificBuyResponseTco2ListInner>;
+    'tco2List'?: Array<SpecificBuyResponseAssetAmountsInner>;
 }
 /**
  * 
@@ -424,33 +424,27 @@ export interface SpecificBuyResponse {
     'buyTxHash': string;
     /**
      * 
-     * @type {string}
+     * @type {Array<SpecificBuyResponseAssetAmountsInner>}
      * @memberof SpecificBuyResponse
      */
-    'assetAmount': string;
-    /**
-     * 
-     * @type {Array<SpecificBuyResponseTco2ListInner>}
-     * @memberof SpecificBuyResponse
-     */
-    'tco2List'?: Array<SpecificBuyResponseTco2ListInner>;
+    'assetAmounts': Array<SpecificBuyResponseAssetAmountsInner>;
 }
 /**
  * 
  * @export
- * @interface SpecificBuyResponseTco2ListInner
+ * @interface SpecificBuyResponseAssetAmountsInner
  */
-export interface SpecificBuyResponseTco2ListInner {
+export interface SpecificBuyResponseAssetAmountsInner {
     /**
      * 
      * @type {string}
-     * @memberof SpecificBuyResponseTco2ListInner
+     * @memberof SpecificBuyResponseAssetAmountsInner
      */
     'address': string;
     /**
      * 
      * @type {string}
-     * @memberof SpecificBuyResponseTco2ListInner
+     * @memberof SpecificBuyResponseAssetAmountsInner
      */
     'amount': string;
 }

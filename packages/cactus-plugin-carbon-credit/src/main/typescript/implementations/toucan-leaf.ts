@@ -33,6 +33,39 @@ dotenv.config({ path: "packages/cactus-plugin-carbon-credit/.env" });
 
 export interface IToucanLeafOptions extends CarbonMarketplaceAbstractOptions {}
 
+/**
+ * Implements the integration with the Toucan carbon marketplace for buying, retiring, and querying TCO2 tokens.
+ *
+ * The `ToucanLeaf` class provides methods to interact with the Toucan protocol, enabling operations such as:
+ * - Buying specific or random TCO2 tokens via NCT pool swaps.
+ * - Retiring TCO2 tokens and minting retirement certificates.
+ * - Fetching available TCO2 tokens and their metadata.
+ * - Swapping USDC for NCT tokens and handling ERC20 approvals.
+ *
+ * This class is designed to be used as a concrete implementation of the `CarbonMarketplaceAbstract` base class,
+ * and requires a configured signer, DEX implementation, and network options.
+ *
+ * @remarks
+ * - Only supports Polygon, Alfajores, and Celo networks (Toucan SDK limitation).
+ * - Handles logging and error reporting for all major operations.
+ * - Uses the Toucan SDK for contract interactions and event decoding.
+ *
+ * @example
+ * ```typescript
+ * const toucanLeaf = new ToucanLeaf({
+ *   signer,
+ *   dexImpl,
+ *   network: Network.Polygon,
+ *   logLevel: "INFO"
+ * });
+ * const buyResponse = await toucanLeaf.specificBuy({ ... });
+ * ```
+ *
+ * @see {@link CarbonMarketplaceAbstract}
+ * @see {@link ToucanClient}
+ *
+ * @public
+ */
 export class ToucanLeaf extends CarbonMarketplaceAbstract {
   public static CLASS_NAME = "ToucanLeaf";
 
@@ -75,23 +108,6 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
 
   public get className(): string {
     return ToucanLeaf.CLASS_NAME;
-  }
-
-  private convertNetwork(network: Network): ToucanNetwork {
-    switch (network) {
-      case Network.Polygon:
-        return "polygon";
-      case Network.Alfajores:
-        return "alfajores";
-      case Network.Celo:
-        return "celo";
-      // case Network.Base:
-      //   return "base";
-      // case Network.BaseSepolia:
-      //   return "base-sepolia";
-      default:
-        throw new Error(`Unsupported network: ${network}`);
-    }
   }
 
   public async specificBuy(
@@ -139,13 +155,14 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
 
     this.logger.info(`Specific buy operation completed successfully.`);
 
+    const redeemedAmounts = this.filterRedeemedEvents(receipt.events);
+
     return {
       txHashSwap: txHashSwap,
       buyTxHash: receipt.transactionHash,
-      assetAmount: totalTonnes,
-      tco2List: tco2Addresses.map((addr, idx) => ({
-        address: addr,
-        amount: tonnesBigInt[idx].toString(),
+      assetAmounts: redeemedAmounts.map((curr) => ({
+        address: curr.address,
+        amount: curr.amount,
       })),
     };
   }
@@ -241,17 +258,11 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
     request: GetAvailableTCO2sRequest,
   ): Promise<GetAvailableTCO2sResponse> {
     const fnTag = `${this.className}#getAvailableTCO2s()`;
-    this.logger.info(
-      `Fetching available TCO2s for marketplace ${request.marketplace}`,
-    );
-
     this.logger.info(`${fnTag} Fetching available TCO2s...`);
 
-    // Search for available TCO2s already sorted by quality score
     const tco2Addresses: string[] =
       await this.toucanClient.getScoredTCO2s("NCT");
 
-    // Collect basic metadata to enable filtering and sorting
     let projects = await Promise.all(
       tco2Addresses.map(async (addr) => {
         const tco2 = await this.toucanClient.getTCO2Contract(addr);
@@ -265,7 +276,14 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
         const region = attrs[0].region;
         const projectId = attrs[0].projectId;
 
-        return { addr, name, symbol, totalSupply, region, projectId };
+        return {
+          addr,
+          name,
+          symbol,
+          totalSupply: totalSupply.toString(),
+          region,
+          projectId,
+        };
       }),
     );
 
@@ -381,5 +399,87 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
     }
 
     return txHashSwap;
+  }
+
+  /**
+   * Filters and decodes "Redeemed" events from a list of Ethereum events emitted when TCO2s are redeemed
+   * This is done by filtering the events emitted with signature `Redeemed (address account, address erc20, uint256 amount)`
+   * i.e., topic[0] = 0x27d4634c833b7622a0acddbf7f746183625f105945e95c723ad1d5a9f2a0b6fc
+   *
+   * @param events - An array of `ethers.Event` objects or `undefined` from a transaction receipt.
+   * @returns An array of objects containing the `address` and `amount` for each "Redeemed" event found.
+   *
+   * @remarks
+   * - Logs a warning if no events are provided or if no "Redeemed" events are found.
+   * - Uses a specific topic hash to identify "Redeemed" events.
+   * - Decodes event data using the ABI types: `address`, `address`, and `uint256`.
+   */
+  private filterRedeemedEvents(
+    events: ethers.Event[] | undefined,
+  ): { address: string; amount: string }[] {
+    const fnTag = `${this.className}#filterRedeemedEvents()`;
+
+    if (!events) {
+      this.logger.warn(`${fnTag} No events found in the transaction receipt.`);
+      return [];
+    }
+
+    const REDEEMED_TOPIC =
+      "0x27d4634c833b7622a0acddbf7f746183625f105945e95c723ad1d5a9f2a0b6fc";
+
+    const redeemedEvents = events.filter(
+      (event) => event.topics[0] === REDEEMED_TOPIC,
+    );
+
+    if (redeemedEvents.length === 0) {
+      this.logger.warn(`${fnTag} No Redeemed events found.`);
+      return [];
+    }
+
+    const results = redeemedEvents.map((event) => {
+      const decoded = ethers.utils.defaultAbiCoder.decode(
+        ["address", "address", "uint256"],
+        event.data,
+      );
+      return {
+        address: decoded[1],
+        amount: decoded[2].toString(),
+      };
+    });
+
+    this.logger.info(
+      `${fnTag} Found ${results.length} Redeemed events in the transaction.`,
+    );
+
+    return results;
+  }
+
+  /**
+   * Converts a generic Network enum to the specific ToucanNetwork type.
+   *
+   * @param network - The generic Network enum value to convert.
+   * @returns The corresponding ToucanNetwork string value.
+   * @throws An error if the provided network is unsupported.
+   *
+   * @remarks
+   * - Supports conversion for Polygon, Alfajores, and Celo networks.
+   * - Throws an error for unsupported networks such as Base and BaseSepolia
+   *   because Toucan SDK does not currently support them.
+   */
+  private convertNetwork(network: Network): ToucanNetwork {
+    switch (network) {
+      case Network.Polygon:
+        return "polygon";
+      case Network.Alfajores:
+        return "alfajores";
+      case Network.Celo:
+        return "celo";
+      // case Network.Base:
+      //   return "base";
+      // case Network.BaseSepolia:
+      //   return "base-sepolia";
+      default:
+        throw new Error(`Unsupported network: ${network}`);
+    }
   }
 }

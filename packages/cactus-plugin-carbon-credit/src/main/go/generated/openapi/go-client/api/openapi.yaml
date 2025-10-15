@@ -181,27 +181,24 @@ components:
       type: object
     SpecificBuyResponse:
       example:
-        assetAmount: assetAmount
+        assetAmounts:
+        - amount: amount
+          address: address
+        - amount: amount
+          address: address
         buyTxHash: buyTxHash
         txHashSwap: txHashSwap
-        tco2List:
-        - amount: amount
-          address: address
-        - amount: amount
-          address: address
       properties:
         txHashSwap:
           type: string
         buyTxHash:
           type: string
-        assetAmount:
-          type: string
-        tco2List:
+        assetAmounts:
           items:
-            $ref: '#/components/schemas/SpecificBuyResponse_tco2List_inner'
+            $ref: '#/components/schemas/SpecificBuyResponse_assetAmounts_inner'
           type: array
       required:
-      - assetAmount
+      - assetAmounts
       - buyTxHash
       - txHashSwap
       type: object
@@ -241,7 +238,7 @@ components:
           type: string
         tco2List:
           items:
-            $ref: '#/components/schemas/SpecificBuyResponse_tco2List_inner'
+            $ref: '#/components/schemas/SpecificBuyResponse_assetAmounts_inner'
           type: array
       required:
       - assetAmount
@@ -435,7 +432,7 @@ components:
       required:
       - price
       type: object
-    SpecificBuyResponse_tco2List_inner:
+    SpecificBuyResponse_assetAmounts_inner:
       example:
         amount: amount
         address: address

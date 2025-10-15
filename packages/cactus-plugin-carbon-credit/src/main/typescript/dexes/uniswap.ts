@@ -21,6 +21,21 @@ dotenv.config({ path: "packages/cactus-plugin-carbon-credit/.env" });
 
 export interface IUniswapOptions extends DexAbstractOptions {}
 
+/**
+ * An implementation of the DexAbstract class for Uniswap.
+ * This class provides methods to interact with the Uniswap decentralized exchange,
+ * including swapping tokens and fetching quotes.
+ *
+ * @extends DexAbstract
+ * @example
+ * ```typescript
+ * import { UniswapImpl } from "./dexes/uniswap";
+ * import { ethers } from "ethers";
+ *
+ * const provider = new ethers.providers.JsonRpcProvider("<RPC_URL>");
+ * const uniswap = new UniswapImpl({ provider, logLevel: "INFO" });
+ * ```
+ */
 export class UniswapImpl extends DexAbstract {
   public static CLASS_NAME = "UniswapImpl";
 
@@ -66,7 +81,6 @@ export class UniswapImpl extends DexAbstract {
     await getBalances(this.log, await signer.getAddress(), this.provider);
 
     // Step 2: Approve router to spend USDC (infinite approval for simplicity) if not already approved
-
     const approvalTx = await approveERC20IfNeeded(
       USDC_ADDRESS,
       signer,

@@ -67,10 +67,7 @@
           "buyTxHash": {
             "type": "string"
           },
-          "assetAmount": {
-            "type": "string"
-          },
-          "tco2List": {
+          "assetAmounts": {
             "type": "array",
             "items": {
               "type": "object",
@@ -92,7 +89,7 @@
         "required": [
           "txHashSwap",
           "buyTxHash",
-          "assetAmount"
+          "assetAmounts"
         ]
       },
       "RandomBuyRequest": {

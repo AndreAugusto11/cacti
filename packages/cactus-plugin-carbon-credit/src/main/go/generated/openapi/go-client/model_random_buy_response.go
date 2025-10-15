@@ -21,7 +21,7 @@ var _ MappedNullable = &RandomBuyResponse{}
 type RandomBuyResponse struct {
 	TxHashSwap string `json:"txHashSwap"`
 	AssetAmount string `json:"assetAmount"`
-	Tco2List []SpecificBuyResponseTco2ListInner `json:"tco2List,omitempty"`
+	Tco2List []SpecificBuyResponseAssetAmountsInner `json:"tco2List,omitempty"`
 }
 
 // NewRandomBuyResponse instantiates a new RandomBuyResponse object
@@ -92,9 +92,9 @@ func (o *RandomBuyResponse) SetAssetAmount(v string) {
 }
 
 // GetTco2List returns the Tco2List field value if set, zero value otherwise.
-func (o *RandomBuyResponse) GetTco2List() []SpecificBuyResponseTco2ListInner {
+func (o *RandomBuyResponse) GetTco2List() []SpecificBuyResponseAssetAmountsInner {
 	if o == nil || IsNil(o.Tco2List) {
-		var ret []SpecificBuyResponseTco2ListInner
+		var ret []SpecificBuyResponseAssetAmountsInner
 		return ret
 	}
 	return o.Tco2List
@@ -102,7 +102,7 @@ func (o *RandomBuyResponse) GetTco2List() []SpecificBuyResponseTco2ListInner {
 
 // GetTco2ListOk returns a tuple with the Tco2List field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *RandomBuyResponse) GetTco2ListOk() ([]SpecificBuyResponseTco2ListInner, bool) {
+func (o *RandomBuyResponse) GetTco2ListOk() ([]SpecificBuyResponseAssetAmountsInner, bool) {
 	if o == nil || IsNil(o.Tco2List) {
 		return nil, false
 	}
@@ -118,8 +118,8 @@ func (o *RandomBuyResponse) HasTco2List() bool {
 	return false
 }
 
-// SetTco2List gets a reference to the given []SpecificBuyResponseTco2ListInner and assigns it to the Tco2List field.
-func (o *RandomBuyResponse) SetTco2List(v []SpecificBuyResponseTco2ListInner) {
+// SetTco2List gets a reference to the given []SpecificBuyResponseAssetAmountsInner and assigns it to the Tco2List field.
+func (o *RandomBuyResponse) SetTco2List(v []SpecificBuyResponseAssetAmountsInner) {
 	o.Tco2List = v
 }
 

@@ -11,6 +11,11 @@ export interface DexAbstractOptions {
   provider: ethers.providers.Provider;
 }
 
+/**
+ * An abstract class representing a Decentralized Exchange (DEX).
+ * This class defines the common interface and operations that any specific
+ * DEX implementation must provide.
+ */
 export abstract class DexAbstract {
   /**
    * Logging level.

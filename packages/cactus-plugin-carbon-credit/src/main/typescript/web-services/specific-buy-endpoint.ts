@@ -45,36 +45,10 @@ export class SpecificBuyEndpoint implements IWebServiceEndpoint {
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public get oasPath(): (typeof OAS.paths)["/api/v1/@hyperledger/cactus-plugin-carbon-credit/specific-buy"] & {
-    post: {
-      "x-hyperledger-cacti": {
-        http: {
-          path: string;
-          verbLowerCase: string;
-        };
-      };
-      operationId: string;
-      description: string;
-      requestBody: any;
-      responses: any;
-    };
-  } {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/@hyperledger/cactus-plugin-carbon-credit/specific-buy"] {
     return OAS.paths[
       "/api/v1/@hyperledger/cactus-plugin-carbon-credit/specific-buy"
-    ] as (typeof OAS.paths)["/api/v1/@hyperledger/cactus-plugin-carbon-credit/specific-buy"] & {
-      post: {
-        "x-hyperledger-cacti": {
-          http: {
-            path: string;
-            verbLowerCase: string;
-          };
-        };
-        operationId: string;
-        description: string;
-        requestBody: any;
-        responses: any;
-      };
-    };
+    ];
   }
 
   public getPath(): string {

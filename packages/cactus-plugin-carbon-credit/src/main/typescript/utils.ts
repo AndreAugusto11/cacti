@@ -174,6 +174,13 @@ export async function approveERC20IfNeeded(
   return null; // No approval needed
 }
 
+/**
+ * Retrieves the NCT and USDC token balances for a given address.
+ * @param logger - Logger instance for logging
+ * @param address - Address to check balances for
+ * @param provider - Ethers provider instance
+ * @returns Promise resolving to an object containing the USDC and NCT balances
+ */
 export async function getBalances(
   logger: Logger,
   address: string,
