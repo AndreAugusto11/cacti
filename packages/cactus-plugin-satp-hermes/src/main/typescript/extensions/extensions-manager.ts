@@ -7,6 +7,12 @@ import {
 
 import { ExtensionType } from "./extensions-utils";
 import { ICactusPlugin } from "@hyperledger/cactus-core-api";
+import {
+  PluginCarbonCredit,
+  type Network,
+  type NetworkConfig,
+} from "@hyperledger/cactus-plugin-carbon-credit";
+import { Web3SigningCredentialType } from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
 import { ExtensionConfig } from "../services/validation/config-validating-functions/validate-extensions";
 
 export interface IExtensionsManagerOptions {
@@ -17,6 +23,7 @@ export interface IExtensionsManagerOptions {
 export class ExtensionsManager {
   public static readonly CLASS_NAME = "ExtensionsManager";
   private readonly logger: Logger;
+  private readonly logLevel: LogLevelDesc = "INFO";
 
   // Group oracle by the network, a network can have various oracles (bridges)
   private readonly extensions: Map<ExtensionType, ICactusPlugin> = new Map();
@@ -52,11 +59,33 @@ export class ExtensionsManager {
     switch (extension.name) {
       case ExtensionType.CARBON_CREDIT:
         this.logger.info(`${fnTag}: Adding Carbon Credit extension`);
-        // PLACEHOLDER: Add link to specific implementation
+
+        const plugin = new PluginCarbonCredit({
+          instanceId: "carbon-credit-plugin",
+          networksConfig: extension.networksConfig.map((net) => ({
+            network: net.network_name as Network,
+            rpcUrl: net.rpc_url,
+          })) as NetworkConfig[],
+          signingCredential: {
+            type: Web3SigningCredentialType.PrivateKeyHex,
+            ethAccount: extension.signingCredential.ethAccount,
+            secret: extension.signingCredential.secret,
+          },
+          logLevel: this.logLevel,
+        });
+
+        this.extensions.set(ExtensionType.CARBON_CREDIT, plugin);
+
+        this.logger.debug(
+          `${fnTag}: Added Carbon Credit extension with config: ${JSON.stringify(
+            extension,
+            null,
+            2,
+          )}`,
+        );
         break;
       case ExtensionType.DIGITAL_PRODUCT_PASSPORT:
         this.logger.info(`${fnTag}: Adding Digital Product Passport extension`);
-        // PLACEHOLDER: Add link to specific implementation
         break;
       default:
         this.logger.warn(`${fnTag}: Unsupported extension type: ${extension}`);

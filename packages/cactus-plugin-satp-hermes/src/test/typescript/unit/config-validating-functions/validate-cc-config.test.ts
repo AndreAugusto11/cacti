@@ -363,7 +363,7 @@ describe("Validate CC Config", () => {
     );
   });
 
-  it("should not throw when there is no config", async () => {
+  it("should throw when there is no config", async () => {
     const result = await validateCCConfig({ configValue: null }, logger);
     expect(result).toEqual({
       oracleConfig: [],

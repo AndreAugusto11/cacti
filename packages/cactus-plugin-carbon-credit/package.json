@@ -1,0 +1,108 @@
+{
+    "name": "@hyperledger/cactus-plugin-carbon-credit",
+    "version": "0.0.1",
+    "description": "Carbon credit abstraction layer for interacting with different protocol implementations across multiple blockchains",
+    "keywords": [
+        "Hyperledger",
+        "Cacti",
+        "Integration",
+        "Blockchain",
+        "Interoperability",
+        "Distributed Ledger Technology",
+        "Carbon Credits"
+    ],
+    "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
+    "bugs": {
+        "url": "https://github.com/hyperledger-cacti/cacti/issues"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/hyperledger-cacti/cacti.git"
+    },
+    "license": "Apache-2.0",
+    "author": {
+        "name": "Hyperledger Cacti Contributors",
+        "email": "cacti@lists.lfdecentralizedtrust.org",
+        "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
+    },
+    "contributors": [
+        {
+            "name": "André Augusto",
+            "email": "andre.augusto@tecnico.ulisboa.pt",
+            "url": "https://github.com/AndreAugusto11"
+        },
+        {
+            "name": "Edson da Veiga",
+            "email": "edson.da.veiga@tecnico.ulisboa.pt",
+            "url": "https://github.com/edsonCVN"
+        },
+        {
+            "name": "Add your name",
+            "url": "https://github.com/USERNAME1"
+        }
+    ],
+    "main": "dist/lib/main/typescript/index.js",
+    "module": "dist/lib/main/typescript/index.js",
+    "types": "dist/lib/main/typescript/index.d.ts",
+    "files": [
+        "dist/*"
+    ],
+    "scripts": {
+        "codegen": "yarn run --top-level run-s 'codegen:*'",
+        "codegen:openapi": "npm run generate-sdk",
+        "generate-sdk": "run-p 'generate-sdk:*'",
+        "generate-sdk:java": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g java -o ./src/main/java/generated/openapi/java/ --ignore-file-override ../../openapi-generator-ignore",
+        "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --ignore-file-override ../../openapi-generator-ignore",
+        "watch": "npm-watch",
+        "webpack": "npm-run-all webpack:dev",
+        "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
+        "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js",
+        "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
+    },
+    "dependencies": {
+        "@hyperledger/cactus-common": "2.1.0",
+        "@hyperledger/cactus-core": "2.1.0",
+        "@hyperledger/cactus-core-api": "2.1.0",
+        "@hyperledger/cactus-plugin-ledger-connector-ethereum": "2.1.0",
+        "@uniswap/sdk-core": "7.7.2",
+        "@uniswap/v3-core": "1.0.1",
+        "@uniswap/v3-periphery": "1.4.4",
+        "@uniswap/v3-sdk": "3.25.2",
+        "axios": "1.8.4",
+        "dotenv": "17.2.3",
+        "ethers": "5.6.4",
+        "express": "5.1.0",
+        "http-proxy-middleware": "3.0.5",
+        "minimist": "1.2.8",
+        "safe-stable-stringify": "2.5.0",
+        "toucan-sdk": "1.0.6-beta"
+    },
+    "devDependencies": {
+        "@hyperledger/cactus-test-tooling": "2.1.0",
+        "@openapitools/openapi-generator-cli": "2.25.0",
+        "@types/body-parser": "1.19.4",
+        "@types/express": "5.0.1",
+        "@types/js-yaml": "4.0.5",
+        "@types/minimist": "1.2.2",
+        "@types/sanitize-html": "2.9.5",
+        "@types/uuid": "10.0.0",
+        "body-parser": "1.20.3",
+        "npm-run-all": "4.1.5"
+    },
+    "engines": {
+        "node": ">=18",
+        "npm": ">=8"
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "browserMinified": "dist/cactus-plugin-carbon-credit.web.umd.min.js",
+    "mainMinified": "dist/cactus-plugin-carbon-credit.node.umd.min.js",
+    "watch": {
+        "codegen:openapi": {
+            "patterns": [
+                "./src/main/json/openapi.json"
+            ]
+        }
+    }
+}

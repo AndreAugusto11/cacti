@@ -1,0 +1,600 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Hyperledger Cactus Plugin - Carbon Credit",
+    "description": "Implementation for Carbon Credit Plugin logic",
+    "version": "1.0.0",
+    "license": {
+      "name": "Apache-2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "components": {
+    "schemas": {
+      "Marketplace": {
+        "type": "string",
+        "enum": ["Toucan"]
+      },
+      "Network": {
+        "type": "string",
+        "enum": ["polygon", "celo", "alfajores"]
+      },
+      "NetworkConfig": {
+        "type": "object",
+        "properties": {
+          "rpcUrl": {
+            "type": "string"
+          },
+          "network": {
+            "$ref": "#/components/schemas/Network"
+          }
+        },
+        "required": ["rpcUrl", "network"]
+      },
+      "SpecificBuyRequest": {
+        "type": "object",
+        "properties": {
+          "marketplace": {
+            "$ref": "#/components/schemas/Marketplace"
+          },
+          "network": {
+            "$ref": "#/components/schemas/Network"
+          },
+          "paymentToken": {
+            "type": "string"
+          },
+          "items": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "A mapping from address (string) to amount (string)."
+          },
+          "walletObject": {
+            "type": "object",
+            "properties": {
+              "address": { "type": "string" },
+              "privateKey": { "type": "string" },
+              "providerURL": { "type": "string" }
+            },
+            "required": ["privateKey", "providerURL"],
+            "description": "An object containing the private key and provider URL for the wallet."
+          }
+        },
+        "required": [
+          "marketplace",
+          "network",
+          "paymentToken",
+          "items",
+          "walletObject"
+        ]
+      },
+      "SpecificBuyResponse": {
+        "type": "object",
+        "properties": {
+          "txHashSwap": {
+            "type": "string"
+          },
+          "buyTxHash": {
+            "type": "string"
+          },
+          "assetAmounts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "address": {
+                  "type": "string"
+                },
+                "amount": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "address",
+                "amount"
+              ]
+            }
+          }
+        },
+        "required": [
+          "txHashSwap",
+          "buyTxHash",
+          "assetAmounts"
+        ]
+      },
+      "RandomBuyRequest": {
+        "type": "object",
+        "properties": {
+          "marketplace": {
+            "$ref": "#/components/schemas/Marketplace"
+          },
+          "network": {
+            "$ref": "#/components/schemas/Network"
+          },
+          "paymentToken": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "string"
+          },
+          "walletObject": {
+            "type": "object",
+            "properties": {
+              "address": { "type": "string" },
+              "privateKey": { "type": "string" },
+              "providerURL": { "type": "string" }
+            },
+            "required": ["privateKey", "providerURL"],
+            "description": "An object containing the private key and provider URL for the wallet."
+          }
+        },
+        "required": [
+          "marketplace",
+          "network",
+          "amount",
+          "walletObject"
+        ]
+      },
+      "RandomBuyResponse": {
+        "type": "object",
+        "properties": {
+          "txHashSwap": {
+            "type": "string"
+          },
+          "assetAmounts": {
+            "items": {
+              "type": "object",
+              "properties": {
+                "address": {
+                  "type": "string"
+                },
+                "amount": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "address",
+                "amount"
+              ]
+            }
+          },
+          "tco2List": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "address": {
+                  "type": "string"
+                },
+                "amount": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "address",
+                "amount"
+              ]
+            }
+          }
+        },
+        "required": [
+          "txHashSwap",
+          "assetAmounts"
+        ]
+      },
+      "RetireRequest": {
+        "type": "object",
+        "properties": {
+          "marketplace": {
+            "$ref": "#/components/schemas/Marketplace"
+          },
+          "network": {
+            "$ref": "#/components/schemas/Network"
+          },
+          "entityName": {
+            "type": "string"
+          },
+          "tco2s": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "amounts": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "beneficiaryAddress": {
+            "type": "string"
+          },
+          "beneficiaryName": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "retirementReason": {
+            "type": "string"
+          },
+          "walletObject": {
+            "type": "object",
+            "properties": {
+              "address": { "type": "string" },
+              "privateKey": { "type": "string" },
+              "providerURL": { "type": "string" }
+            },
+            "required": ["privateKey", "providerURL"],
+            "description": "An object containing the private key and provider URL for the wallet."
+          }
+        },
+        "required": [
+          "marketplace",
+          "network",
+          "entityName",
+          "tco2s",
+          "amounts",
+          "beneficiaryAddress",
+          "beneficiaryName",
+          "retirementReason",
+          "walletObject"
+        ]
+      },
+      "RetireResponse": {
+        "type": "object",
+        "properties": {
+          "txHashesRetire": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "retirementCertificateIds": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          }
+        },
+        "required": [
+          "txHashesRetire",
+          "retirementCertificateIds"
+        ]
+      },
+      "GetAvailableTCO2sRequest": {
+        "type": "object",
+        "properties": {
+          "marketplace": {
+            "$ref": "#/components/schemas/Marketplace"
+          },
+          "network": {
+            "$ref": "#/components/schemas/Network"
+          },
+          "filterCriteria": {
+            "type": "string",
+            "description": "A string to filter the results by (e.g., supply)."
+          },
+          "orderBy": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "marketplace",
+          "network"
+        ]
+      },
+      "GetAvailableTCO2sResponse": {
+        "type": "object",
+        "properties": {
+          "tco2List": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "address": {
+                  "type": "string"
+                },
+                "projectId": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "address",
+                "projectId"
+              ]
+            }
+          },
+          "totalCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "tco2List",
+          "totalCount"
+        ]
+      },
+      "GetTCO2MetadataRequest": {
+        "type": "object",
+        "properties": {
+          "marketplace": {
+            "$ref": "#/components/schemas/Marketplace"
+          },
+          "network": {
+            "$ref": "#/components/schemas/Network"
+          },
+          "projectIdentifier": {
+            "type": "string"
+          },
+          "tco2Identifier": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "marketplace",
+          "network",
+          "projectIdentifier",
+          "tco2Identifier"
+        ]
+      },
+      "TCO2Metadata": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "symbol": {
+            "type": "string"
+          },
+          "totalSupply": {
+            "type": "number"
+          },
+          "attributes": {
+            "type": "object",
+            "properties": {
+              "region": { "type": "string" },
+              "totalVintageQuantity": { "type": "string" },
+              "methodology": { "type": "string" }
+            }
+          }
+        },
+        "required": [
+          "name",
+          "symbol",
+          "totalSupply",
+          "attributes"
+        ]
+      },
+      "GetPurchasePriceRequest": {
+        "type": "object",
+        "properties": {
+          "marketplace": { "$ref": "#/components/schemas/Marketplace" },
+          "network": { "$ref": "#/components/schemas/Network" },
+          "unit": {
+            "type": "string",
+            "description": "The token address to retrieve the price for."
+          },
+          "amount": {
+            "type": "string",
+            "description": "The amount of Units to retrieve the price for."
+          }
+        },
+        "required": ["marketplace", "network", "unit", "amount"]
+      },
+      "GetPurchasePriceResponse": {
+        "type": "object",
+        "properties": {
+          "price": {
+            "type": "integer",
+            "description": "The current price in USDC for the requested amount."
+          }
+        },
+        "required": ["price"]
+      }
+    }
+  },
+  "paths": {
+    "/api/v1/@hyperledger/cactus-plugin-carbon-credit/specific-buy": {
+      "post": {
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/@hyperledger/cactus-plugin-carbon-credit/specific-buy"
+          }
+        },
+        "operationId": "specificBuyRequest",
+        "description": "Acquire a specific basket of TCO2s from a marketplace.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SpecificBuyRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpecificBuyResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/@hyperledger/cactus-plugin-carbon-credit/random-buy": {
+      "post": {
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/@hyperledger/cactus-plugin-carbon-credit/random-buy"
+          }
+        },
+        "operationId": "randomBuyRequest",
+        "description": "Acquire a random basket of TCO2s from a marketplace.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RandomBuyRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RandomBuyResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/@hyperledger/cactus-plugin-carbon-credit/retire": {
+      "post": {
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/@hyperledger/cactus-plugin-carbon-credit/retire"
+          }
+        },
+        "operationId": "retireRequest",
+        "description": "Retire a specific basket of TCO2s on a marketplace.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RetireRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RetireResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/@hyperledger/cactus-plugin-carbon-credit/get-available-tco2s": {
+      "post": {
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/@hyperledger/cactus-plugin-carbon-credit/get-available-tco2s"
+          }
+        },
+        "operationId": "getAvailableTCO2sRequest",
+        "description": "Get a list of available TCO2s (Tokenized Carbon Offset Units).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetAvailableTCO2sRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response with a list of available TCO2s.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAvailableTCO2sResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/@hyperledger/cactus-plugin-carbon-credit/get-tco2-metadata": {
+      "post": {
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/@hyperledger/cactus-plugin-carbon-credit/get-tco2-metadata"
+          }
+        },
+        "operationId": "getTCO2MetadataRequest",
+        "description": "Get metadata for a specific TCO2.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetTCO2MetadataRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response with VCU metadata.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TCO2Metadata"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/@hyperledger/cactus-plugin-carbon-credit/get-purchase-price": {
+      "post": {
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/@hyperledger/cactus-plugin-carbon-credit/get-purchase-price"
+          }
+        },
+        "operationId": "getPurchasePriceRequest",
+        "description": "Get the purchase price for a specific TCO2.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetPurchasePriceRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response with the purchase price.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetPurchasePriceResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
