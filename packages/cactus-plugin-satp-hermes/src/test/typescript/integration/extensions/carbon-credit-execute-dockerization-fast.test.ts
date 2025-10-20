@@ -32,7 +32,7 @@ import {
 } from "../../constants";
 import { ExtensionType } from "../../../../main/typescript/extensions/extensions-utils";
 import { ExtensionConfig } from "../../../../main/typescript/services/validation/config-validating-functions/validate-extensions";
-import { ethers } from "ethers";
+import { ethers, parseUnits } from "ethers";
 
 const logLevel: LogLevelDesc = "TRACE";
 const log = LoggerProvider.getOrCreate({
@@ -43,18 +43,24 @@ const log = LoggerProvider.getOrCreate({
 let gatewayRunner: SATPGatewayRunner;
 let carbonCreditApi: CarbonCreditApi;
 
-const testNetwork = "test-network";
-
 const gatewayAddress = "gateway.satp-hermes";
 
 const provider = new ethers.JsonRpcProvider("http://127.0.0.1:8545");
 
+const hardhat_addr1 = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
+const hardhat_privateKey1 =
+  "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
+
+const RECIPIENT = ethers.getAddress(hardhat_addr1);
 // This is the address of a Polygon wallet with a good amount of USDC. It was randomly selected
-const impersonatedAddress = "0xfa0b641678f5115ad8a8de5752016bd1359681b9";
+const WHALE = ethers.getAddress(
+  "0xD36ec33c8bed5a9F7B6630855f1533455b98a418",
+);
+
 
 const walletObject = {
-  address: impersonatedAddress,
-  privateKey: "", // private key not needed for impersonated account
+  address: RECIPIENT,
+  privateKey: hardhat_privateKey1,
   providerURL: "http://host.docker.internal:8545",
 };
 
@@ -74,6 +80,7 @@ afterAll(async () => {
 
 beforeAll(async () => {
   const address: Address = `http://${gatewayAddress}`;
+  await provider.send("hardhat_impersonateAccount", ["0xD36ec33c8bed5a9F7B6630855f1533455b98a418"]);
 
   // gateway setup:
   const gatewayIdentity = {
@@ -129,14 +136,12 @@ beforeAll(async () => {
     emitContainerLogs: true,
     configPath: files.configPath,
     logsPath: files.logsPath,
-    ontologiesPath: files.ontologiesPath,
-    networkName: testNetwork,
     url: gatewayAddress,
   };
 
   gatewayRunner = new SATPGatewayRunner(gatewayRunnerOptions);
   log.debug("starting gatewayRunner...");
-  await gatewayRunner.start(true);
+  await gatewayRunner.start(false);
   log.debug("gatewayRunner started successfully");
 
   carbonCreditApi = new CarbonCreditApi(
@@ -144,6 +149,35 @@ beforeAll(async () => {
       basePath: `http://${await gatewayRunner.getOApiHost()}`,
     }),
   );
+
+  // Fund the impersonated test account with USDC by impersonating a real holder on the fork
+  const ERC20_ABI = [
+    "function transfer(address to, uint256 value) returns (bool)",
+    "function balanceOf(address) view returns (uint256)",
+  ];
+
+  await provider.send("hardhat_impersonateAccount", [WHALE]);
+  // Give 1 MATIC for gas
+  await provider.send("hardhat_setBalance", [
+    WHALE,
+    `0x${ethers.parseEther("1").toString(16)}`,
+  ]);
+
+  const amount = parseUnits("1000000", 6);
+
+  const usdc = new ethers.Contract(
+    getTokenAddressBySymbol(Network.Polygon, "USDC"),
+    ERC20_ABI,
+    new ethers.JsonRpcSigner(provider, WHALE),
+  );
+
+  // Transfer 1,000,000 USDC (USDC has 6 decimals)
+  await usdc.transfer(RECIPIENT, amount, {
+    gasLimit: 200000,
+    gasPrice: parseUnits("30", "gwei"),
+  });
+
+  await provider.send("hardhat_stopImpersonatingAccount", [WHALE]);
 }, CI_TEST_TIMEOUT);
 
 describe("Test reachability to Carbon Credit Plugin through SATP Gateway extensions functionality", () => {
@@ -163,37 +197,54 @@ describe("Test reachability to Carbon Credit Plugin through SATP Gateway extensi
   });
 
   test("Retire function retires specifically purchased TCO2s successfully via API client", async () => {
-    await provider.send("hardhat_impersonateAccount", [impersonatedAddress]);
-
-    // Step 2: Get available TCO2s and select 3
+    // Step 2: Get available TCO2s and select 3 with enough liquidity
     const tco2sResponse = await carbonCreditApi.getAvailableTCO2sRequest({
       marketplace: Marketplace.Toucan,
       network: Network.Polygon,
       orderBy: "supply",
     });
+
     expect(tco2sResponse).toBeDefined();
     expect(Array.isArray(tco2sResponse.data.tco2List)).toBeTrue();
     expect(tco2sResponse.data.totalCount).toBeGreaterThan(0);
 
-    const randomIndex = Math.floor(
-      Math.random() * (tco2sResponse.data.tco2List.length - 3),
-    );
-    const selectedTCO2s = tco2sResponse.data.tco2List.slice(
-      randomIndex,
-      randomIndex + 3,
-    );
+    const ERC20_ABI = ["function balanceOf(address) view returns (uint256)"];
+    const NCT_ADDRESS = getTokenAddressBySymbol(Network.Polygon, "NCT");
+    const required = parseUnits("400", 18);
 
-    // Step 3: Buy each TCO2 specifically
-    const items: Record<string, string> = {};
-    selectedTCO2s.forEach((tco2) => {
-      items[tco2.address] = ethers.parseUnits("400", 18).toString();
-    });
+    const selectedTCO2s: any[] = [];
+    for (const t of tco2sResponse.data.tco2List) {
+      try {
+        const tco2Contract = new ethers.Contract(
+          t.address,
+          ERC20_ABI,
+          provider,
+        );
+        const bal = await tco2Contract.balanceOf(NCT_ADDRESS);
+        if (bal >= required) {
+          selectedTCO2s.push(t);
+          if (selectedTCO2s.length >= 3) break;
+        }
+      } catch (err) {
+        log.warn(`Failed to query balance for ${t.address}: ${err}`);
+      }
+    }
+
+    if (selectedTCO2s.length < 3) {
+      fail(
+        `Not enough TCO2s with sufficient liquidity found. Found only ${selectedTCO2s.length}`,
+      );
+    }
 
     const specificBuyResponse = await carbonCreditApi.specificBuyRequest({
       marketplace: Marketplace.Toucan,
       network: Network.Polygon,
       paymentToken: getTokenAddressBySymbol(Network.Polygon, "USDC"),
-      items,
+      items: {
+        [selectedTCO2s[0].address]: parseUnits("400", 18).toString(),
+        [selectedTCO2s[1].address]: parseUnits("400", 18).toString(),
+        [selectedTCO2s[2].address]: parseUnits("400", 18).toString(),
+      },
       walletObject: walletObject,
     });
     expect(specificBuyResponse).toBeDefined();
@@ -208,7 +259,7 @@ describe("Test reachability to Carbon Credit Plugin through SATP Gateway extensi
     // Step 4: Retire all specifically purchased TCO2s
     const retireItems: Record<string, string> = {};
     selectedTCO2s.forEach((tco2) => {
-      retireItems[tco2.address] = ethers.parseUnits("200", 18).toString();
+      retireItems[tco2.address] = parseUnits("200", 18).toString();
     });
 
     const retireRequest = {
@@ -217,7 +268,7 @@ describe("Test reachability to Carbon Credit Plugin through SATP Gateway extensi
       entityName: "Unit Test Entity",
       tco2s: Object.keys(retireItems),
       amounts: Object.values(retireItems),
-      beneficiaryAddress: impersonatedAddress,
+      beneficiaryAddress: RECIPIENT,
       beneficiaryName: "Unit Test Beneficiary",
       message: "Retired for specific buy test",
       retirementReason: "Unit testing specific buy retire",

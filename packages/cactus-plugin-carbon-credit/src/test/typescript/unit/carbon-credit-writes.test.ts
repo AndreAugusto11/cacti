@@ -75,7 +75,7 @@ describe("Uniswap quote and swap functionality", () => {
           {
             marketplace: Marketplace.Toucan,
             network: Network.Polygon,
-            projectIdentifier: t.projectId,
+            projectIdentifier: t.projectDetails.projectId,
             tco2Identifier: t.address,
           },
           signer,
@@ -238,7 +238,7 @@ describe("Uniswap quote and swap functionality", () => {
     } = await getBalances(logger, impersonatedAddress, provider);
     expect(initial_usdc_balance).toBeGreaterThan(BigInt(0));
 
-    // Step 2: Get available TCO2s and select 3
+    // Step 2: Get available TCO2s and select 3 with enough liquidity
     const tco2sRequest: GetAvailableTCO2sRequest = {
       marketplace: Marketplace.Toucan,
       network: Network.Polygon,
@@ -249,14 +249,27 @@ describe("Uniswap quote and swap functionality", () => {
     expect(tco2sResponse.tco2List).toBeInstanceOf(Array);
     expect(tco2sResponse.totalCount).toBeGreaterThan(0);
 
-    const randomIndex = Math.floor(
-      Math.random() * (tco2sResponse.tco2List.length - 3),
-    );
+    const ERC20_ABI = ["function balanceOf(address) view returns (uint256)"];
+    const NCT_ADDRESS = getTokenAddressBySymbol(Network.Polygon, "NCT");
+    const required = ethers.utils.parseUnits("400", 18);
 
-    const selectedTCO2s = tco2sResponse.tco2List.slice(
-      randomIndex,
-      randomIndex + 3,
-    );
+    const selectedTCO2s: any[] = [];
+    for (const t of tco2sResponse.tco2List) {
+      try {
+        const tco2Contract = new ethers.Contract(
+          t.address,
+          ERC20_ABI,
+          provider,
+        );
+        const bal: ethers.BigNumber = await tco2Contract.balanceOf(NCT_ADDRESS);
+        if (bal.gte(required)) {
+          selectedTCO2s.push(t);
+          if (selectedTCO2s.length >= 3) break;
+        }
+      } catch (err) {
+        logger.warn(`Failed to query balance for ${t.address}: ${err}`);
+      }
+    }
 
     // Step 3: Buy each TCO2 specifically
     const specificBuyRequest = {

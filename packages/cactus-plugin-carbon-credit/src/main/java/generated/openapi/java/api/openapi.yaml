@@ -377,9 +377,17 @@ components:
         totalCount: 0.8008281904610115
         tco2List:
         - address: address
-          projectId: projectId
+          projectDetails:
+            projectDescription: projectDescription
+            projectType: projectType
+            projectName: projectName
+            projectId: projectId
         - address: address
-          projectId: projectId
+          projectDetails:
+            projectDescription: projectDescription
+            projectType: projectType
+            projectName: projectName
+            projectId: projectId
       properties:
         tco2List:
           items:
@@ -499,18 +507,40 @@ components:
       - address
       - amount
       type: object
+    GetAvailableTCO2sResponse_tco2List_inner_projectDetails:
+      example:
+        projectDescription: projectDescription
+        projectType: projectType
+        projectName: projectName
+        projectId: projectId
+      properties:
+        projectId:
+          type: string
+        projectName:
+          type: string
+        projectDescription:
+          type: string
+        projectType:
+          type: string
+      required:
+      - projectId
+      type: object
     GetAvailableTCO2sResponse_tco2List_inner:
       example:
         address: address
-        projectId: projectId
+        projectDetails:
+          projectDescription: projectDescription
+          projectType: projectType
+          projectName: projectName
+          projectId: projectId
       properties:
         address:
           type: string
-        projectId:
-          type: string
+        projectDetails:
+          $ref: '#/components/schemas/GetAvailableTCO2sResponse_tco2List_inner_projectDetails'
       required:
       - address
-      - projectId
+      - projectDetails
       type: object
     TCO2Metadata_attributes:
       example:

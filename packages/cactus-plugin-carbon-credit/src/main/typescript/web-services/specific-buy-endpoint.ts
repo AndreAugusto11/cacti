@@ -94,8 +94,8 @@ export class SpecificBuyEndpoint implements IWebServiceEndpoint {
     const provider = new ethers.providers.JsonRpcProvider(
       reqBody.walletObject.providerURL,
     );
-    // const signer = new ethers.Wallet(reqBody.walletObject.privateKey, provider);
-    const signer = provider.getSigner(reqBody.walletObject.address);
+
+    const signer = new ethers.Wallet(reqBody.walletObject.privateKey, provider);
 
     try {
       const specificBuyResponse = await this.options.plugin.specificBuy(

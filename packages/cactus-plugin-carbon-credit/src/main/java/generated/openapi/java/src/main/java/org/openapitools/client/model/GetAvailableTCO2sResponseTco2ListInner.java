@@ -21,6 +21,7 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
+import org.openapitools.client.model.GetAvailableTCO2sResponseTco2ListInnerProjectDetails;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -50,15 +51,15 @@ import org.openapitools.client.JSON;
 /**
  * GetAvailableTCO2sResponseTco2ListInner
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2025-10-15T20:54:09.533419+01:00[Europe/Lisbon]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2025-10-20T11:26:47.000372+01:00[Europe/Lisbon]")
 public class GetAvailableTCO2sResponseTco2ListInner {
   public static final String SERIALIZED_NAME_ADDRESS = "address";
   @SerializedName(SERIALIZED_NAME_ADDRESS)
   private String address;
 
-  public static final String SERIALIZED_NAME_PROJECT_ID = "projectId";
-  @SerializedName(SERIALIZED_NAME_PROJECT_ID)
-  private String projectId;
+  public static final String SERIALIZED_NAME_PROJECT_DETAILS = "projectDetails";
+  @SerializedName(SERIALIZED_NAME_PROJECT_DETAILS)
+  private GetAvailableTCO2sResponseTco2ListInnerProjectDetails projectDetails;
 
   public GetAvailableTCO2sResponseTco2ListInner() {
   }
@@ -84,24 +85,24 @@ public class GetAvailableTCO2sResponseTco2ListInner {
   }
 
 
-  public GetAvailableTCO2sResponseTco2ListInner projectId(String projectId) {
+  public GetAvailableTCO2sResponseTco2ListInner projectDetails(GetAvailableTCO2sResponseTco2ListInnerProjectDetails projectDetails) {
     
-    this.projectId = projectId;
+    this.projectDetails = projectDetails;
     return this;
   }
 
    /**
-   * Get projectId
-   * @return projectId
+   * Get projectDetails
+   * @return projectDetails
   **/
   @javax.annotation.Nonnull
-  public String getProjectId() {
-    return projectId;
+  public GetAvailableTCO2sResponseTco2ListInnerProjectDetails getProjectDetails() {
+    return projectDetails;
   }
 
 
-  public void setProjectId(String projectId) {
-    this.projectId = projectId;
+  public void setProjectDetails(GetAvailableTCO2sResponseTco2ListInnerProjectDetails projectDetails) {
+    this.projectDetails = projectDetails;
   }
 
 
@@ -116,12 +117,12 @@ public class GetAvailableTCO2sResponseTco2ListInner {
     }
     GetAvailableTCO2sResponseTco2ListInner getAvailableTCO2sResponseTco2ListInner = (GetAvailableTCO2sResponseTco2ListInner) o;
     return Objects.equals(this.address, getAvailableTCO2sResponseTco2ListInner.address) &&
-        Objects.equals(this.projectId, getAvailableTCO2sResponseTco2ListInner.projectId);
+        Objects.equals(this.projectDetails, getAvailableTCO2sResponseTco2ListInner.projectDetails);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(address, projectId);
+    return Objects.hash(address, projectDetails);
   }
 
   @Override
@@ -129,7 +130,7 @@ public class GetAvailableTCO2sResponseTco2ListInner {
     StringBuilder sb = new StringBuilder();
     sb.append("class GetAvailableTCO2sResponseTco2ListInner {\n");
     sb.append("    address: ").append(toIndentedString(address)).append("\n");
-    sb.append("    projectId: ").append(toIndentedString(projectId)).append("\n");
+    sb.append("    projectDetails: ").append(toIndentedString(projectDetails)).append("\n");
     sb.append("}");
     return sb.toString();
   }
@@ -153,12 +154,12 @@ public class GetAvailableTCO2sResponseTco2ListInner {
     // a set of all properties/fields (JSON key names)
     openapiFields = new HashSet<String>();
     openapiFields.add("address");
-    openapiFields.add("projectId");
+    openapiFields.add("projectDetails");
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>();
     openapiRequiredFields.add("address");
-    openapiRequiredFields.add("projectId");
+    openapiRequiredFields.add("projectDetails");
   }
 
  /**
@@ -191,9 +192,8 @@ public class GetAvailableTCO2sResponseTco2ListInner {
       if (!jsonObj.get("address").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format("Expected the field `address` to be a primitive type in the JSON string but got `%s`", jsonObj.get("address").toString()));
       }
-      if (!jsonObj.get("projectId").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format("Expected the field `projectId` to be a primitive type in the JSON string but got `%s`", jsonObj.get("projectId").toString()));
-      }
+      // validate the required field `projectDetails`
+      GetAvailableTCO2sResponseTco2ListInnerProjectDetails.validateJsonObject(jsonObj.getAsJsonObject("projectDetails"));
   }
 
   public static class CustomTypeAdapterFactory implements TypeAdapterFactory {

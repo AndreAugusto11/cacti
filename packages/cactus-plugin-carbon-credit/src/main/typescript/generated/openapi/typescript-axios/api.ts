@@ -95,10 +95,41 @@ export interface GetAvailableTCO2sResponseTco2ListInner {
     'address': string;
     /**
      * 
-     * @type {string}
+     * @type {GetAvailableTCO2sResponseTco2ListInnerProjectDetails}
      * @memberof GetAvailableTCO2sResponseTco2ListInner
      */
+    'projectDetails': GetAvailableTCO2sResponseTco2ListInnerProjectDetails;
+}
+/**
+ * 
+ * @export
+ * @interface GetAvailableTCO2sResponseTco2ListInnerProjectDetails
+ */
+export interface GetAvailableTCO2sResponseTco2ListInnerProjectDetails {
+    /**
+     * 
+     * @type {string}
+     * @memberof GetAvailableTCO2sResponseTco2ListInnerProjectDetails
+     */
     'projectId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetAvailableTCO2sResponseTco2ListInnerProjectDetails
+     */
+    'projectName'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetAvailableTCO2sResponseTco2ListInnerProjectDetails
+     */
+    'projectDescription'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetAvailableTCO2sResponseTco2ListInnerProjectDetails
+     */
+    'projectType'?: string;
 }
 /**
  * 

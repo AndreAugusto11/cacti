@@ -33,20 +33,27 @@ if (!ALCHEMY_API_KEY) {
 
 const provider = new ethers.providers.JsonRpcProvider("http://127.0.0.1:8545");
 
+const hardhat_addr1 = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
+const hardhat_privateKey1 =
+  "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
+
+const RECIPIENT = ethers.utils.getAddress(hardhat_addr1);
 // This is the address of a Polygon wallet with a good amount of USDC. It was randomly selected
-const impersonatedAddress = "0xfa0b641678f5115ad8a8de5752016bd1359681b9";
+const WHALE = ethers.utils.getAddress(
+  "0xD36ec33c8bed5a9F7B6630855f1533455b98a418",
+);
 
 const walletObject = {
-  address: impersonatedAddress,
-  privateKey: "", // private key not needed for impersonated account
+  address: RECIPIENT,
+  privateKey: hardhat_privateKey1,
   providerURL: "http://127.0.0.1:8545",
 };
 
 const pluginOptions: IPluginCarbonCreditOptions = {
   instanceId: "test-instance-id",
   signingCredential: {
-    ethAccount: "0xb5271339c211cC1EEeD30a2f9f447063a5faD1F0",
-    secret: "739ed7c97109f28bc8f13b354b30bbd01a47061be7676c3c3934aa4a56540de4",
+    ethAccount: RECIPIENT,
+    secret: hardhat_privateKey1,
   } as Web3SigningCredentialPrivateKeyHex,
   networksConfig: [
     {
@@ -65,7 +72,7 @@ const logger = new Logger({
 // Create a Polygon hardfork on block 77660000, and start the node on port 8545
 
 describe("Carbon Credit API Integration Tests", () => {
-  let apiClient: CarbonCreditApi, connector: PluginCarbonCredit;
+  let apiClient: CarbonCreditApi;
   const expressApp = express();
   expressApp.use(bodyParser.json({ limit: "250mb" }));
   const server = http.createServer(expressApp);
@@ -91,24 +98,48 @@ describe("Carbon Credit API Integration Tests", () => {
 
     apiClient = new CarbonCreditApi(new Configuration({ basePath: apiHost }));
 
-    await provider.send("hardhat_impersonateAccount", [impersonatedAddress]);
+    // Fund the impersonated test account with USDC by impersonating a real holder on the fork
+    const ERC20_ABI = [
+      "function transfer(address to, uint256 value) returns (bool)",
+      "function balanceOf(address) view returns (uint256)",
+    ];
+
+    await getBalances(logger, RECIPIENT, provider);
+
+    await provider.send("hardhat_impersonateAccount", [WHALE]);
+    await provider.send("hardhat_setBalance", [
+      WHALE,
+      ethers.utils.parseEther("1").toHexString(), // give 1 MATIC for gas
+    ]);
+
+    const amount = ethers.BigNumber.from("1000000").mul(
+      ethers.BigNumber.from(10).pow(6),
+    );
+
+    const usdc = new ethers.Contract(
+      getTokenAddressBySymbol(Network.Polygon, "USDC"),
+      ERC20_ABI,
+      provider.getSigner(WHALE),
+    );
+
+    // Transfer 1,000,000 USDC (USDC has 6 decimals)
+    await usdc.transfer(RECIPIENT, amount, {
+      gasLimit: 200000,
+      gasPrice: ethers.utils.parseUnits("30", "gwei"),
+    });
+
+    await getBalances(logger, RECIPIENT, provider);
+
+    await provider.send("hardhat_stopImpersonatingAccount", [WHALE]);
   });
 
   afterAll(async () => {
     await Servers.shutdown(server);
-
-    await provider.send("hardhat_stopImpersonatingAccount", [
-      impersonatedAddress,
-    ]);
   });
 
   test("performs specificBuy using apiClient and checks balances", async () => {
     // Get initial balances
-    const balancesResponse = await getBalances(
-      logger,
-      impersonatedAddress,
-      provider,
-    );
+    const balancesResponse = await getBalances(logger, RECIPIENT, provider);
     const initial_usdc_balance = BigInt(balancesResponse.usdcBalance);
     const initial_nct_balance = BigInt(balancesResponse.nctBalance);
     expect(initial_usdc_balance).toBeGreaterThan(BigInt(0));
@@ -132,7 +163,7 @@ describe("Carbon Credit API Integration Tests", () => {
         apiClient.getTCO2MetadataRequest({
           marketplace: Marketplace.Toucan,
           network: Network.Polygon,
-          projectIdentifier: t.projectId,
+          projectIdentifier: t.projectDetails.projectId,
           tco2Identifier: t.address,
         }),
       ),
@@ -169,7 +200,7 @@ describe("Carbon Credit API Integration Tests", () => {
     // Get final balances
     const finalBalancesResponse = await getBalances(
       logger,
-      impersonatedAddress,
+      RECIPIENT,
       provider,
     );
     const final_usdc_balance = BigInt(finalBalancesResponse.usdcBalance);
@@ -184,7 +215,7 @@ describe("Carbon Credit API Integration Tests", () => {
     const {
       usdcBalance: initial_usdc_balance,
       nctBalance: initial_nct_balance,
-    } = await getBalances(logger, impersonatedAddress, provider);
+    } = await getBalances(logger, RECIPIENT, provider);
     expect(initial_usdc_balance).toBeGreaterThan(BigInt(0));
 
     // Prepare randomBuy request
@@ -206,7 +237,7 @@ describe("Carbon Credit API Integration Tests", () => {
 
     // Get final balances
     const { usdcBalance: final_usdc_balance, nctBalance: final_nct_balance } =
-      await getBalances(logger, impersonatedAddress, provider);
+      await getBalances(logger, RECIPIENT, provider);
 
     expect(final_usdc_balance).toBeLessThan(
       initial_usdc_balance -
@@ -221,7 +252,7 @@ describe("Carbon Credit API Integration Tests", () => {
     const {
       usdcBalance: initial_usdc_balance,
       nctBalance: initial_nct_balance,
-    } = await getBalances(logger, impersonatedAddress, provider);
+    } = await getBalances(logger, RECIPIENT, provider);
     expect(initial_usdc_balance).toBeGreaterThan(BigInt(0));
 
     // Step 1: Buy some TCO2s using randomBuy via API client
@@ -241,7 +272,7 @@ describe("Carbon Credit API Integration Tests", () => {
     const {
       usdcBalance: post_buy_usdc_balance,
       nctBalance: post_buy_nct_balance,
-    } = await getBalances(logger, impersonatedAddress, provider);
+    } = await getBalances(logger, RECIPIENT, provider);
     expect(post_buy_usdc_balance).toBeLessThan(initial_usdc_balance);
     expect(post_buy_nct_balance).toBe(initial_nct_balance);
 
@@ -257,7 +288,7 @@ describe("Carbon Credit API Integration Tests", () => {
       entityName: "Unit Test Entity",
       tco2s: Object.keys(retireItems),
       amounts: Object.values(retireItems),
-      beneficiaryAddress: impersonatedAddress,
+      beneficiaryAddress: RECIPIENT,
       beneficiaryName: "Unit Test Beneficiary",
       message: "Retired for unit test",
       retirementReason: "Unit testing of carbon credit plugin",
@@ -277,7 +308,7 @@ describe("Carbon Credit API Integration Tests", () => {
     );
 
     const { usdcBalance: final_usdc_balance, nctBalance: final_nct_balance } =
-      await getBalances(logger, impersonatedAddress, provider);
+      await getBalances(logger, RECIPIENT, provider);
 
     expect(final_usdc_balance).toBe(post_buy_usdc_balance);
     expect(final_nct_balance).toBe(post_buy_nct_balance);
@@ -297,10 +328,10 @@ describe("Carbon Credit API Integration Tests", () => {
     const {
       usdcBalance: initial_usdc_balance,
       nctBalance: initial_nct_balance,
-    } = await getBalances(logger, impersonatedAddress, provider);
+    } = await getBalances(logger, RECIPIENT, provider);
     expect(initial_usdc_balance).toBeGreaterThan(BigInt(0));
 
-    // Step 2: Get available TCO2s and select 3
+    // Step 2: Get available TCO2s and select 3 with enough liquidity
     const tco2sResponse = await apiClient.getAvailableTCO2sRequest({
       marketplace: Marketplace.Toucan,
       network: Network.Polygon,
@@ -310,18 +341,32 @@ describe("Carbon Credit API Integration Tests", () => {
     expect(Array.isArray(tco2sResponse.data.tco2List)).toBeTrue();
     expect(tco2sResponse.data.totalCount).toBeGreaterThan(0);
 
-    const randomIndex = Math.floor(
-      Math.random() * (tco2sResponse.data.tco2List.length - 3),
-    );
-    const selectedTCO2s = tco2sResponse.data.tco2List.slice(
-      randomIndex,
-      randomIndex + 3,
-    );
+    const ERC20_ABI = ["function balanceOf(address) view returns (uint256)"];
+    const NCT_ADDRESS = getTokenAddressBySymbol(Network.Polygon, "NCT");
+    const required = ethers.utils.parseUnits("40", 18);
 
-    // Step 3: Buy each TCO2 specifically
+    const selectedTCO2s: any[] = [];
+    for (const t of tco2sResponse.data.tco2List) {
+      try {
+        const tco2Contract = new ethers.Contract(
+          t.address,
+          ERC20_ABI,
+          provider,
+        );
+        const bal: ethers.BigNumber = await tco2Contract.balanceOf(NCT_ADDRESS);
+        if (bal.gte(required)) {
+          selectedTCO2s.push(t);
+          if (selectedTCO2s.length >= 3) break;
+        }
+      } catch (err) {
+        logger.warn(`Failed to query balance for ${t.address}: ${err}`);
+      }
+    }
+
+    // Step 3: Buy each selected TCO2 specifically for 40 units (18 decimals)
     const items: Record<string, string> = {};
     selectedTCO2s.forEach((tco2) => {
-      items[tco2.address] = ethers.utils.parseUnits("400", 18).toString();
+      items[tco2.address] = required.toString();
     });
 
     const specificBuyResponse = await apiClient.specificBuyRequest({
@@ -337,13 +382,13 @@ describe("Carbon Credit API Integration Tests", () => {
     expect(specificBuyResponse.data.assetAmounts).toBeDefined();
     expect(specificBuyResponse.data.assetAmounts.length).toBe(3);
     for (const assetAmount of specificBuyResponse.data.assetAmounts) {
-      expect(assetAmount.amount).toBe("360000000000000000000");
+      expect(assetAmount.amount).toBe("36000000000000000000");
     }
 
     // Step 4: Retire all specifically purchased TCO2s
     const retireItems: Record<string, string> = {};
     selectedTCO2s.forEach((tco2) => {
-      retireItems[tco2.address] = ethers.utils.parseUnits("200", 18).toString();
+      retireItems[tco2.address] = ethers.utils.parseUnits("5", 18).toString();
     });
 
     const retireRequest = {
@@ -352,7 +397,7 @@ describe("Carbon Credit API Integration Tests", () => {
       entityName: "Unit Test Entity",
       tco2s: Object.keys(retireItems),
       amounts: Object.values(retireItems),
-      beneficiaryAddress: impersonatedAddress,
+      beneficiaryAddress: RECIPIENT,
       beneficiaryName: "Unit Test Beneficiary",
       message: "Retired for specific buy test",
       retirementReason: "Unit testing specific buy retire",
@@ -379,7 +424,7 @@ describe("Carbon Credit API Integration Tests", () => {
     }
 
     const { usdcBalance: final_usdc_balance, nctBalance: final_nct_balance } =
-      await getBalances(logger, impersonatedAddress, provider);
+      await getBalances(logger, RECIPIENT, provider);
 
     expect(final_usdc_balance).toBeLessThan(initial_usdc_balance);
     expect(final_nct_balance).toBe(initial_nct_balance);

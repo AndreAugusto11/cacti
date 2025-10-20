@@ -8,7 +8,7 @@
 | Name | Type | Description | Notes |
 |------------ | ------------- | ------------- | -------------|
 |**address** | **String** |  |  |
-|**projectId** | **String** |  |  |
+|**projectDetails** | [**GetAvailableTCO2sResponseTco2ListInnerProjectDetails**](GetAvailableTCO2sResponseTco2ListInnerProjectDetails.md) |  |  |
 
 
 

@@ -8,6 +8,7 @@ docs/DefaultApi.md
 docs/GetAvailableTCO2sRequest.md
 docs/GetAvailableTCO2sResponse.md
 docs/GetAvailableTCO2sResponseTco2ListInner.md
+docs/GetAvailableTCO2sResponseTco2ListInnerProjectDetails.md
 docs/GetPurchasePriceRequest.md
 docs/GetPurchasePriceResponse.md
 docs/GetTCO2MetadataRequest.md
@@ -54,6 +55,7 @@ src/main/java/org/openapitools/client/model/AbstractOpenApiSchema.java
 src/main/java/org/openapitools/client/model/GetAvailableTCO2sRequest.java
 src/main/java/org/openapitools/client/model/GetAvailableTCO2sResponse.java
 src/main/java/org/openapitools/client/model/GetAvailableTCO2sResponseTco2ListInner.java
+src/main/java/org/openapitools/client/model/GetAvailableTCO2sResponseTco2ListInnerProjectDetails.java
 src/main/java/org/openapitools/client/model/GetPurchasePriceRequest.java
 src/main/java/org/openapitools/client/model/GetPurchasePriceResponse.java
 src/main/java/org/openapitools/client/model/GetTCO2MetadataRequest.java

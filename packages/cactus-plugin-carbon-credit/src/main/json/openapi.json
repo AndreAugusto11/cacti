@@ -299,13 +299,30 @@
                 "address": {
                   "type": "string"
                 },
-                "projectId": {
-                  "type": "string"
+                "projectDetails": {
+                  "type": "object",
+                  "properties": {
+                    "projectId": {
+                      "type": "string"
+                    },
+                    "projectName": {
+                      "type": "string"
+                    },
+                    "projectDescription": {
+                      "type": "string"
+                    },
+                    "projectType": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "projectId"
+                  ]
                 }
               },
               "required": [
                 "address",
-                "projectId"
+                "projectDetails"
               ]
             }
           },

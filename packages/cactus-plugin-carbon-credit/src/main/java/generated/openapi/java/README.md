@@ -2,7 +2,7 @@
 
 Hyperledger Cactus Plugin - Carbon Credit
 - API version: 1.0.0
-  - Build date: 2025-10-15T20:54:09.533419+01:00[Europe/Lisbon]
+  - Build date: 2025-10-20T11:26:47.000372+01:00[Europe/Lisbon]
 
 Implementation for Carbon Credit Plugin logic
 
@@ -127,6 +127,7 @@ Class | Method | HTTP request | Description
  - [GetAvailableTCO2sRequest](docs/GetAvailableTCO2sRequest.md)
  - [GetAvailableTCO2sResponse](docs/GetAvailableTCO2sResponse.md)
  - [GetAvailableTCO2sResponseTco2ListInner](docs/GetAvailableTCO2sResponseTco2ListInner.md)
+ - [GetAvailableTCO2sResponseTco2ListInnerProjectDetails](docs/GetAvailableTCO2sResponseTco2ListInnerProjectDetails.md)
  - [GetPurchasePriceRequest](docs/GetPurchasePriceRequest.md)
  - [GetPurchasePriceResponse](docs/GetPurchasePriceResponse.md)
  - [GetTCO2MetadataRequest](docs/GetTCO2MetadataRequest.md)

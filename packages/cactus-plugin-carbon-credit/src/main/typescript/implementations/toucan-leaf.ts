@@ -305,7 +305,13 @@ export class ToucanLeaf extends CarbonMarketplaceAbstract {
       .slice(0, Math.min(Number(request.limit ?? 100), 100))
       .map((p) => ({
         address: p.addr,
-        projectId: p.projectId,
+        projectDetails: {
+          projectId: p.projectId,
+          // TODO: The remaining information requires connection to GraphQL
+          // projectName
+          // projectDescription
+          // projectType
+        },
       }));
 
     this.logger.info(`There are ${projects.length} available TCO2s.`);

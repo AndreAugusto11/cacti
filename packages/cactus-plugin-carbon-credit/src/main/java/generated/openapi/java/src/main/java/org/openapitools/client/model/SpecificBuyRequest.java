@@ -55,7 +55,7 @@ import org.openapitools.client.JSON;
 /**
  * SpecificBuyRequest
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2025-10-15T20:54:09.533419+01:00[Europe/Lisbon]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2025-10-20T11:26:47.000372+01:00[Europe/Lisbon]")
 public class SpecificBuyRequest {
   public static final String SERIALIZED_NAME_MARKETPLACE = "marketplace";
   @SerializedName(SERIALIZED_NAME_MARKETPLACE)

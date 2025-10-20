@@ -51,7 +51,7 @@ import org.openapitools.client.JSON;
 /**
  * NetworkConfig
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2025-10-15T20:54:09.533419+01:00[Europe/Lisbon]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2025-10-20T11:26:47.000372+01:00[Europe/Lisbon]")
 public class NetworkConfig {
   public static final String SERIALIZED_NAME_RPC_URL = "rpcUrl";
   @SerializedName(SERIALIZED_NAME_RPC_URL)
