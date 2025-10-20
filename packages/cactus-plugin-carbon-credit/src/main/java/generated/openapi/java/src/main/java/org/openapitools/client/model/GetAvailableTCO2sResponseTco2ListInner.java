@@ -51,7 +51,7 @@ import org.openapitools.client.JSON;
 /**
  * GetAvailableTCO2sResponseTco2ListInner
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2025-10-20T11:26:47.000372+01:00[Europe/Lisbon]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2025-10-20T16:45:32.252160+01:00[Europe/Lisbon]")
 public class GetAvailableTCO2sResponseTco2ListInner {
   public static final String SERIALIZED_NAME_ADDRESS = "address";
   @SerializedName(SERIALIZED_NAME_ADDRESS)

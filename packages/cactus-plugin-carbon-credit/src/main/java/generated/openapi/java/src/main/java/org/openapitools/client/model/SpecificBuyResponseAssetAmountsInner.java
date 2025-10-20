@@ -50,7 +50,7 @@ import org.openapitools.client.JSON;
 /**
  * SpecificBuyResponseAssetAmountsInner
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2025-10-20T11:26:47.000372+01:00[Europe/Lisbon]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2025-10-20T16:45:32.252160+01:00[Europe/Lisbon]")
 public class SpecificBuyResponseAssetAmountsInner {
   public static final String SERIALIZED_NAME_ADDRESS = "address";
   @SerializedName(SERIALIZED_NAME_ADDRESS)

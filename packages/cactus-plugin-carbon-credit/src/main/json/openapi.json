@@ -17,7 +17,7 @@
       },
       "Network": {
         "type": "string",
-        "enum": ["polygon", "celo", "alfajores"]
+        "enum": ["Polygon", "Celo", "Alfajores"]
       },
       "NetworkConfig": {
         "type": "object",

@@ -149,9 +149,9 @@ components:
       type: string
     Network:
       enum:
-      - polygon
-      - celo
-      - alfajores
+      - Polygon
+      - Celo
+      - Alfajores
       type: string
     NetworkConfig:
       properties:

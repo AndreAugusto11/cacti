@@ -29,11 +29,11 @@ import com.google.gson.stream.JsonWriter;
 @JsonAdapter(Network.Adapter.class)
 public enum Network {
   
-  POLYGON("polygon"),
+  POLYGON("Polygon"),
   
-  CELO("celo"),
+  CELO("Celo"),
   
-  ALFAJORES("alfajores");
+  ALFAJORES("Alfajores");
 
   private String value;
 

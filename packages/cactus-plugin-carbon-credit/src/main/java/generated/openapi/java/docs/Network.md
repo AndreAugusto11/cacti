@@ -5,11 +5,11 @@
 ## Enum
 
 
-* `POLYGON` (value: `"polygon"`)
+* `POLYGON` (value: `"Polygon"`)
 
-* `CELO` (value: `"celo"`)
+* `CELO` (value: `"Celo"`)
 
-* `ALFAJORES` (value: `"alfajores"`)
+* `ALFAJORES` (value: `"Alfajores"`)
 
 
 

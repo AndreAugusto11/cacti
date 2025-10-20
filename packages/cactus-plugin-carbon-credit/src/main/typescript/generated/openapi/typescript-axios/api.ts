@@ -230,9 +230,9 @@ export type Marketplace = typeof Marketplace[keyof typeof Marketplace];
  */
 
 export const Network = {
-    Polygon: 'polygon',
-    Celo: 'celo',
-    Alfajores: 'alfajores'
+    Polygon: 'Polygon',
+    Celo: 'Celo',
+    Alfajores: 'Alfajores'
 } as const;
 
 export type Network = typeof Network[keyof typeof Network];
