@@ -117,6 +117,4 @@ Live Reloading the GUI Application
 12.  At this point if you modify the source code of the GUI application under the `./examples/cactus-example-supply-chain-frontend/` path it will automatically reload the browser window (you will need to paste in the JWT again when this happens)
 
 
-[Previous](../examples.md "Examples") [Next](../governance.md "Governance")
-
 * * *

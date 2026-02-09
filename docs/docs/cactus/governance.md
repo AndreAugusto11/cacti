@@ -67,6 +67,4 @@ We require that changes to this document require a three-quarters approval of th
 
 This document is based on the Hyperledger Fabric governance document, with some substantial changes.
 
-[Previous](examples/supply-chain-app.md "Hyperledger Cactus Example - Supply Chain App") [Next](code-of-conduct.md "Code of Conduct Guidelines")
-
 * * *

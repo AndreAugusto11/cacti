@@ -8,7 +8,7 @@
     * review [How to Ask Technical Questions to Get Quality Answers](https://opensource.com/life/16/10/how-ask-technical-questions) prior to asking your question.
 
 ## Chat
-[Hyperledger’s Discord server](https://discord.gg/hyperledger) is the place to go for real-time chat about everything from quick help to involved discussions.
+[Linux Foundatation Decentralized Trust Discord server](https://discord.gg/hyperledger) is the place to go for real-time chat about everything from quick help to involved discussions.
 
 For general Hyperledger Cacti discussions, join the Discord server and visit #Cacti.
 

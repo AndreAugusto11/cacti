@@ -133,6 +133,4 @@ One such common trait is the client side component of the routing that decides w
 
 @see — https ://github.com/OpenAPITools/openapi-generator/blob/v5.0.0/docs/generators/typescript-axios.md
 
-[Previous](../packages.md "Cactus Components") [Next](cactus-cmd-api-server.md "@hyperledger/cactus-cmd-api-server")
-
 * * *

@@ -535,6 +535,4 @@ This distribution is published under the Apache License Version 2.0 found in the
 7\. Acknowledgments
 --------------------------------------------------------------------
 
-[Previous](cactus-plugin-ledger-connector-corda.md "@hyperledger/cactus-plugin-ledger-connector-corda") [Next](cactus-test-api-client.md "@hyperledger/cactus-test-api-client")
-
 * * *

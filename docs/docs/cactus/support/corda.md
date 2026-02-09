@@ -42,6 +42,4 @@ Corda 4.5
 
   
 
-[Previous](besu.md "Besu Support") [Next](fabric.md "Fabric Support")
-
 * * *

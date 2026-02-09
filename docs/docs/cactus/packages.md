@@ -16,6 +16,4 @@ This section contains the components to form Hyperledger Cactus.
 *   [Test CMD Api Server](packages/cactus-test-cmd-api-server.md)
 *   [Test Tooling](packages/cactus-test-tooling.md)
 
-[Previous](regulatory-and-industry-initiatives-reading-list.md "Regulatory and Industry Initiatives Reading List") [Next](packages/cactus-api-client.md "@hyperledger/cactus-api-client")
-
 * * *

@@ -436,6 +436,4 @@ The node is what has an identity within your PKI and can be made up of 1-N API s
 
 **Yes.** You can deploy your plugin written in any language, anywhere as long as it is accessible over the network and does come with a Typescript API client that you can use to install into the API server as a proxy for an in-process plugin implementation.
 
-[Previous](cactus-api-client.md "@hyperledger/cactus-api-client") [Next](cactus-common.md "@hyperledger/cactus-common")
-
 * * *

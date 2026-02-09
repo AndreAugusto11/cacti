@@ -115,6 +115,4 @@ xDai 1.8.27
 
   
 
-[Previous](fabric.md "Fabric Support") [Next](substrate.md "Substrate Support")
-
 * * *

@@ -9,6 +9,4 @@ This section contains the ledger supported versions for connectors in Hyperledge
 *   [xDai](support/xdai.md)
 *   [Substrate](support/substrate.md)
 
-[Previous](packages/cactus-test-tooling.md "@hyperledger/cactus-test-tooling") [Next](support/besu.md "Besu Support")
-
 * * *

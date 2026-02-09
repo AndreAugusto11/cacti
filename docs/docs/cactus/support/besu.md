@@ -123,6 +123,4 @@ Besu 1.5.1 and Orion 1.6
 
   
 
-[Previous](../support.md "Ledger Support for Connectors") [Next](corda.md "Corda Support")
-
 * * *

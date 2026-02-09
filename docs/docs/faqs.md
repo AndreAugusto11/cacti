@@ -8,7 +8,7 @@ Cacti was created as the merer of two pre-existing Hyperledger projects in late 
 
 ### Who is involved in maintaining Cacti?
 
-The project is maintained jointly by members of Accenture, Fujitsu, and IBM, with contributions from a diverse community of open-source developers and researchers.
+The project is maintained jointly by members of Accenture, Fujitsu, IBM, and INESC-ID (Tecnico Lisboa) with contributions from a diverse community of open-source developers and researchers.
 
 ## Usage and Logistics
 

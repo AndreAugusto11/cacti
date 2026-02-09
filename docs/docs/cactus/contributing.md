@@ -492,6 +492,4 @@ Further details:
 *   https://spin.atomicobject.com/2016/12/16/reproducible-builds-npm-yarn/
     
 
-[Previous](code-of-conduct.md "Code of Conduct Guidelines") [Next](whitepaper.md "Hyperledger Cactus White Paper")
-
 * * *
