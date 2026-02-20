@@ -12,12 +12,12 @@
 
 ## Hyperledger Cacti Build Instructions
 
-This is the place to start if you want to give Cactus a spin on your local
+This is the place to start if you want to give Cacti a spin on your local
 machine or if you are planning on contributing.
 
-> This is not a guide for `using` Cactus for your projects that have business logic
-> but rather a guide for people who want to make changes to the code of Cactus.
-> If you are just planning on using Cactus as an npm dependency for your project,
+> This is not a guide for `using` Cacti for your projects that have business logic
+> but rather a guide for people who want to make changes to the code of Cacti.
+> If you are just planning on using Cacti as an npm dependency for your project,
 > then you might not need this guide at all.
 
 The project uses Typescript for both back-end and front-end components.
@@ -79,7 +79,7 @@ The `npm run watch` script in action:
   * Open the command palette (`F1` or `Ctrl+Shift+P`) and select **"Reopen in Container"**
   * Wait for the container setup and start developing!
     
-### MacOS 
+### Software Requirements
 
 _Unless explicitly stated otherwise, each bullet will apply to both Intel and ARM Macs. In bullets where there is a difference in the installation process it will be noted._
 * Git
@@ -105,12 +105,9 @@ _Unless explicitly stated otherwise, each bullet will apply to both Intel and AR
   * [Installing Go for Mac](https://go.dev/dl/)
     * _Under featured downloads on the page above choose between the ARM64 or x86-64 option based on your machine._
   * [Adding Environment Variable and Go extensions](https://code.visualstudio.com/docs/languages/go)
-
-### Linux 
-* Insert Linux instructions here 
-
-### Windows 
-* Insert Linux instructions here 
+* Foundry
+  * [Installing Foundry for Mac](https://www.getfoundry.sh/introduction/getting-started)
+    * _Follow the instructions for installing foundryup and then run `foundryup` to install the latest version of foundry._
 
 ### Random Windows specific issues not covered here
 
@@ -122,7 +119,7 @@ We test most frequently on Ubuntu 20.04 LTS
 * Clone the repository
 
 ```sh
-git clone https://github.com/hyperledger/cactus.git
+git clone https://github.com/hyperledger-cacti/cacti.git
 ```
 
 
@@ -136,7 +133,7 @@ git config --system core.longpaths true
 * Change directories to the project root
 
 ```sh
-cd cactus
+cd cacti
 ```
 
 * Run this command to enable corepack (Corepack is included by default with all Node.js installs, but is currently opt-in.)
@@ -164,8 +161,8 @@ npx tap --ts --timeout=600 packages/cactus-test-plugin-htlc-eth-besu/src/test/ty
 ```
 
 *You can also start the API server* and verify more complex scenarios with an
-arbitrary list of plugins loaded into Cactus. This is useful for when you intend
-to develop your plugin either as a Cactus maintained plugin or one on your own.
+arbitrary list of plugins loaded into Cacti. This is useful for when you intend
+to develop your plugin either as a Cacti maintained plugin or one on your own.
 
 ```sh
 npm run generate-api-server-config
@@ -182,7 +179,7 @@ that you can fit into a generic JSON object).
 Notice that to include a plugin, all you need is specify it's npm package name.
 This is important since it allows you to have your own plugins in their respective,
 independent Github repositories and npm packages where you do not have to seek
-explicit approval from the Cactus maintainers to create/maintain your plugin at all.
+explicit approval from the Cacti maintainers to create/maintain your plugin at all.
 
 Once you are satisfied with the `.config.json` file's contents you can just:
 
@@ -211,12 +208,12 @@ At this point, with the running API server, you can
 ## Build Script Decision Tree
 
 The `npm run watch` script should cover 99% of the cases when it comes to working
-on Cactus code and having it recompile, but for that last 1% you'll need to
+on Cacti code and having it recompile, but for that last 1% you'll need to
 get your hands dirty with the rest of the build scripts. Usually this is only
 needed when you are adding new dependencies (npm packages) as part of something
 that you are implementing.
 
-There are a lot of different build scripts in Cactus in order to provide contributors
+There are a lot of different build scripts in Cacti in order to provide contributors
 fine(r) grained control over what parts of the framework they wish build.
 
 > Q: Why the complexity of so many build scripts?
@@ -225,7 +222,7 @@ fine(r) grained control over what parts of the framework they wish build.
 always, but that would be a nightmare to wait for after having changed a single
 line of code for example.
 
-To figure out which script could work for rebuilding Cactus, please follow
+To figure out which script could work for rebuilding Cacti, please follow
 the following decision tree (and keep in mind that we have `npm run watch` too)
 
 ![Build Script Decision Tree](./docs/images/build-script-decision-tree-2021-03-06.png)
@@ -243,6 +240,6 @@ Keep in mind that the SSH upterm session should come after the checkout step (us
 
 By creating a PR for the edited `ci.yml` file, this will the CI to run their tests. There are two ways to navigate to CIs.
   1) Go to the PR and click the `checks` tab
-  2) Go to the `Actions` tab within the main Hyperledger Cactus Repository
+  2) Go to the `Actions` tab within the main Hyperledger Cacti Repository
 
-Click on the `CI Cactus workflow`. There should be a new job you've created be listed underneath the `build (ubuntu-22.04)` jobs. Click on the the new job (what's you've named your build) and locate the SSH Session within the `Setup Upterm Session` dropdown. Copy the SSH command that start with `ssh` and ends in `.dev` (ex. ssh **********:***********@uptermd.upterm.dev). Open your OS and paste the SSH command script in order to begin an upterm session.
+Click on the `CI Cacti workflow`. There should be a new job you've created be listed underneath the `build (ubuntu-22.04)` jobs. Click on the the new job (what's you've named your build) and locate the SSH Session within the `Setup Upterm Session` dropdown. Copy the SSH command that start with `ssh` and ends in `.dev` (ex. ssh **********:***********@uptermd.upterm.dev). Open your OS and paste the SSH command script in order to begin an upterm session.
